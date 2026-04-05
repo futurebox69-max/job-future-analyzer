@@ -1,0 +1,47 @@
+name: 월간 직업 시장 컨텍스트 업데이트
+
+on:
+  # 매월 1일 오전 9시 (KST = UTC+9, 즉 UTC 00:00)
+  schedule:
+    - cron: '0 0 1 * *'
+  # 수동 실행 (테스트용)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '강제 업데이트 (캐시 무시)'
+        required: false
+        default: 'false'
+
+jobs:
+  update-context:
+    name: 뉴스·법령·산업 동향 크롤링 및 AI 요약
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 🟢 Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 의존성 설치
+        run: npm ci
+
+      - name: 🔄 컨텍스트 업데이트 실행
+        run: npx tsx scripts/update-context.ts
+        env:
+          JOB_ANALYZER_API_KEY: ${{ secrets.JOB_ANALYZER_API_KEY }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+
+      - name: ✅ 완료 알림
+        if: success()
+        run: echo "직업 시장 컨텍스트 업데이트 성공: $(date '+%Y-%m-%d')"
+
+      - name: ❌ 실패 알림
+        if: failure()
+        run: echo "업데이트 실패! GitHub Actions 로그를 확인하세요."

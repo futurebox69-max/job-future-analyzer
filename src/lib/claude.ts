@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { AnalysisResultSchema, AnalysisResult, DIMENSION_WEIGHTS, getRiskLevel } from "@/types/analysis";
+import { getLatestContext, formatContextForPrompt } from "@/lib/context";
 
 function getClient() {
   const apiKey = process.env.JOB_ANALYZER_API_KEY;
@@ -125,11 +126,20 @@ export async function analyzeJob(
   job: string,
   mode: "adult" | "youth"
 ): Promise<AnalysisResult> {
+  // 월간 업데이트 컨텍스트 로드 (없으면 null → 생략)
+  const marketContext = await getLatestContext();
+  const contextBlock = marketContext ? formatContextForPrompt(marketContext) : "";
+
+  // 시스템 프롬프트에 최신 동향 주입
+  const systemWithContext = contextBlock
+    ? `${SYSTEM_PROMPT}\n\n${contextBlock}`
+    : SYSTEM_PROMPT;
+
   const response = await getClient().messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 16000,
     temperature: 0.1,
-    system: SYSTEM_PROMPT,
+    system: systemWithContext,
     messages: [
       {
         role: "user",
