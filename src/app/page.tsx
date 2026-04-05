@@ -1,65 +1,180 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import ModeToggle from "@/components/ModeToggle";
+import JobInput from "@/components/JobInput";
+import GaugeChart from "@/components/GaugeChart";
+import SixDimensions from "@/components/SixDimensions";
+import IcebergModel from "@/components/IcebergModel";
+import TransitionCards from "@/components/TransitionCards";
+import TimeHorizonChart from "@/components/TimeHorizonChart";
+import SkillGapAnalysis from "@/components/SkillGapAnalysis";
+import IncomeImpact from "@/components/IncomeImpact";
+import IndustryContext from "@/components/IndustryContext";
+import ConsultingNote from "@/components/ConsultingNote";
+import { AnalysisResult, AnalyzeResponse } from "@/types/analysis";
 
 export default function Home() {
+  const [mode, setMode] = useState<"adult" | "youth">("adult");
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAnalyze = async (job: string) => {
+    setIsLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job, mode }),
+      });
+
+      const data: AnalyzeResponse = await response.json();
+
+      if (!data.success || !data.data) {
+        setError(data.error ?? "분석에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+
+      setResult(data.data);
+
+      setTimeout(() => {
+        document.getElementById("result-section")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    } catch {
+      setError("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen" style={{ background: "#0A0A0F" }}>
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,99,255,0.15) 0%, transparent 60%)",
+        }}
+      />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
+        {/* 헤더 */}
+        <header className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <ModeToggle mode={mode} onChange={(m) => { setMode(m); setResult(null); setError(null); }} />
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">
+            내 직업의{" "}
+            <span
+              style={{
+                background: "linear-gradient(135deg, #6C63FF, #A78BFA)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              미래
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-white/50 text-lg">
+            {mode === "youth"
+              ? "관심 직업의 AI 대체 가능성을 확인하고 진로를 설계하세요"
+              : "내 직업의 AI 대체 가능성을 8차원으로 심층 분석합니다"}
           </p>
+        </header>
+
+        {/* 입력 */}
+        <div className="mb-8">
+          <JobInput onAnalyze={handleAnalyze} isLoading={isLoading} mode={mode} />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* 로딩 */}
+        {isLoading && (
+          <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
+            <div className="w-16 h-16 rounded-full border-4 border-[#6C63FF]/20 border-t-[#6C63FF] animate-spin" />
+            <p className="text-white/50 text-sm">Claude AI가 심층 분석 중입니다...</p>
+            <p className="text-white/30 text-xs">8차원 분석 · 시간 지평선 · 스킬 갭 · 소득 예측 — 약 15~20초 소요</p>
+          </div>
+        )}
+
+        {/* 에러 */}
+        {error && !isLoading && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-5 text-center animate-fade-in">
+            <p className="text-red-400 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* 결과 */}
+        {result && !isLoading && (
+          <div id="result-section" className="space-y-6 animate-fade-in">
+            {/* 요약 */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <p className="text-white/70 text-sm leading-relaxed text-center">
+                {result.summary}
+              </p>
+            </div>
+
+            {/* 게이지 */}
+            <GaugeChart
+              rate={result.overallRate}
+              riskLevel={result.riskLevel}
+              jobName={result.jobName}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+            {/* 8차원 */}
+            <SixDimensions dimensions={result.dimensions} />
+
+            {/* 시간 지평선 */}
+            <TimeHorizonChart data={result.timeHorizon} />
+
+            {/* 스킬 갭 */}
+            <SkillGapAnalysis data={result.skillGap} />
+
+            {/* 빙산 모델 */}
+            <IcebergModel layers={result.iceberg} />
+
+            {/* 소득 영향 */}
+            <IncomeImpact data={result.incomeImpact} />
+
+            {/* 업종별 분석 */}
+            <IndustryContext data={result.industryContext} />
+
+            {/* 전환 경로 */}
+            <TransitionCards cards={result.transitions} mode={mode} />
+
+            {/* 컨설팅 노트 */}
+            <ConsultingNote note={result.consultingNote} jobName={result.jobName} />
+
+            {/* 면책 고지 */}
+            <div className="text-center py-4">
+              <p className="text-white/20 text-xs">
+                본 분석은 AI 생성 참고 자료로, 실제 직업 시장 상황과 다를 수 있습니다.
+                참고 출처: WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013) · McKinsey (2023)
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 빈 상태 */}
+        {!result && !isLoading && !error && (
+          <div className="text-center py-12 text-white/20">
+            <p className="text-5xl mb-4">🔮</p>
+            <p className="text-sm">직업명을 입력하고 분석을 시작하세요</p>
+            <p className="text-xs mt-2 text-white/15">8차원 분석 · 10년 예측 · 스킬 로드맵 · 소득 영향</p>
+          </div>
+        )}
+      </div>
+
+      <footer className="relative z-10 text-center py-6 text-white/20 text-xs border-t border-white/5">
+        LoginFuture Ministry · 내 직업의 미래 v2.0
+      </footer>
+    </main>
   );
 }
