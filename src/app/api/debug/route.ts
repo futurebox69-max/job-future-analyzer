@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   return NextResponse.json({
-    hasKey: !!process.env.ANTHROPIC_API_KEY,
-    keyPrefix: process.env.ANTHROPIC_API_KEY?.substring(0, 10) || "not set",
-    allKeys: Object.keys(process.env).filter(k => k.includes("ANTHROPIC") || k.includes("UPSTASH")),
+    jobKey: process.env.JOB_ANALYZER_API_KEY
+      ? `${process.env.JOB_ANALYZER_API_KEY.substring(0, 15)}...`
+      : "not set",
+    hasUpstash: !!process.env.UPSTASH_REDIS_REST_URL,
+    envKeys: Object.keys(process.env).filter(
+      (k) => k.includes("JOB_ANALYZER") || k.includes("UPSTASH") || k.includes("NEXT_PUBLIC")
+    ),
   });
 }
