@@ -38,26 +38,32 @@ export async function getLatestContext(): Promise<JobMarketContext | null> {
   }
 }
 
+// 배열이나 문자열 모두 처리
+function toText(v: unknown): string {
+  if (Array.isArray(v)) return v.map((item) => `• ${item}`).join("\n");
+  return String(v ?? "");
+}
+
 export function formatContextForPrompt(ctx: JobMarketContext): string {
   return `
-=== 최신 직업 시장 동향 (${ctx.updatedAt} 기준) ===
+=== 최신 직업 시장 동향 (${ctx.updatedAt} 기준, 월간 자동 업데이트) ===
 ⚡ AI 기술 업데이트:
-${ctx.aiTechUpdates}
+${toText(ctx.aiTechUpdates)}
 
 📋 법·규제 변화:
-${ctx.regulatoryChanges}
+${toText(ctx.regulatoryChanges)}
 
 🏭 산업 구조 변화:
-${ctx.industryShifts}
+${toText(ctx.industryShifts)}
 
 🌱 새롭게 생겨나는 직업:
-${ctx.emergingJobs}
+${toText(ctx.emergingJobs)}
 
 ⚠️ 현재 고위험 분야:
-${ctx.atRiskSectors}
+${toText(ctx.atRiskSectors)}
 
 📊 최신 통계:
-${ctx.keyStats}
+${toText(ctx.keyStats)}
 
 위 최신 동향을 분석에 반드시 반영하세요.
 === 최신 동향 끝 ===`.trim();

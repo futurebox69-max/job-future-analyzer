@@ -17,19 +17,20 @@ const redis = new Redis({
 
 // ── RSS / 오픈 피드 소스 ──────────────────────────────────────
 const SOURCES = [
-  // 한국 고용·노동
-  { name: "고용노동부 보도자료", url: "https://www.moel.go.kr/rss/RssNewsListAction.do", lang: "ko" },
-  { name: "한국고용정보원", url: "https://www.keis.or.kr/rss/rssMain.do", lang: "ko" },
-  { name: "과학기술정보통신부", url: "https://www.msit.go.kr/rss/rssMain.do", lang: "ko" },
-
-  // 글로벌 AI·미래 직업
+  // 글로벌 AI·미래 직업 (안정적인 RSS)
   { name: "WEF Jobs & Work", url: "https://www.weforum.org/agenda/feed/?topic=jobs-and-the-future-of-work", lang: "en" },
   { name: "MIT Tech Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/", lang: "en" },
-  { name: "OECD Employment", url: "https://www.oecd-ilibrary.org/feed/content/OECD-Employment-Overview", lang: "en" },
+  { name: "The Verge AI", url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml", lang: "en" },
+  { name: "VentureBeat AI", url: "https://venturebeat.com/category/ai/feed/", lang: "en" },
+  { name: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/", lang: "en" },
 
   // 법·제도
-  { name: "법제처 최신 법령", url: "https://www.law.go.kr/LSW/rss/rssMain.do?currentPage=1&menuType=news", lang: "ko" },
   { name: "EU AI Policy", url: "https://digital-strategy.ec.europa.eu/en/news/rss.xml", lang: "en" },
+  { name: "AI Policy Exchange", url: "https://aipolicyexchange.org/feed/", lang: "en" },
+
+  // 경제·노동
+  { name: "ILO Future of Work", url: "https://www.ilo.org/rss/future-work.xml", lang: "en" },
+  { name: "McKinsey Insights", url: "https://www.mckinsey.com/featured-insights/rss", lang: "en" },
 ];
 
 // ── RSS 파싱 (간단한 정규식 기반) ─────────────────────────────
@@ -177,9 +178,10 @@ async function main() {
   // 4. 결과 출력
   console.log("\n✅ 업데이트 완료!\n");
   console.log("── 이달의 핵심 컨텍스트 ──");
-  console.log("AI 기술:", context.aiTechUpdates.substring(0, 100) + "...");
-  console.log("규제 변화:", context.regulatoryChanges.substring(0, 100) + "...");
-  console.log("위험 분야:", context.atRiskSectors.substring(0, 100) + "...");
+  const toStr = (v: unknown) => (Array.isArray(v) ? v.join(" / ") : String(v ?? ""));
+  console.log("AI 기술:", toStr(context.aiTechUpdates).substring(0, 120) + "...");
+  console.log("규제 변화:", toStr(context.regulatoryChanges).substring(0, 120) + "...");
+  console.log("위험 분야:", toStr(context.atRiskSectors).substring(0, 120) + "...");
 }
 
 main().catch((e) => {
