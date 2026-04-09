@@ -24,7 +24,12 @@ export default function Home() {
   const [totalCount, setTotalCount] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/stats").then((r) => r.json()).then((d) => setTotalCount(d.total)).catch(() => {});
+    const fetchCount = () => {
+      fetch("/api/stats").then((r) => r.json()).then((d) => setTotalCount(d.total)).catch(() => {});
+    };
+    fetchCount();
+    const interval = setInterval(fetchCount, 60_000); // 1분마다 자동 갱신
+    return () => clearInterval(interval);
   }, []);
 
   const handleAnalyze = async (job: string) => {
