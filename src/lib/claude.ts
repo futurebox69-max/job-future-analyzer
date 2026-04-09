@@ -137,7 +137,7 @@ export async function analyzeJob(
 
   const response = await getClient().messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 8000,
+    max_tokens: 12000,
     temperature: 0.1,
     system: [
       {
