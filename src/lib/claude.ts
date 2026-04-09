@@ -139,13 +139,7 @@ export async function analyzeJob(
     model: "claude-haiku-4-5",
     max_tokens: 4000,
     temperature: 0.1,
-    system: [
-      {
-        type: "text",
-        text: systemWithContext,
-        cache_control: { type: "ephemeral" },
-      },
-    ],
+    system: systemWithContext,
     messages: [
       {
         role: "user",
