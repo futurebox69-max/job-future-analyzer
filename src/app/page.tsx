@@ -12,11 +12,22 @@ import SkillGapAnalysis from "@/components/SkillGapAnalysis";
 import IncomeImpact from "@/components/IncomeImpact";
 import IndustryContext from "@/components/IndustryContext";
 import ConsultingNote from "@/components/ConsultingNote";
-import { AnalysisResult, AnalyzeResponse } from "@/types/analysis";
+import { AnalysisResult } from "@/types/analysis";
+
+const LOADING_STAGES = [
+  "Claude AI가 직업 데이터를 수집하고 있습니다...",
+  "8차원 분석 모델을 적용하는 중...",
+  "AI 대체 가능성을 계산하고 있습니다...",
+  "10년 시간 지평선 예측 생성 중...",
+  "스킬 갭 및 전환 경로 분석 중...",
+  "소득 영향 및 업종 분석 마무리 중...",
+];
 
 export default function Home() {
   const [mode, setMode] = useState<"adult" | "youth">("adult");
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState(LOADING_STAGES[0]);
+  const [loadingStageIdx, setLoadingStageIdx] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
@@ -28,14 +39,29 @@ export default function Home() {
       fetch("/api/stats").then((r) => r.json()).then((d) => setTotalCount(d.total)).catch(() => {});
     };
     fetchCount();
-    const interval = setInterval(fetchCount, 60_000); // 1분마다 자동 갱신
+    const interval = setInterval(fetchCount, 60_000);
     return () => clearInterval(interval);
   }, []);
+
+  // 로딩 중 메시지 순환
+  useEffect(() => {
+    if (!isLoading) return;
+    const interval = setInterval(() => {
+      setLoadingStageIdx((i) => {
+        const next = Math.min(i + 1, LOADING_STAGES.length - 1);
+        setLoadingMsg(LOADING_STAGES[next]);
+        return next;
+      });
+    }, 12000);
+    return () => clearInterval(interval);
+  }, [isLoading]);
 
   const handleAnalyze = async (job: string) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setLoadingMsg(LOADING_STAGES[0]);
+    setLoadingStageIdx(0);
 
     try {
       const response = await fetch("/api/analyze", {
@@ -44,23 +70,66 @@ export default function Home() {
         body: JSON.stringify({ job, mode }),
       });
 
-      const data: AnalyzeResponse = await response.json();
-
-      if (!data.success || !data.data) {
-        setError(data.error ?? "분석에 실패했습니다. 다시 시도해주세요.");
+      if (!response.ok) {
+        // 에러 응답 (4xx, 5xx)
+        const data = await response.json().catch(() => ({}));
+        setError((data as { error?: string }).error ?? "분석에 실패했습니다. 다시 시도해주세요.");
         return;
       }
 
-      setResult(data.data);
-      if (data.remaining !== undefined) setRemaining(data.remaining);
-      setFromCache(data.fromCache ?? false);
+      const contentType = response.headers.get("Content-Type") ?? "";
 
-      setTimeout(() => {
-        document.getElementById("result-section")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 100);
+      if (contentType.includes("text/event-stream")) {
+        // SSE 스트리밍 응답 (Claude 신규 분석)
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split("\n\n");
+          buffer = parts.pop() ?? "";
+
+          for (const part of parts) {
+            if (!part.startsWith("data: ")) continue;
+            const jsonStr = part.slice(6);
+            try {
+              const event = JSON.parse(jsonStr);
+
+              if (event.type === "progress") {
+                if (event.message) setLoadingMsg(event.message);
+              } else if (event.type === "result" && event.success && event.data) {
+                setResult(event.data);
+                if (event.remaining !== undefined) setRemaining(event.remaining);
+                setFromCache(event.fromCache ?? false);
+                setTimeout(() => {
+                  document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }, 100);
+              } else if (event.type === "error") {
+                setError(event.error ?? "분석에 실패했습니다. 다시 시도해주세요.");
+              }
+            } catch {
+              // JSON 파싱 실패 무시
+            }
+          }
+        }
+      } else {
+        // JSON 응답 (캐시 히트)
+        const data = await response.json();
+        if (!data.success || !data.data) {
+          setError(data.error ?? "분석에 실패했습니다. 다시 시도해주세요.");
+          return;
+        }
+        setResult(data.data);
+        if (data.remaining !== undefined) setRemaining(data.remaining);
+        setFromCache(data.fromCache ?? false);
+        setTimeout(() => {
+          document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
     } catch {
       setError("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
     } finally {
@@ -121,9 +190,21 @@ export default function Home() {
         {/* 로딩 */}
         {isLoading && (
           <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
-            <div className="w-16 h-16 rounded-full border-4 border-[#6C63FF]/20 border-t-[#6C63FF] animate-spin" />
-            <p className="text-sm" style={{ color: "#6B7280" }}>Claude AI가 심층 분석 중입니다...</p>
-            <p className="text-xs" style={{ color: "#9CA3AF" }}>8차원 분석 · 시간 지평선 · 스킬 갭 · 소득 예측 — 약 15~20초 소요</p>
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-[#6C63FF]/20 border-t-[#6C63FF] animate-spin" />
+              <div className="absolute inset-3 rounded-full border-4 border-[#A78BFA]/20 border-b-[#A78BFA] animate-spin" style={{ animationDirection: "reverse", animationDuration: "1.5s" }} />
+            </div>
+            <p className="text-sm font-medium" style={{ color: "#4B5563" }}>{loadingMsg}</p>
+            <div className="flex gap-1.5">
+              {LOADING_STAGES.map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full transition-all duration-500"
+                  style={{ background: i <= loadingStageIdx ? "#6C63FF" : "#E5E7EB" }}
+                />
+              ))}
+            </div>
+            <p className="text-xs" style={{ color: "#9CA3AF" }}>처음 분석은 30~90초 소요됩니다 · 같은 직업은 즉시 로드</p>
           </div>
         )}
 
