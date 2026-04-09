@@ -98,7 +98,7 @@ export default function Home() {
               미래
             </span>
           </h1>
-          <p className="text-lg" style={{ color: "#6B7280" }}>
+          <p className="text-lg" style={{ color: "#6B7280", wordBreak: "keep-all" }}>
             {mode === "youth"
               ? "관심 직업의 AI 대체 가능성을 확인하고 진로를 설계하세요"
               : "내 직업의 AI 대체 가능성을 8차원으로 심층 분석합니다"}
