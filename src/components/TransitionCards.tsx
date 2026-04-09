@@ -8,15 +8,15 @@ interface TransitionCardsProps {
 }
 
 const TYPE_STYLES = {
-  이직: { icon: "💼", bg: "bg-purple-500/10", border: "border-purple-500/30", color: "text-purple-300", badge: "bg-purple-500/20 text-purple-300" },
-  전직: { icon: "🚀", bg: "bg-orange-500/10", border: "border-orange-500/30", color: "text-orange-300", badge: "bg-orange-500/20 text-orange-300" },
-  창직: { icon: "✨", bg: "bg-green-500/10", border: "border-green-500/30", color: "text-green-300", badge: "bg-green-500/20 text-green-300" },
+  이직: { icon: "💼", bg: "#F5F4FF", border: "#DDD6FE", color: "#6C63FF", badgeBg: "#EDE9FE", badgeColor: "#6C63FF" },
+  전직: { icon: "🚀", bg: "#FFF7ED", border: "#FED7AA", color: "#EA580C", badgeBg: "#FFEDD5", badgeColor: "#EA580C" },
+  창직: { icon: "✨", bg: "#F0FDF4", border: "#BBF7D0", color: "#16A34A", badgeBg: "#DCFCE7", badgeColor: "#16A34A" },
 };
 
 const DIFFICULTY_COLORS = {
-  낮음: "text-green-400",
-  보통: "text-yellow-400",
-  높음: "text-red-400",
+  낮음: "#16A34A",
+  보통: "#D97706",
+  높음: "#DC2626",
 };
 
 const TYPE_DESCRIPTIONS = {
@@ -27,8 +27,11 @@ const TYPE_DESCRIPTIONS = {
 
 export default function TransitionCards({ cards, mode }: TransitionCardsProps) {
   return (
-    <div className="bg-white/5 rounded-3xl border border-white/10 p-6">
-      <h3 className="text-white font-semibold text-lg mb-5 flex items-center gap-2">
+    <div
+      className="rounded-3xl border p-6"
+      style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
+    >
+      <h3 className="font-semibold text-lg mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         🗺️ {mode === "youth" ? "진로 전환 경로" : "전환 경로"}
       </h3>
 
@@ -39,36 +42,45 @@ export default function TransitionCards({ cards, mode }: TransitionCardsProps) {
           return (
             <div
               key={card.type}
-              className={`${style.bg} border ${style.border} rounded-2xl p-5 flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg`}
+              className="rounded-2xl p-5 border flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                background: style.bg,
+                borderColor: style.border,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+              }}
             >
               {/* 헤더 */}
               <div className="flex items-center justify-between">
                 <span className="text-2xl">{style.icon}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${style.badge}`}>
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                  style={{ background: style.badgeBg, color: style.badgeColor }}
+                >
                   {card.type}
                 </span>
               </div>
 
               {/* 제목 */}
               <div>
-                <div className={`font-semibold ${style.color}`}>{card.title}</div>
-                <div className="text-white/40 text-xs mt-0.5">{typeDesc}</div>
+                <div className="font-semibold" style={{ color: style.color }}>{card.title}</div>
+                <div className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>{typeDesc}</div>
               </div>
 
               {/* 설명 */}
-              <p className="text-white/70 text-sm leading-relaxed flex-1">
+              <p className="text-sm leading-relaxed flex-1" style={{ color: "#374151" }}>
                 {card.description}
               </p>
 
               {/* 예시 직함 */}
               {card.examples.length > 0 && (
                 <div>
-                  <div className="text-white/30 text-xs mb-1.5">직함 예시</div>
+                  <div className="text-xs mb-1.5" style={{ color: "#9CA3AF" }}>직함 예시</div>
                   <div className="flex flex-wrap gap-1.5">
                     {card.examples.map((ex, i) => (
                       <span
                         key={i}
-                        className="text-xs px-2 py-0.5 bg-white/10 text-white/60 rounded-lg"
+                        className="text-xs px-2 py-0.5 rounded-lg"
+                        style={{ background: "#F3F4F6", color: "#6B7280", border: "1px solid #E5E7EB" }}
                       >
                         {ex}
                       </span>
@@ -80,13 +92,13 @@ export default function TransitionCards({ cards, mode }: TransitionCardsProps) {
               {/* 필요 스킬 */}
               {card.keySkills && card.keySkills.length > 0 && (
                 <div>
-                  <div className="text-white/30 text-xs mb-1.5">핵심 스킬</div>
+                  <div className="text-xs mb-1.5" style={{ color: "#9CA3AF" }}>핵심 스킬</div>
                   <div className="flex flex-wrap gap-1.5">
                     {card.keySkills.map((sk, i) => (
                       <span
                         key={i}
-                        className={`text-xs px-2 py-0.5 rounded-lg border`}
-                        style={{ borderColor: "rgba(108,99,255,0.3)", color: "#A78BFA", background: "rgba(108,99,255,0.1)" }}
+                        className="text-xs px-2 py-0.5 rounded-lg border"
+                        style={{ borderColor: "#DDD6FE", color: "#6C63FF", background: "#EDE9FE" }}
                       >
                         {sk}
                       </span>
@@ -96,12 +108,15 @@ export default function TransitionCards({ cards, mode }: TransitionCardsProps) {
               )}
 
               {/* 난이도 + 기간 */}
-              <div className="flex items-center justify-between text-xs text-white/40">
+              <div className="flex items-center justify-between text-xs" style={{ color: "#9CA3AF" }}>
                 <span>
-                  난이도: <span className={`font-medium ${DIFFICULTY_COLORS[card.difficulty]}`}>{card.difficulty}</span>
+                  난이도:{" "}
+                  <span className="font-semibold" style={{ color: DIFFICULTY_COLORS[card.difficulty] }}>
+                    {card.difficulty}
+                  </span>
                 </span>
                 {card.timeframe && (
-                  <span className="text-white/30">⏱ {card.timeframe}</span>
+                  <span>⏱ {card.timeframe}</span>
                 )}
               </div>
             </div>

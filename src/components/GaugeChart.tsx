@@ -9,23 +9,29 @@ interface GaugeChartProps {
 }
 
 const RISK_COLORS = {
-  안전: "#22C55E",
-  주의: "#F59E0B",
-  위험: "#EF4444",
-  매우위험: "#DC2626",
+  안전: "#16A34A",
+  주의: "#D97706",
+  위험: "#DC2626",
+  매우위험: "#991B1B",
 };
 
 const RISK_BG = {
-  안전: "rgba(34, 197, 94, 0.1)",
-  주의: "rgba(245, 158, 11, 0.1)",
-  위험: "rgba(239, 68, 68, 0.1)",
-  매우위험: "rgba(220, 38, 38, 0.15)",
+  안전: "#F0FDF4",
+  주의: "#FFFBEB",
+  위험: "#FEF2F2",
+  매우위험: "#FEF2F2",
+};
+
+const RISK_BORDER = {
+  안전: "#BBF7D0",
+  주의: "#FDE68A",
+  위험: "#FECACA",
+  매우위험: "#FECACA",
 };
 
 export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps) {
   const [animatedRate, setAnimatedRate] = useState(0);
 
-  // 애니메이션: 0 → rate
   useEffect(() => {
     setAnimatedRate(0);
     const duration = 1200;
@@ -34,7 +40,6 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
     const animate = (now: number) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
-      // easeOutCubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setAnimatedRate(Math.round(eased * rate));
       if (progress < 1) requestAnimationFrame(animate);
@@ -43,16 +48,14 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
     requestAnimationFrame(animate);
   }, [rate]);
 
-  // SVG 반원 게이지 계산
   const cx = 150;
   const cy = 150;
   const r = 110;
   const strokeWidth = 18;
 
-  // 반원: -180도 ~ 0도 (왼쪽에서 오른쪽)
-  const startAngle = Math.PI; // 180도 (왼쪽)
-  const endAngle = 0;         // 0도 (오른쪽)
-  const totalArc = Math.PI;   // 180도
+  const startAngle = Math.PI;
+  const endAngle = 0;
+  const totalArc = Math.PI;
 
   const toXY = (angle: number) => ({
     x: cx + r * Math.cos(angle),
@@ -62,10 +65,8 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
   const start = toXY(startAngle);
   const end = toXY(endAngle);
 
-  // 배경 반원 path
   const bgPath = `M ${start.x} ${start.y} A ${r} ${r} 0 0 1 ${end.x} ${end.y}`;
 
-  // 게이지 path (animatedRate/100 비율)
   const gaugeAngle = startAngle + (totalArc * animatedRate) / 100;
   const gaugeEnd = toXY(gaugeAngle);
   const largeArc = animatedRate > 50 ? 1 : 0;
@@ -74,7 +75,6 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
       ? ""
       : `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${gaugeEnd.x} ${gaugeEnd.y}`;
 
-  // 바늘 각도
   const needleAngle = startAngle + (totalArc * animatedRate) / 100;
   const needleTip = toXY(needleAngle);
 
@@ -82,16 +82,19 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
 
   return (
     <div
-      className="flex flex-col items-center p-6 rounded-3xl border border-white/10 transition-all duration-500"
-      style={{ background: RISK_BG[riskLevel] }}
+      className="flex flex-col items-center p-6 rounded-3xl border transition-all duration-500"
+      style={{
+        background: RISK_BG[riskLevel],
+        borderColor: RISK_BORDER[riskLevel],
+        boxShadow: "0 4px 24px rgba(108,99,255,0.08)",
+      }}
     >
-      {/* SVG 게이지 */}
       <svg width="300" height="170" viewBox="0 0 300 170" className="overflow-visible">
         {/* 배경 트랙 */}
         <path
           d={bgPath}
           fill="none"
-          stroke="rgba(255,255,255,0.08)"
+          stroke="rgba(0,0,0,0.08)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
@@ -106,7 +109,7 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
               key={tick}
               x1={inner.x} y1={inner.y}
               x2={outer.x} y2={outer.y}
-              stroke="rgba(255,255,255,0.2)"
+              stroke="rgba(0,0,0,0.15)"
               strokeWidth={2}
             />
           );
@@ -120,7 +123,7 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
             stroke={color}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
-            style={{ filter: `drop-shadow(0 0 8px ${color}60)` }}
+            style={{ filter: `drop-shadow(0 0 6px ${color}50)` }}
           />
         )}
 
@@ -131,35 +134,35 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
           stroke={color}
           strokeWidth={3}
           strokeLinecap="round"
-          style={{ filter: `drop-shadow(0 0 4px ${color})` }}
         />
         <circle cx={cx} cy={cy} r={6} fill={color} />
+        <circle cx={cx} cy={cy} r={3} fill="#FFFFFF" />
 
         {/* 레이블 */}
-        <text x={start.x - 8} y={cy + 24} fill="rgba(255,255,255,0.4)" fontSize="11" textAnchor="middle">0%</text>
-        <text x={end.x + 8} y={cy + 24} fill="rgba(255,255,255,0.4)" fontSize="11" textAnchor="middle">100%</text>
+        <text x={start.x - 8} y={cy + 24} fill="#9CA3AF" fontSize="11" textAnchor="middle">0%</text>
+        <text x={end.x + 8} y={cy + 24} fill="#9CA3AF" fontSize="11" textAnchor="middle">100%</text>
       </svg>
 
       {/* 중앙 수치 */}
       <div className="text-center -mt-4">
         <div
           className="text-6xl font-bold tabular-nums"
-          style={{ color, textShadow: `0 0 30px ${color}60` }}
+          style={{ color }}
         >
           {animatedRate}%
         </div>
-        <div className="mt-1 text-white/50 text-sm">AI 대체 가능성</div>
+        <div className="mt-1 text-sm" style={{ color: "#6B7280" }}>AI 대체 가능성</div>
       </div>
 
       {/* 직업명 + 리스크 레벨 */}
       <div className="mt-4 flex items-center gap-3">
-        <span className="text-white text-xl font-semibold">{jobName}</span>
+        <span className="text-xl font-semibold" style={{ color: "#1E1B4B" }}>{jobName}</span>
         <span
-          className="px-3 py-1 rounded-full text-sm font-medium"
+          className="px-3 py-1 rounded-full text-sm font-semibold"
           style={{
-            background: `${color}25`,
+            background: `${color}18`,
             color,
-            border: `1px solid ${color}40`,
+            border: `1.5px solid ${color}40`,
           }}
         >
           {riskLevel}

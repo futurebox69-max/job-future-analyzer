@@ -7,32 +7,35 @@ interface Props {
 }
 
 const CONTEXTS = [
-  { key: "largeEnterprise" as const, icon: "🏢", label: "대기업", color: "#3B82F6" },
-  { key: "sme" as const, icon: "🏪", label: "중소기업", color: "#10B981" },
-  { key: "freelance" as const, icon: "🧑‍💻", label: "프리랜서/개인사업", color: "#F59E0B" },
-  { key: "globalTrend" as const, icon: "🌍", label: "글로벌 동향", color: "#8B5CF6" },
+  { key: "largeEnterprise" as const, icon: "🏢", label: "대기업", color: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE" },
+  { key: "sme" as const, icon: "🏪", label: "중소기업", color: "#16A34A", bg: "#F0FDF4", border: "#BBF7D0" },
+  { key: "freelance" as const, icon: "🧑‍💻", label: "프리랜서/개인사업", color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+  { key: "globalTrend" as const, icon: "🌍", label: "글로벌 동향", color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
 ];
 
 export default function IndustryContext({ data }: Props) {
   return (
-    <section className="rounded-2xl border border-white/10 p-6" style={{ background: "rgba(255,255,255,0.03)" }}>
-      <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+    <section
+      className="rounded-2xl border p-6"
+      style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
+    >
+      <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         <span>🏭</span> 업종별 세부 분석
       </h2>
-      <p className="text-white/40 text-xs mb-5">같은 직업이라도 환경에 따라 다른 AI 대체 속도</p>
+      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>같은 직업이라도 환경에 따라 다른 AI 대체 속도</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {CONTEXTS.map(({ key, icon, label, color }) => (
+        {CONTEXTS.map(({ key, icon, label, color, bg, border }) => (
           <div
             key={key}
             className="rounded-xl p-4 border"
-            style={{ borderColor: `${color}22`, background: `${color}08` }}
+            style={{ background: bg, borderColor: border }}
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-base">{icon}</span>
               <span className="text-sm font-semibold" style={{ color }}>{label}</span>
             </div>
-            <p className="text-white/75 text-sm leading-relaxed">{data[key]}</p>
+            <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{data[key]}</p>
           </div>
         ))}
       </div>

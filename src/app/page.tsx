@@ -55,12 +55,13 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen" style={{ background: "#0A0A0F" }}>
+    <main className="min-h-screen" style={{ background: "#F5F4FF" }}>
+      {/* 상단 프리미엄 헤더 그라데이션 */}
       <div
-        className="fixed inset-0 pointer-events-none"
+        className="fixed top-0 left-0 right-0 h-80 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,99,255,0.15) 0%, transparent 60%)",
+            "linear-gradient(180deg, rgba(108,99,255,0.08) 0%, rgba(245,244,255,0) 100%)",
         }}
       />
 
@@ -71,7 +72,7 @@ export default function Home() {
             <ModeToggle mode={mode} onChange={(m) => { setMode(m); setResult(null); setError(null); }} />
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-3" style={{ color: "#1E1B4B" }}>
             내 직업의{" "}
             <span
               style={{
@@ -83,7 +84,7 @@ export default function Home() {
               미래
             </span>
           </h1>
-          <p className="text-white/50 text-lg">
+          <p className="text-lg" style={{ color: "#6B7280" }}>
             {mode === "youth"
               ? "관심 직업의 AI 대체 가능성을 확인하고 진로를 설계하세요"
               : "내 직업의 AI 대체 가능성을 8차원으로 심층 분석합니다"}
@@ -99,24 +100,27 @@ export default function Home() {
         {isLoading && (
           <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
             <div className="w-16 h-16 rounded-full border-4 border-[#6C63FF]/20 border-t-[#6C63FF] animate-spin" />
-            <p className="text-white/50 text-sm">Claude AI가 심층 분석 중입니다...</p>
-            <p className="text-white/30 text-xs">8차원 분석 · 시간 지평선 · 스킬 갭 · 소득 예측 — 약 15~20초 소요</p>
+            <p className="text-sm" style={{ color: "#6B7280" }}>Claude AI가 심층 분석 중입니다...</p>
+            <p className="text-xs" style={{ color: "#9CA3AF" }}>8차원 분석 · 시간 지평선 · 스킬 갭 · 소득 예측 — 약 15~20초 소요</p>
           </div>
         )}
 
         {/* 에러 */}
         {error && !isLoading && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-5 text-center animate-fade-in">
-            <p className="text-red-400 text-sm">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 text-center animate-fade-in">
+            <p className="text-red-500 text-sm">{error}</p>
           </div>
         )}
 
         {/* 결과 */}
         {result && !isLoading && (
-          <div id="result-section" className="space-y-6 animate-fade-in">
+          <div id="result-section" className="space-y-5 animate-fade-in">
             {/* 요약 */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-white/70 text-sm leading-relaxed text-center">
+            <div
+              className="rounded-2xl p-5 border"
+              style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 1px 8px rgba(108,99,255,0.08)" }}
+            >
+              <p className="text-sm leading-relaxed text-center" style={{ color: "#4B5563" }}>
                 {result.summary}
               </p>
             </div>
@@ -154,7 +158,7 @@ export default function Home() {
 
             {/* 면책 고지 */}
             <div className="text-center py-4">
-              <p className="text-white/20 text-xs">
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>
                 본 분석은 AI 생성 참고 자료로, 실제 직업 시장 상황과 다를 수 있습니다.
                 참고 출처: WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013) · McKinsey (2023)
               </p>
@@ -164,15 +168,18 @@ export default function Home() {
 
         {/* 빈 상태 */}
         {!result && !isLoading && !error && (
-          <div className="text-center py-12 text-white/20">
+          <div className="text-center py-12" style={{ color: "#9CA3AF" }}>
             <p className="text-5xl mb-4">🔮</p>
             <p className="text-sm">직업명을 입력하고 분석을 시작하세요</p>
-            <p className="text-xs mt-2 text-white/15">8차원 분석 · 10년 예측 · 스킬 로드맵 · 소득 영향</p>
+            <p className="text-xs mt-2" style={{ color: "#C4B5FD" }}>8차원 분석 · 10년 예측 · 스킬 로드맵 · 소득 영향</p>
           </div>
         )}
       </div>
 
-      <footer className="relative z-10 text-center py-6 text-white/20 text-xs border-t border-white/5">
+      <footer
+        className="relative z-10 text-center py-6 text-xs border-t"
+        style={{ color: "#9CA3AF", borderColor: "#EDE9FE" }}
+      >
         LoginFuture Ministry · 내 직업의 미래 v2.0
       </footer>
     </main>

@@ -7,18 +7,21 @@ interface IcebergModelProps {
 }
 
 const LAYER_STYLES = [
-  { bg: "bg-blue-500/20", border: "border-blue-500/30", icon: "🌊", textColor: "text-blue-300", label: "수면 위" },
-  { bg: "bg-blue-600/20", border: "border-blue-600/30", icon: "🔵", textColor: "text-blue-400", label: "얕은 층" },
-  { bg: "bg-blue-700/20", border: "border-blue-700/30", icon: "🔷", textColor: "text-blue-500", label: "깊은 층" },
-  { bg: "bg-blue-900/30", border: "border-blue-900/40", icon: "⚓", textColor: "text-blue-600", label: "근본" },
+  { bg: "#EFF6FF", border: "#BFDBFE", icon: "🌊", textColor: "#1D4ED8", label: "수면 위" },
+  { bg: "#EEF2FF", border: "#C7D2FE", icon: "🔵", textColor: "#3730A3", label: "얕은 층" },
+  { bg: "#E0E7FF", border: "#A5B4FC", icon: "🔷", textColor: "#4338CA", label: "깊은 층" },
+  { bg: "#C7D2FE", border: "#818CF8", icon: "⚓", textColor: "#3730A3", label: "근본" },
 ];
 
 export default function IcebergModel({ layers }: IcebergModelProps) {
   const sorted = [...layers].sort((a, b) => a.level - b.level);
 
   return (
-    <div className="bg-white/5 rounded-3xl border border-white/10 p-6">
-      <h3 className="text-white font-semibold text-lg mb-5 flex items-center gap-2">
+    <div
+      className="rounded-3xl border p-6"
+      style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
+    >
+      <h3 className="font-semibold text-lg mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         🧊 시스템사고 빙산 모델
       </h3>
 
@@ -30,15 +33,16 @@ export default function IcebergModel({ layers }: IcebergModelProps) {
           return (
             <div
               key={layer.level}
-              className={`${widthClass} ${style.bg} border ${style.border} rounded-2xl p-4 transition-all duration-300 hover:scale-[1.01]`}
+              className={`${widthClass} rounded-2xl p-4 border transition-all duration-300 hover:scale-[1.01]`}
+              style={{ background: style.bg, borderColor: style.border }}
             >
               <div className="flex items-start gap-3">
                 <span className="text-xl flex-shrink-0">{style.icon}</span>
                 <div>
-                  <div className={`text-xs font-medium mb-1 ${style.textColor}`}>
+                  <div className="text-xs font-semibold mb-1" style={{ color: style.textColor }}>
                     {layer.title}
                   </div>
-                  <p className="text-white/80 text-sm leading-relaxed">
+                  <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>
                     {layer.content}
                   </p>
                 </div>
@@ -48,7 +52,7 @@ export default function IcebergModel({ layers }: IcebergModelProps) {
         })}
       </div>
 
-      <p className="mt-4 text-white/30 text-xs text-center">
+      <p className="mt-4 text-xs text-center" style={{ color: "#9CA3AF" }}>
         Donella Meadows 시스템사고 빙산 모델 적용
       </p>
     </div>

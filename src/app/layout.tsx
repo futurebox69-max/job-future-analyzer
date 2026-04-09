@@ -11,7 +11,7 @@ const notoSansKR = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: "내 직업의 미래 | AI 직업 대체율 분석기",
   description:
-    "AI가 내 직업을 대체할 가능성을 6차원으로 분석하고, 구체적인 전환 경로를 제시합니다.",
+    "AI가 내 직업을 대체할 가능성을 8차원으로 분석하고, 구체적인 전환 경로를 제시합니다.",
   keywords: ["AI 직업 대체율", "직업 미래", "커리어 전환", "자동화"],
 };
 
@@ -27,7 +27,7 @@ export default function RootLayout({
     >
       <body
         className="min-h-full flex flex-col antialiased"
-        style={{ background: "#0A0A0F", fontFamily: "var(--font-noto-sans-kr), sans-serif" }}
+        style={{ background: "#F5F4FF", fontFamily: "var(--font-noto-sans-kr), sans-serif" }}
       >
         {children}
       </body>
