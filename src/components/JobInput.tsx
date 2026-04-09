@@ -93,7 +93,7 @@ export default function JobInput({ onAnalyze, isLoading, mode }: JobInputProps) 
       )}
 
       <p className="mt-2 text-xs text-center" style={{ color: "#9CA3AF" }}>
-        하루 10회 무료 분석 · AI 분석 결과는 참고용입니다
+        하루 20회 무료 분석 · AI 분석 결과는 참고용입니다
       </p>
     </form>
   );
