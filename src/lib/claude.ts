@@ -136,8 +136,8 @@ export async function analyzeJob(
     : SYSTEM_PROMPT;
 
   const response = await getClient().messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 16000,
+    model: "claude-haiku-4-5",
+    max_tokens: 4000,
     temperature: 0.1,
     system: [
       {
