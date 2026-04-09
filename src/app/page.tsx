@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModeToggle from "@/components/ModeToggle";
 import JobInput from "@/components/JobInput";
 import GaugeChart from "@/components/GaugeChart";
@@ -21,6 +21,11 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats").then((r) => r.json()).then((d) => setTotalCount(d.total)).catch(() => {});
+  }, []);
 
   const handleAnalyze = async (job: string) => {
     setIsLoading(true);
@@ -93,6 +98,14 @@ export default function Home() {
               ? "관심 직업의 AI 대체 가능성을 확인하고 진로를 설계하세요"
               : "내 직업의 AI 대체 가능성을 8차원으로 심층 분석합니다"}
           </p>
+          {totalCount !== null && totalCount > 0 && (
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm" style={{ background: "#F5F4FF", border: "1px solid #EDE9FE" }}>
+              <span style={{ color: "#A78BFA" }}>✦</span>
+              <span style={{ color: "#6B7280" }}>지금까지</span>
+              <span className="font-bold" style={{ color: "#6C63FF" }}>{totalCount.toLocaleString()}번</span>
+              <span style={{ color: "#6B7280" }}>분석됨</span>
+            </div>
+          )}
         </header>
 
         {/* 입력 */}

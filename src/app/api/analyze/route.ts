@@ -31,6 +31,9 @@ async function trackStats(type: "request" | "cache_hit" | "claude_call", job: st
   const month = d.slice(0, 7);
   try {
     await Promise.all([
+      // 전체 누적 카운터 (TTL 없음 — 영구 보관)
+      redis.incr("stats:total"),
+      // 일별
       redis.incr(`stats:req:${d}`),
       redis.expire(`stats:req:${d}`, 60 * 60 * 24 * 35),
       type === "cache_hit"
