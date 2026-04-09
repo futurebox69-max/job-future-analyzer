@@ -19,6 +19,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [fromCache, setFromCache] = useState(false);
 
   const handleAnalyze = async (job: string) => {
     setIsLoading(true);
@@ -40,6 +42,8 @@ export default function Home() {
       }
 
       setResult(data.data);
+      if (data.remaining !== undefined) setRemaining(data.remaining);
+      setFromCache(data.fromCache ?? false);
 
       setTimeout(() => {
         document.getElementById("result-section")?.scrollIntoView({
@@ -115,6 +119,20 @@ export default function Home() {
         {/* 결과 */}
         {result && !isLoading && (
           <div id="result-section" className="space-y-5 animate-fade-in">
+            {/* 사용 횟수 표시 */}
+            {remaining !== null && (
+              <div className="flex items-center justify-end gap-2">
+                {fromCache && (
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "#F0FDF4", color: "#16A34A", border: "1px solid #BBF7D0" }}>
+                    ⚡ 즉시 로드
+                  </span>
+                )}
+                <span className="text-xs px-3 py-1 rounded-full" style={{ background: "#F5F4FF", color: "#6C63FF", border: "1px solid #EDE9FE" }}>
+                  오늘 남은 횟수: {remaining}회
+                </span>
+              </div>
+            )}
+
             {/* 요약 */}
             <div
               className="rounded-2xl p-5 border"

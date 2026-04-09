@@ -127,4 +127,6 @@ export interface AnalyzeResponse {
   success: boolean;
   data?: AnalysisResult;
   error?: string;
+  remaining?: number; // 오늘 남은 사용 횟수
+  fromCache?: boolean;
 }
