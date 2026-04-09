@@ -151,7 +151,7 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
         >
           {animatedRate}%
         </div>
-        <div className="mt-1 text-sm" style={{ color: "#6B7280" }}>AI 대체 가능성</div>
+        <div className="mt-1 text-sm" style={{ color: "#6B7280" }}>현재 트렌드 기반 추정값</div>
       </div>
 
       {/* 직업명 + 리스크 레벨 */}
@@ -167,6 +167,11 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
         >
           {riskLevel}
         </span>
+      </div>
+
+      {/* 불확실성 안내 */}
+      <div className="mt-4 px-4 py-2.5 rounded-xl text-xs text-center" style={{ background: "rgba(0,0,0,0.04)", color: "#9CA3AF" }}>
+        ⚠️ 이 수치는 현재 기술 트렌드 기반의 <strong>추정값</strong>입니다. AI 발전 속도와 사회·제도적 변화에 따라 달라질 수 있습니다.
       </div>
     </div>
   );

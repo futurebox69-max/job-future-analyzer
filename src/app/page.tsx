@@ -188,10 +188,17 @@ export default function Home() {
             <ConsultingNote note={result.consultingNote} jobName={result.jobName} />
 
             {/* 면책 고지 */}
-            <div className="text-center py-4">
-              <p className="text-xs" style={{ color: "#9CA3AF" }}>
-                본 분석은 AI 생성 참고 자료로, 실제 직업 시장 상황과 다를 수 있습니다.
-                참고 출처: WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013) · McKinsey (2023)
+            <div className="rounded-2xl p-4 text-center" style={{ background: "#F9F9FF", border: "1px solid #EDE9FE" }}>
+              <p className="text-xs font-medium mb-1" style={{ color: "#6B7280" }}>
+                📌 분석 결과 활용 시 유의사항
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: "#9CA3AF" }}>
+                이 분석은 현재 시점의 기술 트렌드와 학술 연구를 바탕으로 한 <strong style={{ color: "#6B7280" }}>추정값</strong>입니다.
+                AI 기술 발전 속도, 사회·제도적 변화, 개인의 역량에 따라 실제 결과는 크게 달라질 수 있습니다.
+                참고 자료로 활용하시되, 중요한 진로 결정은 전문가와 함께 검토하시길 권장합니다.
+              </p>
+              <p className="text-xs mt-2" style={{ color: "#C4B5FD" }}>
+                출처: WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013·2023) · McKinsey (2023) · Autor (2022)
               </p>
             </div>
           </div>
