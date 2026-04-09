@@ -1,11 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
 import { analyzeJob } from "@/lib/claude";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
-import { AnalyzeRequest, AnalyzeResponse } from "@/types/analysis";
+import { AnalyzeRequest, AnalyzeResponse, AnalysisResult } from "@/types/analysis";
 
 // 허용되는 문자: 한글, 영문, 숫자, 공백, 일부 특수문자
 const JOB_PATTERN = /^[\uAC00-\uD7A3a-zA-Z0-9\s\-\/\(\)·]+$/;
 const MAX_JOB_LENGTH = 50;
+const CACHE_TTL = 60 * 60 * 24 * 30; // 30일
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+// 월별 캐시 키 — 매월 1일 컨텍스트 업데이트 시 자동으로 새 키 사용
+function getCacheKey(job: string, mode: string): string {
+  const month = new Date().toISOString().slice(0, 7); // "2026-04"
+  const normalized = job.trim().toLowerCase().replace(/\s+/g, " ");
+  return `job_result:${month}:${mode}:${normalized}`;
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeResponse>> {
   try {
@@ -60,7 +74,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeRe
       );
     }
 
-    // 3. Rate Limit 체크
+    // 3. 캐시 확인 (rate limit 차감 없이 즉시 반환)
+    const cacheKey = getCacheKey(trimmed, mode);
+    try {
+      const cached = await redis.get<AnalysisResult>(cacheKey);
+      if (cached) {
+        return NextResponse.json(
+          { success: true, data: cached },
+          { headers: { "X-Cache": "HIT", "X-RateLimit-Remaining": "10" } }
+        );
+      }
+    } catch (e) {
+      console.warn("캐시 조회 실패 (무시):", e);
+    }
+
+    // 4. Rate Limit 체크 (캐시 미스 시에만)
     const ip = getClientIp(request);
     const rateLimit = await checkRateLimit(ip);
 
@@ -80,8 +108,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeRe
       );
     }
 
-    // 4. Claude 분석 (1회 재시도 포함)
-    let result;
+    // 5. Claude 분석 (1회 재시도 포함)
+    let result: AnalysisResult;
     try {
       result = await analyzeJob(trimmed, mode);
     } catch (firstError) {
@@ -100,14 +128,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeRe
       }
     }
 
-    // 5. 성공 응답
+    // 6. 결과 캐시 저장 (30일)
+    try {
+      await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
+    } catch (e) {
+      console.warn("캐시 저장 실패 (무시):", e);
+    }
+
+    // 7. 성공 응답
     return NextResponse.json(
-      {
-        success: true,
-        data: result,
-      },
+      { success: true, data: result },
       {
         headers: {
+          "X-Cache": "MISS",
           "X-RateLimit-Remaining": String(rateLimit.remaining),
         },
       }
