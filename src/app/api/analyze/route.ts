@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
+
+// Vercel 함수 실행 시간 제한 60초로 확장 (기본 10초)
+export const maxDuration = 60;
 import { analyzeJob } from "@/lib/claude";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { AnalyzeRequest, AnalyzeResponse, AnalysisResult } from "@/types/analysis";
