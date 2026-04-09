@@ -139,7 +139,13 @@ export async function analyzeJob(
     model: "claude-sonnet-4-6",
     max_tokens: 16000,
     temperature: 0.1,
-    system: systemWithContext,
+    system: [
+      {
+        type: "text",
+        text: systemWithContext,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
     messages: [
       {
         role: "user",
