@@ -249,28 +249,32 @@ export const COUNTRY_CONTEXTS: Record<LangCode, string> = {
 - AI adoption speed: World-leading (Silicon Valley ecosystem, major AI investments)
 - Data sources: O*NET, BLS Occupational Outlook Handbook, McKinsey US reports
 - Job titles and transition examples must use US market terminology.
-- Write ALL analysis results in English.`,
+- Write ALL free-text fields (descriptions, titles, summaries, narratives) in English.
+- CRITICAL: Keep these JSON enum fields in Korean exactly as specified: riskLevel (안전/주의/위험/매우위험), urgency (즉시/1년 내/3년 내), transitions[].type (이직/전직/창직), transitions[].difficulty (낮음/보통/높음).`,
 
   zh: `本分析基于中国劳动力市场。
 - 适用法规：劳动合同法、职业资格认证制度、行业许可证制度
 - 产业结构：制造业大国向服务业转型，政府主导AI产业政策（新一代AI发展规划）
 - AI采用速度：全球领先（政府大力投资、BAT等科技巨头推动）
 - 职业名称和转型路径示例须使用中国市场通用术语
-- 请用中文撰写所有分析结果。`,
+- 请用中文撰写所有自由文本字段（描述、标题、摘要、叙述等）。
+- 重要：以下JSON枚举字段必须严格保持韩语不变：riskLevel（안전/주의/위험/매우위험）、urgency（즉시/1년 내/3년 내）、transitions[].type（이직/전직/창직）、transitions[].difficulty（낮음/보통/높음）。`,
 
   ja: `この分析は日本の労働市場を基準としています。
 - 適用法規：労働基準法、職業安定法、各種国家資格・免許制度
 - 産業構造：製造業と自動車産業、高齢化に伴うサービス業のAI化加速
 - AI導入速度：先進国中やや遅め（規制・文化的要因）だが政府のDX推進で加速中
 - 職種名と転職事例は日本の雇用慣行（終身雇用・年功序列の変化）を考慮すること
-- すべての分析結果を日本語で記述してください。`,
+- すべての自由テキストフィールド（説明、タイトル、要約、ナラティブ）を日本語で記述してください。
+- 重要：以下のJSONの列挙フィールドは必ず韓国語のまま維持してください：riskLevel（안전/주의/위험/매우위험）、urgency（즉시/1년 내/3년 내）、transitions[].type（이직/전직/창직）、transitions[].difficulty（낮음/보통/높음）。`,
 
   es: `Este análisis está basado en el mercado laboral de España y Latinoamérica.
 - Marco legal: Estatuto de los Trabajadores (España), legislación laboral de cada país
 - Estructura industrial: Economías mixtas con sectores de servicios en crecimiento
 - Velocidad de adopción de IA: Variable según país (España moderada, Brasil y México acelerando)
 - Los títulos de trabajo y ejemplos de transición deben usar terminología del mercado hispanohablante
-- Redacta TODOS los resultados del análisis en español.`,
+- Redacta en español todos los campos de texto libre (descripciones, títulos, resúmenes, narrativas).
+- IMPORTANTE: Mantén estos campos enum del JSON exactamente en coreano: riskLevel (안전/주의/위험/매우위험), urgency (즉시/1년 내/3년 내), transitions[].type (이직/전직/창직), transitions[].difficulty (낮음/보통/높음).`,
 };
 
 export function getLang(code: LangCode) {
