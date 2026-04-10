@@ -122,6 +122,38 @@ function buildUserPrompt(job: string, mode: "adult" | "youth"): string {
 위 직업에 대해 JSON 형식으로만 분석 결과를 반환하세요. 설명 텍스트 없이 JSON만 출력하세요.`;
 }
 
+// 프롬프트 인젝션 즉시 차단 키워드
+const INJECTION_KEYWORDS = [
+  "무시", "프롬프트", "ignore", "prompt", "system", "bypass",
+  "jailbreak", "instruction", "override", "pretend", "forget",
+  "disregard", "instead", "actually", "위에", "이전", "앞의",
+];
+
+export async function validateJobName(job: string): Promise<boolean> {
+  // 1차: 키워드 블랙리스트 (즉시 차단)
+  const lower = job.toLowerCase();
+  if (INJECTION_KEYWORDS.some((kw) => lower.includes(kw))) return false;
+
+  // 2차: Haiku로 실제 직업명 여부 확인 (빠름, 저렴)
+  try {
+    const res = await getClient().messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 10,
+      temperature: 0,
+      messages: [
+        {
+          role: "user",
+          content: `"${job}"이 실제 직업명인가요? YES 또는 NO만 답하세요.`,
+        },
+      ],
+    });
+    const text = res.content[0].type === "text" ? res.content[0].text.trim().toUpperCase() : "";
+    return text.startsWith("YES");
+  } catch {
+    return true; // 검증 실패 시 허용 (서비스 중단 방지)
+  }
+}
+
 export async function analyzeJob(
   job: string,
   mode: "adult" | "youth"

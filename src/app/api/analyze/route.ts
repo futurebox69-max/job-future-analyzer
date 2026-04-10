@@ -3,7 +3,7 @@ import { Redis } from "@upstash/redis";
 
 // Vercel Pro 함수 실행 시간 제한 300초 (Pro 플랜 최대값)
 export const maxDuration = 300;
-import { analyzeJob } from "@/lib/claude";
+import { analyzeJob, validateJobName } from "@/lib/claude";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { AnalyzeRequest, AnalysisResult } from "@/types/analysis";
 
@@ -90,7 +90,16 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!mode || !["adult", "youth"].includes(mode))
     return new Response(JSON.stringify({ success: false, error: "모드 값이 올바르지 않습니다." }), { status: 400, headers: { "Content-Type": "application/json" } });
 
-  // 2. 캐시 확인 — 즉시 JSON 반환 (스트리밍 불필요)
+  // 2. 직업명 유효성 검증 (프롬프트 인젝션 방어)
+  const isValidJob = await validateJobName(trimmed);
+  if (!isValidJob) {
+    return new Response(
+      JSON.stringify({ success: false, error: "입력된 텍스트는 유효한 직업명이 아닙니다. '간호사', '변호사', '회계사' 등 실제 직업명을 입력해주세요." }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  // 3. 캐시 확인 — 캐시 히트면 즉시 JSON 반환 (스트리밍 불필요)
   const cacheKey = getCacheKey(trimmed, mode);
   try {
     const cached = await redis.get<AnalysisResult>(cacheKey);
@@ -105,7 +114,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     console.warn("캐시 조회 실패 (무시):", e);
   }
 
-  // 3. Rate Limit 체크
+  // 4. Rate Limit 체크
   const ip = getClientIp(request);
   const rateLimit = await checkRateLimit(ip);
 
@@ -119,7 +128,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
   }
 
-  // 4. SSE 스트리밍으로 Claude 분석 — 브라우저 타임아웃 방지
+  // 5. SSE 스트리밍으로 Claude 분석 — 브라우저 타임아웃 방지
   const stream = new ReadableStream({
     async start(controller) {
       const send = (data: object) => {
