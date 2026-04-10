@@ -12,6 +12,7 @@ import SkillGapAnalysis from "@/components/SkillGapAnalysis";
 import IncomeImpact from "@/components/IncomeImpact";
 import IndustryContext from "@/components/IndustryContext";
 import ConsultingNote from "@/components/ConsultingNote";
+import ShareCard from "@/components/ShareCard";
 import { AnalysisResult } from "@/types/analysis";
 
 const LOADING_STAGES = [
@@ -272,6 +273,9 @@ export default function Home() {
 
             {/* 컨설팅 노트 */}
             <ConsultingNote note={result.consultingNote} jobName={result.jobName} />
+
+            {/* 공유하기 */}
+            <ShareCard result={result} />
 
             {/* 면책 고지 */}
             <div className="rounded-2xl p-4 text-center" style={{ background: "#F9F9FF", border: "1px solid #EDE9FE" }}>
