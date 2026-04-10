@@ -148,7 +148,7 @@ export default function Home() {
         <header className="text-center mb-12">
           {/* 상단 컨트롤: 모드 토글 + 언어 선택 */}
           <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
-            <ModeToggle mode={mode} onChange={(m) => { setMode(m); setResult(null); setError(null); }} />
+            <ModeToggle mode={mode} onChange={(m) => { setMode(m); setResult(null); setError(null); }} lang={lang} />
             <LanguageSelector lang={lang} onChange={(l) => { setLang(l); setResult(null); setError(null); }} />
           </div>
 
