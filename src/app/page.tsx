@@ -241,31 +241,32 @@ export default function Home() {
               rate={result.overallRate}
               riskLevel={result.riskLevel}
               jobName={result.jobName}
+              lang={lang}
             />
 
             {/* 8차원 */}
-            <SixDimensions dimensions={result.dimensions} />
+            <SixDimensions dimensions={result.dimensions} lang={lang} />
 
             {/* 시간 지평선 */}
-            <TimeHorizonChart data={result.timeHorizon} />
+            <TimeHorizonChart data={result.timeHorizon} lang={lang} />
 
             {/* 스킬 갭 */}
-            <SkillGapAnalysis data={result.skillGap} />
+            <SkillGapAnalysis data={result.skillGap} lang={lang} />
 
             {/* 빙산 모델 */}
-            <IcebergModel layers={result.iceberg} />
+            <IcebergModel layers={result.iceberg} lang={lang} />
 
             {/* 소득 영향 */}
-            <IncomeImpact data={result.incomeImpact} />
+            <IncomeImpact data={result.incomeImpact} lang={lang} />
 
             {/* 업종별 분석 */}
-            <IndustryContext data={result.industryContext} />
+            <IndustryContext data={result.industryContext} lang={lang} />
 
             {/* 전환 경로 */}
-            <TransitionCards cards={result.transitions} mode={mode} />
+            <TransitionCards cards={result.transitions} mode={mode} lang={lang} />
 
             {/* 컨설팅 노트 */}
-            <ConsultingNote note={result.consultingNote} jobName={result.jobName} />
+            <ConsultingNote note={result.consultingNote} jobName={result.jobName} lang={lang} />
 
             {/* 공유하기 */}
             <ShareCard result={result} lang={lang} />

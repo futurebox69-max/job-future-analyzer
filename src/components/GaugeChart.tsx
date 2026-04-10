@@ -1,12 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LangCode } from "@/lib/i18n";
 
 interface GaugeChartProps {
   rate: number; // 0-100
   riskLevel: "안전" | "주의" | "위험" | "매우위험";
   jobName: string;
+  lang?: LangCode;
 }
+
+const LABELS: Record<LangCode, {
+  estimate: string;
+  disclaimer: string;
+  riskMap: Record<string, string>;
+}> = {
+  ko: {
+    estimate: "현재 트렌드 기반 추정값",
+    disclaimer: "이 수치는 현재 기술 트렌드 기반의 추정값입니다. AI 발전 속도와 사회·제도적 변화에 따라 달라질 수 있습니다.",
+    riskMap: { 안전: "안전", 주의: "주의", 위험: "위험", 매우위험: "매우위험" },
+  },
+  en: {
+    estimate: "Estimate based on current trends",
+    disclaimer: "This figure is an estimate based on current technology trends and may change with AI advancement and societal shifts.",
+    riskMap: { 안전: "Safe", 주의: "Caution", 위험: "At Risk", 매우위험: "Critical" },
+  },
+  zh: {
+    estimate: "基于当前趋势的估算值",
+    disclaimer: "该数值为基于当前技术趋势的估算值，随AI发展速度和社会制度变化可能有所不同。",
+    riskMap: { 안전: "安全", 주의: "注意", 위험: "危险", 매우위험: "极危" },
+  },
+  ja: {
+    estimate: "現在のトレンドに基づく推定値",
+    disclaimer: "この数値は現在の技術トレンドに基づく推定値です。AI発展速度や社会・制度的変化により変わる可能性があります。",
+    riskMap: { 안전: "安全", 주의: "注意", 위험: "危険", 매우위험: "非常に危険" },
+  },
+  es: {
+    estimate: "Estimación basada en tendencias actuales",
+    disclaimer: "Esta cifra es una estimación basada en tendencias tecnológicas actuales y puede cambiar con el avance de la IA y los cambios sociales.",
+    riskMap: { 안전: "Seguro", 주의: "Precaución", 위험: "En Riesgo", 매우위험: "Crítico" },
+  },
+};
 
 const RISK_COLORS = {
   안전: "#16A34A",
@@ -29,8 +63,9 @@ const RISK_BORDER = {
   매우위험: "#FECACA",
 };
 
-export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps) {
+export default function GaugeChart({ rate, riskLevel, jobName, lang = "ko" }: GaugeChartProps) {
   const [animatedRate, setAnimatedRate] = useState(0);
+  const L = LABELS[lang];
 
   useEffect(() => {
     setAnimatedRate(0);
@@ -79,6 +114,7 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
   const needleTip = toXY(needleAngle);
 
   const color = RISK_COLORS[riskLevel];
+  const riskLabel = L.riskMap[riskLevel] ?? riskLevel;
 
   return (
     <div
@@ -151,7 +187,7 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
         >
           {animatedRate}%
         </div>
-        <div className="mt-1 text-sm" style={{ color: "#6B7280" }}>현재 트렌드 기반 추정값</div>
+        <div className="mt-1 text-sm" style={{ color: "#6B7280" }}>{L.estimate}</div>
       </div>
 
       {/* 직업명 + 리스크 레벨 */}
@@ -165,13 +201,13 @@ export default function GaugeChart({ rate, riskLevel, jobName }: GaugeChartProps
             border: `1.5px solid ${color}40`,
           }}
         >
-          {riskLevel}
+          {riskLabel}
         </span>
       </div>
 
       {/* 불확실성 안내 */}
       <div className="mt-4 px-4 py-2.5 rounded-xl text-xs text-center" style={{ background: "rgba(0,0,0,0.04)", color: "#9CA3AF" }}>
-        ⚠️ 이 수치는 현재 기술 트렌드 기반의 <strong>추정값</strong>입니다. AI 발전 속도와 사회·제도적 변화에 따라 달라질 수 있습니다.
+        ⚠️ {L.disclaimer}
       </div>
     </div>
   );

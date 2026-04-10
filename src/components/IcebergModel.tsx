@@ -1,10 +1,38 @@
 "use client";
 
 import { IcebergLayer } from "@/types/analysis";
+import { LangCode } from "@/lib/i18n";
 
 interface IcebergModelProps {
   layers: IcebergLayer[];
+  lang?: LangCode;
 }
+
+const LABELS: Record<LangCode, {
+  title: string;
+  footer: string;
+}> = {
+  ko: {
+    title: "🧊 시스템사고 빙산 모델",
+    footer: "Donella Meadows 시스템사고 빙산 모델 적용",
+  },
+  en: {
+    title: "🧊 Systems Thinking Iceberg Model",
+    footer: "Based on Donella Meadows Systems Thinking Iceberg Model",
+  },
+  zh: {
+    title: "🧊 系统思维冰山模型",
+    footer: "基于Donella Meadows系统思维冰山模型",
+  },
+  ja: {
+    title: "🧊 システム思考アイスバーグモデル",
+    footer: "Donella Meadows システム思考アイスバーグモデル適用",
+  },
+  es: {
+    title: "🧊 Modelo Iceberg de Pensamiento Sistémico",
+    footer: "Basado en el Modelo Iceberg de Donella Meadows",
+  },
+};
 
 const LAYER_STYLES = [
   { bg: "#EFF6FF", border: "#BFDBFE", icon: "🌊", textColor: "#1D4ED8", label: "수면 위" },
@@ -13,7 +41,8 @@ const LAYER_STYLES = [
   { bg: "#C7D2FE", border: "#818CF8", icon: "⚓", textColor: "#3730A3", label: "근본" },
 ];
 
-export default function IcebergModel({ layers }: IcebergModelProps) {
+export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps) {
+  const L = LABELS[lang];
   const sorted = [...layers].sort((a, b) => a.level - b.level);
 
   return (
@@ -22,7 +51,7 @@ export default function IcebergModel({ layers }: IcebergModelProps) {
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <h3 className="font-semibold text-lg mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
-        🧊 시스템사고 빙산 모델
+        {L.title}
       </h3>
 
       <div className="space-y-3">
@@ -53,7 +82,7 @@ export default function IcebergModel({ layers }: IcebergModelProps) {
       </div>
 
       <p className="mt-4 text-xs text-center" style={{ color: "#9CA3AF" }}>
-        Donella Meadows 시스템사고 빙산 모델 적용
+        {L.footer}
       </p>
     </div>
   );

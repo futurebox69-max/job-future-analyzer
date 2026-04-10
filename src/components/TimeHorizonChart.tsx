@@ -1,17 +1,68 @@
 "use client";
 
 import { TimeHorizon } from "@/types/analysis";
+import { LangCode } from "@/lib/i18n";
 
 interface Props {
   data: TimeHorizon;
+  lang?: LangCode;
 }
 
-const YEARS = [
-  { key: "current" as const, label: "현재" },
-  { key: "year3" as const, label: "3년 후" },
-  { key: "year5" as const, label: "5년 후" },
-  { key: "year10" as const, label: "10년 후" },
-];
+const LABELS: Record<LangCode, {
+  title: string;
+  subtitle: string;
+  now: string;
+  y3: string;
+  y5: string;
+  y10: string;
+  riskMap: Record<string, string>;
+}> = {
+  ko: {
+    title: "⏳ 시간 지평선 분석",
+    subtitle: "AI 대체율의 시간에 따른 변화 예측",
+    now: "현재",
+    y3: "3년 후",
+    y5: "5년 후",
+    y10: "10년 후",
+    riskMap: { safe: "안전", caution: "주의", danger: "위험", critical: "매우위험" },
+  },
+  en: {
+    title: "⏳ Time Horizon Analysis",
+    subtitle: "AI replacement rate forecast over time",
+    now: "Now",
+    y3: "3 Years",
+    y5: "5 Years",
+    y10: "10 Years",
+    riskMap: { safe: "Safe", caution: "Caution", danger: "At Risk", critical: "Critical" },
+  },
+  zh: {
+    title: "⏳ 时间跨度分析",
+    subtitle: "AI替代率随时间变化预测",
+    now: "当前",
+    y3: "3年后",
+    y5: "5年后",
+    y10: "10年后",
+    riskMap: { safe: "安全", caution: "注意", danger: "危险", critical: "极危" },
+  },
+  ja: {
+    title: "⏳ 時間的展望分析",
+    subtitle: "AI代替率の時間的変化予測",
+    now: "現在",
+    y3: "3年後",
+    y5: "5年後",
+    y10: "10年後",
+    riskMap: { safe: "安全", caution: "注意", danger: "危険", critical: "非常に危険" },
+  },
+  es: {
+    title: "⏳ Análisis de Horizonte Temporal",
+    subtitle: "Pronóstico de la tasa de reemplazo IA a lo largo del tiempo",
+    now: "Ahora",
+    y3: "3 Años",
+    y5: "5 Años",
+    y10: "10 Años",
+    riskMap: { safe: "Seguro", caution: "Precaución", danger: "En Riesgo", critical: "Crítico" },
+  },
+};
 
 function getRiskColor(rate: number): string {
   if (rate < 30) return "#16A34A";
@@ -20,15 +71,22 @@ function getRiskColor(rate: number): string {
   return "#991B1B";
 }
 
-function getRiskLabel(rate: number): string {
-  if (rate < 30) return "안전";
-  if (rate < 55) return "주의";
-  if (rate < 75) return "위험";
-  return "매우위험";
+function getRiskKey(rate: number): string {
+  if (rate < 30) return "safe";
+  if (rate < 55) return "caution";
+  if (rate < 75) return "danger";
+  return "critical";
 }
 
-export default function TimeHorizonChart({ data }: Props) {
+export default function TimeHorizonChart({ data, lang = "ko" }: Props) {
+  const L = LABELS[lang];
   const values = [data.current, data.year3, data.year5, data.year10];
+  const YEARS = [
+    { key: "current" as const, label: L.now },
+    { key: "year3" as const, label: L.y3 },
+    { key: "year5" as const, label: L.y5 },
+    { key: "year10" as const, label: L.y10 },
+  ];
 
   return (
     <section
@@ -36,15 +94,16 @@ export default function TimeHorizonChart({ data }: Props) {
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
-        <span>⏳</span> 시간 지평선 분석
+        <span>⏳</span> {L.title.replace("⏳ ", "")}
       </h2>
-      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>AI 대체율의 시간에 따른 변화 예측</p>
+      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       {/* 바 차트 */}
       <div className="grid grid-cols-4 gap-3 mb-6">
         {YEARS.map((y, i) => {
           const value = values[i];
           const color = getRiskColor(value);
+          const riskKey = getRiskKey(value);
           return (
             <div key={y.key} className="flex flex-col items-center gap-2">
               <span className="text-xs" style={{ color: "#6B7280" }}>{y.label}</span>
@@ -65,7 +124,7 @@ export default function TimeHorizonChart({ data }: Props) {
                 className="text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
                 style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
               >
-                {getRiskLabel(value)}
+                {L.riskMap[riskKey]}
               </span>
             </div>
           );

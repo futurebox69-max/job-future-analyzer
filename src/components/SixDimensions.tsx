@@ -2,10 +2,68 @@
 
 import { useEffect, useState } from "react";
 import { AnalysisResult } from "@/types/analysis";
+import { LangCode } from "@/lib/i18n";
 
 interface Props {
   dimensions: AnalysisResult["dimensions"];
+  lang?: LangCode;
 }
+
+const LABELS: Record<LangCode, {
+  title: string;
+  subtitle: string;
+  why_title: string;
+  shield_badge: string;
+  danger_label: string;
+  safe_label: string;
+  weight_summary: string;
+}> = {
+  ko: {
+    title: "📊 8차원 분석",
+    subtitle: "각 차원의 AI 대체 가능성 점수 (0% = 안전, 100% = 위험)",
+    why_title: "💡 왜 8차원으로 분석하나요?",
+    shield_badge: "보호막",
+    danger_label: "🤖 AI 대체 위험 요소 (높을수록 위험)",
+    safe_label: "🛡️ 인간 고유 강점 (높을수록 안전)",
+    weight_summary: "가중치: 반복업무 20% · 인지판단 18% · 기술속도 12% · 창의성 12% · 대인관계 12% · 신체작업 10% · 윤리법적 8% · 제도보호 −8%",
+  },
+  en: {
+    title: "📊 8-Dimension Analysis",
+    subtitle: "AI replacement probability score per dimension (0% = safe, 100% = at risk)",
+    why_title: "💡 Why 8 dimensions?",
+    shield_badge: "Shield",
+    danger_label: "🤖 AI Replacement Risk Factors (higher = more dangerous)",
+    safe_label: "🛡️ Human Strengths (higher = safer)",
+    weight_summary: "Weights: Repetitive 20% · Cognitive 18% · Tech Velocity 12% · Creative 12% · Social 12% · Physical 10% · Ethical 8% · Regulatory −8%",
+  },
+  zh: {
+    title: "📊 8维度分析",
+    subtitle: "各维度AI替代可能性评分（0%=安全，100%=危险）",
+    why_title: "💡 为什么用8个维度分析？",
+    shield_badge: "保护盾",
+    danger_label: "🤖 AI替代风险因素（越高越危险）",
+    safe_label: "🛡️ 人类固有优势（越高越安全）",
+    weight_summary: "权重：重复工作20%·认知判断18%·技术速度12%·创造力12%·人际关系12%·体力工作10%·伦理法律8%·制度保护−8%",
+  },
+  ja: {
+    title: "📊 8次元分析",
+    subtitle: "各次元のAI代替可能性スコア（0%=安全、100%=危険）",
+    why_title: "💡 なぜ8次元で分析するのか？",
+    shield_badge: "保護壁",
+    danger_label: "🤖 AI代替リスク要因（高いほど危険）",
+    safe_label: "🛡️ 人間固有の強み（高いほど安全）",
+    weight_summary: "ウェイト：反復業務20%·認知判断18%·技術速度12%·創造性12%·対人関係12%·身体作業10%·倫理法的8%·制度保護−8%",
+  },
+  es: {
+    title: "📊 Análisis 8 Dimensiones",
+    subtitle: "Puntuación de probabilidad de reemplazo IA por dimensión (0%=seguro, 100%=riesgo)",
+    why_title: "💡 ¿Por qué 8 dimensiones?",
+    shield_badge: "Escudo",
+    danger_label: "🤖 Factores de Riesgo de Reemplazo IA (más alto = más peligroso)",
+    safe_label: "🛡️ Fortalezas Humanas (más alto = más seguro)",
+    weight_summary: "Pesos: Repetitivo 20% · Cognitivo 18% · Vel. Tecnológica 12% · Creativo 12% · Social 12% · Físico 10% · Ético 8% · Regulatorio −8%",
+  },
+};
 
 const DIMENSION_ORDER = [
   "repetitive",
@@ -39,8 +97,9 @@ const WEIGHTS: Record<string, string> = {
   regulatory: "8% (역방향)",
 };
 
-export default function SixDimensions({ dimensions }: Props) {
+export default function SixDimensions({ dimensions, lang = "ko" }: Props) {
   const [animated, setAnimated] = useState(false);
+  const L = LABELS[lang];
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimated(true), 100);
@@ -53,19 +112,19 @@ export default function SixDimensions({ dimensions }: Props) {
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <h3 className="font-semibold text-lg mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
-        📊 8차원 분석
+        {L.title}
       </h3>
-      <p className="text-xs mb-3" style={{ color: "#9CA3AF" }}>각 차원의 AI 대체 가능성 점수 (0% = 안전, 100% = 위험)</p>
+      <p className="text-xs mb-3" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       {/* 왜 8차원인가 */}
       <div className="rounded-xl p-4 mb-5 border" style={{ background: "#F5F4FF", borderColor: "#EDE9FE" }}>
-        <p className="text-xs font-semibold mb-2" style={{ color: "#6C63FF" }}>💡 왜 8차원으로 분석하나요?</p>
+        <p className="text-xs font-semibold mb-2" style={{ color: "#6C63FF" }}>{L.why_title}</p>
         <p className="text-xs leading-relaxed" style={{ color: "#4B5563" }}>
           단순히 "자동화 가능 여부"만 보는 기존 연구와 달리, 이 분석은 <strong>AI가 대체하기 쉬운 요소</strong>와 <strong>인간만이 가진 강점</strong>을 함께 측정합니다.
         </p>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
-            <p className="text-xs font-medium mb-1" style={{ color: "#DC2626" }}>🤖 AI 대체 위험 요소 (높을수록 위험)</p>
+            <p className="text-xs font-medium mb-1" style={{ color: "#DC2626" }}>{L.danger_label}</p>
             <ul className="text-xs space-y-0.5" style={{ color: "#6B7280" }}>
               <li>• <strong>반복 업무 (20%)</strong> — RPA·AI가 가장 먼저 대체</li>
               <li>• <strong>인지적 판단 (18%)</strong> — 표준화된 의사결정</li>
@@ -74,7 +133,7 @@ export default function SixDimensions({ dimensions }: Props) {
             </ul>
           </div>
           <div>
-            <p className="text-xs font-medium mb-1" style={{ color: "#16A34A" }}>🛡️ 인간 고유 강점 (높을수록 안전)</p>
+            <p className="text-xs font-medium mb-1" style={{ color: "#16A34A" }}>{L.safe_label}</p>
             <ul className="text-xs space-y-0.5" style={{ color: "#6B7280" }}>
               <li>• <strong>창의성·감성 (12%)</strong> — AI가 흉내 내기 어려운 영역</li>
               <li>• <strong>대인관계·소통 (12%)</strong> — 신뢰·공감·협상</li>
@@ -100,7 +159,7 @@ export default function SixDimensions({ dimensions }: Props) {
                   <span>{dim.icon}</span>
                   <span>{dim.label}</span>
                   {isInverse && (
-                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0" }}>보호막</span>
+                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0" }}>{L.shield_badge}</span>
                   )}
                 </span>
                 <div className="flex items-center gap-2">
@@ -127,7 +186,7 @@ export default function SixDimensions({ dimensions }: Props) {
 
       <div className="mt-5 pt-4 border-t" style={{ borderColor: "#F3F4F6" }}>
         <p className="text-xs text-center" style={{ color: "#9CA3AF" }}>
-          가중치: 반복업무 20% · 인지판단 18% · 기술속도 12% · 창의성 12% · 대인관계 12% · 신체작업 10% · 윤리법적 8% · 제도보호 −8%
+          {L.weight_summary}
         </p>
       </div>
     </div>
