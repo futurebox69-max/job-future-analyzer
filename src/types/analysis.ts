@@ -120,6 +120,7 @@ export function getRiskLevel(rate: number): AnalysisResult["riskLevel"] {
 export interface AnalyzeRequest {
   job: string;
   mode: "adult" | "youth";
+  lang?: string; // 언어 코드 (ko, en, zh, ja, es)
 }
 
 // API 응답 타입

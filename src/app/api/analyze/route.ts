@@ -4,6 +4,7 @@ import { Redis } from "@upstash/redis";
 // Vercel Pro 함수 실행 시간 제한 300초 (Pro 플랜 최대값)
 export const maxDuration = 300;
 import { analyzeJob, validateJobName } from "@/lib/claude";
+import { LangCode } from "@/lib/i18n";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { AnalyzeRequest, AnalysisResult } from "@/types/analysis";
 
@@ -19,10 +20,10 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-function getCacheKey(job: string, mode: string): string {
+function getCacheKey(job: string, mode: string, lang = "ko"): string {
   const month = new Date().toISOString().slice(0, 7);
   const normalized = job.trim().toLowerCase().replace(/\s+/g, " ");
-  return `job_result:${month}:${mode}:${normalized}`;
+  return `job_result:${month}:${mode}:${lang}:${normalized}`;
 }
 
 function today(): string {
@@ -71,7 +72,9 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
   }
 
-  const { job, mode } = body;
+  const { job, mode, lang } = body;
+  const validLangs: LangCode[] = ["ko", "en", "zh", "ja", "es"];
+  const safeLang: LangCode = lang && validLangs.includes(lang as LangCode) ? (lang as LangCode) : "ko";
 
   if (!job || typeof job !== "string")
     return new Response(JSON.stringify({ success: false, error: "직업명을 입력해주세요." }), { status: 400, headers: { "Content-Type": "application/json" } });
@@ -100,7 +103,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   // 3. 캐시 확인 — 캐시 히트면 즉시 JSON 반환 (스트리밍 불필요)
-  const cacheKey = getCacheKey(trimmed, mode);
+  const cacheKey = getCacheKey(trimmed, mode, safeLang);
   try {
     const cached = await redis.get<AnalysisResult>(cacheKey);
     if (cached) {
@@ -151,11 +154,11 @@ export async function POST(request: NextRequest): Promise<Response> {
         let result: AnalysisResult;
 
         try {
-          result = await analyzeJob(trimmed, mode);
+          result = await analyzeJob(trimmed, mode, safeLang);
         } catch (firstError) {
           console.warn("첫 번째 Claude 호출 실패, 재시도 중:", firstError);
           send({ type: "progress", stage: "retrying", message: "재시도 중..." });
-          result = await analyzeJob(trimmed, mode);
+          result = await analyzeJob(trimmed, mode, safeLang);
         }
 
         clearInterval(keepAlive);

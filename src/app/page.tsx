@@ -13,21 +13,16 @@ import IncomeImpact from "@/components/IncomeImpact";
 import IndustryContext from "@/components/IndustryContext";
 import ConsultingNote from "@/components/ConsultingNote";
 import ShareCard from "@/components/ShareCard";
+import LanguageSelector from "@/components/LanguageSelector";
 import { AnalysisResult } from "@/types/analysis";
-
-const LOADING_STAGES = [
-  "Claude AI가 직업 데이터를 수집하고 있습니다...",
-  "8차원 분석 모델을 적용하는 중...",
-  "AI 대체 가능성을 계산하고 있습니다...",
-  "10년 시간 지평선 예측 생성 중...",
-  "스킬 갭 및 전환 경로 분석 중...",
-  "소득 영향 및 업종 분석 마무리 중...",
-];
+import { getLang, LangCode } from "@/lib/i18n";
 
 export default function Home() {
   const [mode, setMode] = useState<"adult" | "youth">("adult");
+  const [lang, setLang] = useState<LangCode>("ko");
+  const t = getLang(lang);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingMsg, setLoadingMsg] = useState(LOADING_STAGES[0]);
+  const [loadingMsg, setLoadingMsg] = useState("");
   const [loadingStageIdx, setLoadingStageIdx] = useState(0);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,30 +44,29 @@ export default function Home() {
     if (!isLoading) return;
     const interval = setInterval(() => {
       setLoadingStageIdx((i) => {
-        const next = Math.min(i + 1, LOADING_STAGES.length - 1);
-        setLoadingMsg(LOADING_STAGES[next]);
+        const next = Math.min(i + 1, t.loading.length - 1);
+        setLoadingMsg(t.loading[next]);
         return next;
       });
     }, 12000);
     return () => clearInterval(interval);
-  }, [isLoading]);
+  }, [isLoading, t]);
 
   const handleAnalyze = async (job: string) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
-    setLoadingMsg(LOADING_STAGES[0]);
+    setLoadingMsg(t.loading[0]);
     setLoadingStageIdx(0);
 
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ job, mode }),
+        body: JSON.stringify({ job, mode, lang }),
       });
 
       if (!response.ok) {
-        // 에러 응답 (4xx, 5xx)
         const data = await response.json().catch(() => ({}));
         setError((data as { error?: string }).error ?? "분석에 실패했습니다. 다시 시도해주세요.");
         return;
@@ -152,12 +146,14 @@ export default function Home() {
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
         {/* 헤더 */}
         <header className="text-center mb-12">
-          <div className="flex justify-center mb-6">
+          {/* 상단 컨트롤: 모드 토글 + 언어 선택 */}
+          <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
             <ModeToggle mode={mode} onChange={(m) => { setMode(m); setResult(null); setError(null); }} />
+            <LanguageSelector lang={lang} onChange={(l) => { setLang(l); setResult(null); setError(null); }} />
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-bold mb-3" style={{ color: "#1E1B4B" }}>
-            내 직업의{" "}
+            {t.title.split(" ").slice(0, -1).join(" ")}{t.title.split(" ").length > 1 ? " " : ""}
             <span
               style={{
                 background: "linear-gradient(135deg, #6C63FF, #A78BFA)",
@@ -165,27 +161,24 @@ export default function Home() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              미래
+              {t.title.split(" ").slice(-1)[0]}
             </span>
           </h1>
           <p className="text-lg" style={{ color: "#6B7280", wordBreak: "keep-all" }}>
-            {mode === "youth"
-              ? "관심 직업의 AI 대체 가능성을 확인하고 진로를 설계하세요"
-              : "내 직업의 AI 대체 가능성을 8차원으로 심층 분석합니다"}
+            {mode === "youth" ? t.subtitle_youth : t.subtitle_adult}
           </p>
           {totalCount !== null && totalCount > 0 && (
             <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm" style={{ background: "#F5F4FF", border: "1px solid #EDE9FE" }}>
               <span style={{ color: "#A78BFA" }}>✦</span>
-              <span style={{ color: "#6B7280" }}>지금까지</span>
-              <span className="font-bold" style={{ color: "#6C63FF" }}>{totalCount.toLocaleString()}번</span>
-              <span style={{ color: "#6B7280" }}>분석됨</span>
+              <span className="font-bold" style={{ color: "#6C63FF" }}>{totalCount.toLocaleString()}</span>
+              <span style={{ color: "#6B7280" }}>{t.analyzed_count}</span>
             </div>
           )}
         </header>
 
         {/* 입력 */}
         <div className="mb-8">
-          <JobInput onAnalyze={handleAnalyze} isLoading={isLoading} mode={mode} />
+          <JobInput onAnalyze={handleAnalyze} isLoading={isLoading} mode={mode} lang={lang} />
         </div>
 
         {/* 로딩 */}
@@ -195,9 +188,9 @@ export default function Home() {
               <div className="absolute inset-0 rounded-full border-4 border-[#6C63FF]/20 border-t-[#6C63FF] animate-spin" />
               <div className="absolute inset-3 rounded-full border-4 border-[#A78BFA]/20 border-b-[#A78BFA] animate-spin" style={{ animationDirection: "reverse", animationDuration: "1.5s" }} />
             </div>
-            <p className="text-sm font-medium" style={{ color: "#4B5563" }}>{loadingMsg}</p>
+            <p className="text-sm font-medium" style={{ color: "#4B5563" }}>{loadingMsg || t.loading[0]}</p>
             <div className="flex gap-1.5">
-              {LOADING_STAGES.map((_, i) => (
+              {t.loading.map((_, i) => (
                 <div
                   key={i}
                   className="w-1.5 h-1.5 rounded-full transition-all duration-500"
@@ -205,7 +198,7 @@ export default function Home() {
                 />
               ))}
             </div>
-            <p className="text-xs" style={{ color: "#9CA3AF" }}>처음 분석은 30~90초 소요됩니다 · 같은 직업은 즉시 로드</p>
+            <p className="text-xs" style={{ color: "#9CA3AF" }}>{t.loading_hint}</p>
           </div>
         )}
 
@@ -224,11 +217,11 @@ export default function Home() {
               <div className="flex items-center justify-end gap-2">
                 {fromCache && (
                   <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "#F0FDF4", color: "#16A34A", border: "1px solid #BBF7D0" }}>
-                    ⚡ 즉시 로드
+                    {t.instant}
                   </span>
                 )}
                 <span className="text-xs px-3 py-1 rounded-full" style={{ background: "#F5F4FF", color: "#6C63FF", border: "1px solid #EDE9FE" }}>
-                  오늘 남은 횟수: {remaining}회
+                  {t.remaining}: {remaining}
                 </span>
               </div>
             )}
@@ -275,20 +268,18 @@ export default function Home() {
             <ConsultingNote note={result.consultingNote} jobName={result.jobName} />
 
             {/* 공유하기 */}
-            <ShareCard result={result} />
+            <ShareCard result={result} lang={lang} />
 
             {/* 면책 고지 */}
             <div className="rounded-2xl p-4 text-center" style={{ background: "#F9F9FF", border: "1px solid #EDE9FE" }}>
               <p className="text-xs font-medium mb-1" style={{ color: "#6B7280" }}>
-                📌 분석 결과 활용 시 유의사항
+                {t.disclaimer_title}
               </p>
               <p className="text-xs leading-relaxed" style={{ color: "#9CA3AF" }}>
-                이 분석은 현재 시점의 기술 트렌드와 학술 연구를 바탕으로 한 <strong style={{ color: "#6B7280" }}>추정값</strong>입니다.
-                AI 기술 발전 속도, 사회·제도적 변화, 개인의 역량에 따라 실제 결과는 크게 달라질 수 있습니다.
-                참고 자료로 활용하시되, 중요한 진로 결정은 전문가와 함께 검토하시길 권장합니다.
+                {t.disclaimer_body}
               </p>
               <p className="text-xs mt-2" style={{ color: "#C4B5FD" }}>
-                출처: WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013·2023) · McKinsey (2023) · Autor (2022)
+                WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013·2023) · McKinsey (2023) · Autor (2022)
               </p>
             </div>
           </div>
@@ -298,8 +289,8 @@ export default function Home() {
         {!result && !isLoading && !error && (
           <div className="text-center py-12" style={{ color: "#9CA3AF" }}>
             <p className="text-5xl mb-4">🔮</p>
-            <p className="text-sm">직업명을 입력하고 분석을 시작하세요</p>
-            <p className="text-xs mt-2" style={{ color: "#C4B5FD" }}>8차원 분석 · 10년 예측 · 스킬 로드맵 · 소득 영향</p>
+            <p className="text-sm">{t.empty_title}</p>
+            <p className="text-xs mt-2" style={{ color: "#C4B5FD" }}>{t.empty_sub}</p>
           </div>
         )}
       </div>
@@ -308,7 +299,7 @@ export default function Home() {
         className="relative z-10 text-center py-6 text-xs border-t"
         style={{ color: "#9CA3AF", borderColor: "#EDE9FE" }}
       >
-        LoginFuture Ministry · 내 직업의 미래 v2.0
+        {t.footer}
       </footer>
     </main>
   );

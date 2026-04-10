@@ -1,31 +1,91 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AnalysisResult } from "@/types/analysis";
+import { getLang, LangCode } from "@/lib/i18n";
 
 interface ShareCardProps {
   result: AnalysisResult;
+  lang?: LangCode;
 }
 
 const RISK_CONFIG = {
-  안전:    { color: "#10B981", bg: "#ECFDF5", border: "#6EE7B7", emoji: "🟢", label: "AI 대체 안전" },
-  주의:    { color: "#F59E0B", bg: "#FFFBEB", border: "#FCD34D", emoji: "🟡", label: "주의 필요" },
-  위험:    { color: "#EF4444", bg: "#FEF2F2", border: "#FCA5A5", emoji: "🔴", label: "대체 위험" },
-  매우위험: { color: "#7C3AED", bg: "#F5F3FF", border: "#C4B5FD", emoji: "🚨", label: "매우 위험" },
+  안전:    { color: "#10B981", bg: "#ECFDF5", border: "#6EE7B7", emoji: "🟢" },
+  주의:    { color: "#F59E0B", bg: "#FFFBEB", border: "#FCD34D", emoji: "🟡" },
+  위험:    { color: "#EF4444", bg: "#FEF2F2", border: "#FCA5A5", emoji: "🔴" },
+  매우위험: { color: "#7C3AED", bg: "#F5F3FF", border: "#C4B5FD", emoji: "🚨" },
 };
 
-export default function ShareCard({ result }: ShareCardProps) {
+function getShareText(result: AnalysisResult, lang: LangCode, riskLabel: string, appUrl: string): string {
+  const { jobName, overallRate } = result;
+  const emoji = RISK_CONFIG[result.riskLevel].emoji;
+  switch (lang) {
+    case "en":
+      return `🤖 Future of My Job Analysis\n\nJob: ${jobName}\nAI Replacement: ${overallRate}% ${emoji}\nRisk: ${riskLabel}\n\nCheck your job's AI future with 8D analysis!\n👉 ${appUrl}`;
+    case "zh":
+      return `🤖 我的职业未来分析结果\n\n职业：${jobName}\nAI取代率：${overallRate}% ${emoji}\n等级：${riskLabel}\n\n用8维AI分析查看您的职业未来！\n👉 ${appUrl}`;
+    case "ja":
+      return `🤖 私の仕事の未来分析結果\n\n職業：${jobName}\nAI代替率：${overallRate}% ${emoji}\nリスク：${riskLabel}\n\n8次元AI分析で仕事の未来を確認！\n👉 ${appUrl}`;
+    case "es":
+      return `🤖 Análisis del Futuro de Mi Trabajo\n\nPuesto: ${jobName}\nReemplazo IA: ${overallRate}% ${emoji}\nRiesgo: ${riskLabel}\n\n¡Descubre el futuro de tu trabajo con análisis de 8 dimensiones!\n👉 ${appUrl}`;
+    default:
+      return `🤖 내 직업의 미래 분석 결과\n\n직업: ${jobName}\nAI 대체율: ${overallRate}% ${emoji}\n등급: ${riskLabel}\n\n8차원 AI 분석으로 내 직업의 미래를 확인해보세요!\n👉 ${appUrl}`;
+  }
+}
+
+function getAppLabel(lang: LangCode): string {
+  switch (lang) {
+    case "en": return "Future of My Job";
+    case "zh": return "我的职业未来";
+    case "ja": return "私の仕事の未来";
+    case "es": return "Futuro de Mi Trabajo";
+    default: return "내 직업의 미래";
+  }
+}
+
+function getDimensionLabel(lang: LangCode): string {
+  switch (lang) {
+    case "en": return "8D AI Replacement Analysis";
+    case "zh": return "8维AI取代率分析";
+    case "ja": return "8次元AI代替率分析";
+    case "es": return "Análisis AI 8 Dimensiones";
+    default: return "8차원 AI 대체율 분석";
+  }
+}
+
+function getGaugeLabels(lang: LangCode): [string, string] {
+  switch (lang) {
+    case "en": return ["0% Safe", "100% Risk"];
+    case "zh": return ["0% 安全", "100% 危险"];
+    case "ja": return ["0% 安全", "100% 危険"];
+    case "es": return ["0% Seguro", "100% Riesgo"];
+    default: return ["0% 안전", "100% 위험"];
+  }
+}
+
+function getRateLabel(lang: LangCode): string {
+  switch (lang) {
+    case "en": return "AI Replacement";
+    case "zh": return "AI取代率";
+    case "ja": return "AI代替率";
+    case "es": return "Reemplazo IA";
+    default: return "AI 대체율";
+  }
+}
+
+export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const t = getLang(lang);
 
   useEffect(() => { setMounted(true); }, []);
 
   const risk = RISK_CONFIG[result.riskLevel];
+  const riskLabel = t[`risk_${result.riskLevel === "안전" ? "safe" : result.riskLevel === "주의" ? "caution" : result.riskLevel === "위험" ? "danger" : "critical"}` as keyof typeof t] as string;
   const appUrl = "https://job-future-analyzer.vercel.app";
-  const shareText = `🤖 내 직업의 미래 분석 결과\n\n직업: ${result.jobName}\nAI 대체율: ${result.overallRate}% ${risk.emoji}\n등급: ${risk.label}\n\n8차원 AI 분석으로 내 직업의 미래를 확인해보세요!\n👉 ${appUrl}`;
+  const shareText = getShareText(result, lang, riskLabel, appUrl);
 
   const handleCopyText = async () => {
     await navigator.clipboard.writeText(shareText);
@@ -45,7 +105,7 @@ export default function ShareCard({ result }: ShareCardProps) {
 
   const handleShareNative = async () => {
     if (navigator.share) {
-      await navigator.share({ title: "내 직업의 미래", text: shareText, url: appUrl });
+      await navigator.share({ title: getAppLabel(lang), text: shareText, url: appUrl });
     } else {
       handleCopyText();
     }
@@ -58,13 +118,15 @@ export default function ShareCard({ result }: ShareCardProps) {
       if (!card) return;
       const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: null });
       const link = document.createElement("a");
-      link.download = `내직업의미래_${result.jobName}.png`;
+      link.download = `${getAppLabel(lang)}_${result.jobName}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch {
       handleCopyText();
     }
   };
+
+  const [gaugeLeft, gaugeRight] = getGaugeLabels(lang);
 
   return (
     <>
@@ -79,7 +141,7 @@ export default function ShareCard({ result }: ShareCardProps) {
         }}
       >
         <span>📤</span>
-        <span>결과 공유하기</span>
+        <span>{t.share_btn.replace("📤 ", "")}</span>
       </button>
 
       {/* 모달 - Portal로 body에 직접 렌더링 */}
@@ -95,7 +157,7 @@ export default function ShareCard({ result }: ShareCardProps) {
           >
             {/* 모달 헤더 */}
             <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "#F3F4F6" }}>
-              <span className="font-bold text-base" style={{ color: "#1E1B4B" }}>결과 공유하기</span>
+              <span className="font-bold text-base" style={{ color: "#1E1B4B" }}>{t.share_title}</span>
               <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
             </div>
 
@@ -103,7 +165,6 @@ export default function ShareCard({ result }: ShareCardProps) {
             <div className="p-5">
               <div
                 id="share-card-render"
-                ref={cardRef}
                 className="rounded-2xl overflow-hidden"
                 style={{
                   background: "linear-gradient(135deg, #1E1B4B 0%, #3730A3 50%, #6C63FF 100%)",
@@ -132,7 +193,7 @@ export default function ShareCard({ result }: ShareCardProps) {
                     fontSize: 14,
                   }}>🤖</div>
                   <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 600, letterSpacing: "0.05em" }}>
-                    내 직업의 미래
+                    {getAppLabel(lang)}
                   </span>
                 </div>
 
@@ -141,13 +202,13 @@ export default function ShareCard({ result }: ShareCardProps) {
                   {result.jobName}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, marginBottom: 20 }}>
-                  8차원 AI 대체율 분석
+                  {getDimensionLabel(lang)}
                 </div>
 
                 {/* 대체율 + 등급 */}
                 <div className="flex items-end justify-between mb-5">
                   <div>
-                    <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, marginBottom: 2 }}>AI 대체율</div>
+                    <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, marginBottom: 2 }}>{getRateLabel(lang)}</div>
                     <div style={{ color: "#fff", fontSize: 48, fontWeight: 900, lineHeight: 1 }}>
                       {result.overallRate}
                       <span style={{ fontSize: 20, fontWeight: 600 }}>%</span>
@@ -161,7 +222,7 @@ export default function ShareCard({ result }: ShareCardProps) {
                     textAlign: "center",
                   }}>
                     <div style={{ fontSize: 18, marginBottom: 2 }}>{risk.emoji}</div>
-                    <div style={{ color: risk.color, fontSize: 12, fontWeight: 700 }}>{risk.label}</div>
+                    <div style={{ color: risk.color, fontSize: 12, fontWeight: 700 }}>{riskLabel}</div>
                   </div>
                 </div>
 
@@ -177,8 +238,8 @@ export default function ShareCard({ result }: ShareCardProps) {
                     }} />
                   </div>
                   <div className="flex justify-between mt-1">
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 9 }}>0% 안전</span>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 9 }}>100% 위험</span>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 9 }}>{gaugeLeft}</span>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 9 }}>{gaugeRight}</span>
                   </div>
                 </div>
 
@@ -218,7 +279,7 @@ export default function ShareCard({ result }: ShareCardProps) {
                 className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
                 style={{ background: "linear-gradient(135deg, #6C63FF, #A78BFA)", color: "#fff" }}
               >
-                <span>🖼️</span> 이미지로 저장 (인스타·틱톡용)
+                {t.save_image}
               </button>
 
               {/* X, 스레드 */}
@@ -228,14 +289,14 @@ export default function ShareCard({ result }: ShareCardProps) {
                   className="py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 transition-all hover:opacity-90"
                   style={{ background: "#000", color: "#fff" }}
                 >
-                  <span style={{ fontWeight: 900, fontSize: 15 }}>𝕏</span> X (트위터)
+                  <span style={{ fontWeight: 900, fontSize: 15 }}>𝕏</span> X
                 </button>
                 <button
                   onClick={handleShareThreads}
                   className="py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 transition-all hover:opacity-90"
                   style={{ background: "#000", color: "#fff" }}
                 >
-                  <span style={{ fontSize: 16 }}>@</span> 스레드
+                  <span style={{ fontSize: 16 }}>@</span> Threads
                 </button>
               </div>
 
@@ -245,7 +306,7 @@ export default function ShareCard({ result }: ShareCardProps) {
                 className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
                 style={{ background: "#F5F4FF", color: "#6C63FF", border: "1px solid #EDE9FE" }}
               >
-                {copied ? "✅ 복사됨!" : "🔗 링크 + 텍스트 복사"}
+                {copied ? t.copied : t.copy_link}
               </button>
             </div>
           </div>

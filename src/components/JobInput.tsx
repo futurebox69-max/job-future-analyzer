@@ -1,32 +1,32 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { getLang, LangCode } from "@/lib/i18n";
 
 interface JobInputProps {
   onAnalyze: (job: string) => void;
   isLoading: boolean;
   mode: "adult" | "youth";
+  lang: LangCode;
 }
 
-export default function JobInput({ onAnalyze, isLoading, mode }: JobInputProps) {
+export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputProps) {
   const [job, setJob] = useState("");
   const [error, setError] = useState("");
+  const t = getLang(lang);
 
-  const placeholder =
-    mode === "youth"
-      ? "관심 있는 직업을 입력하세요 (예: 선생님, 의사, 프로게이머)"
-      : "직업명을 입력하세요 (예: 의사, 회계사, 소프트웨어 개발자)";
+  const placeholder = mode === "youth" ? t.placeholder_youth : t.placeholder_adult;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const trimmed = job.trim();
 
     if (!trimmed) {
-      setError("직업명을 입력해주세요.");
+      setError(lang === "ko" ? "직업명을 입력해주세요." : lang === "zh" ? "请输入职业名称。" : lang === "ja" ? "職業名を入力してください。" : lang === "es" ? "Por favor ingresa un puesto de trabajo." : "Please enter a job title.");
       return;
     }
     if (trimmed.length > 50) {
-      setError("직업명은 50자 이하로 입력해주세요.");
+      setError(lang === "ko" ? "직업명은 50자 이하로 입력해주세요." : lang === "zh" ? "职业名称请在50字以内。" : lang === "ja" ? "職業名は50文字以内で入力してください。" : lang === "es" ? "El puesto debe tener menos de 50 caracteres." : "Job title must be under 50 characters.");
       return;
     }
 
@@ -76,11 +76,11 @@ export default function JobInput({ onAnalyze, isLoading, mode }: JobInputProps) 
           {isLoading ? (
             <>
               <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              분석 중
+              {t.analyzing_btn}
             </>
           ) : (
             <>
-              🔍 분석하기
+              🔍 {t.analyze_btn}
             </>
           )}
         </button>
@@ -93,7 +93,7 @@ export default function JobInput({ onAnalyze, isLoading, mode }: JobInputProps) 
       )}
 
       <p className="mt-2 text-xs text-center" style={{ color: "#9CA3AF" }}>
-        하루 20회 무료 분석 · AI 분석 결과는 참고용입니다
+        {t.daily_limit}
       </p>
     </form>
   );
