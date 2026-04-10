@@ -110,7 +110,7 @@ const LABELS: Record<LangCode, {
     title: "📊 8维度分析",
     subtitle: "各维度AI替代可能性评分（0%=安全，100%=危险）",
     why_title: "💡 为什么用8个维度分析？",
-    why_body: "与仅关注"是否可自动化"的传统研究不同，本分析同时测量",
+    why_body: "与仅关注「是否可自动化」的传统研究不同，本分析同时测量",
     why_risk_strong: "AI容易替代的因素",
     why_human_strong: "人类独有的优势",
     shield_badge: "保护盾",
