@@ -81,7 +81,7 @@ export default function ShareCard({ result }: ShareCardProps) {
       {/* 모달 */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
           onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
         >
