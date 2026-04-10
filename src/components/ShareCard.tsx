@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AnalysisResult } from "@/types/analysis";
 
 interface ShareCardProps {
@@ -17,7 +18,10 @@ const RISK_CONFIG = {
 export default function ShareCard({ result }: ShareCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const risk = RISK_CONFIG[result.riskLevel];
   const appUrl = "https://job-future-analyzer.vercel.app";
@@ -78,8 +82,8 @@ export default function ShareCard({ result }: ShareCardProps) {
         <span>결과 공유하기</span>
       </button>
 
-      {/* 모달 */}
-      {isOpen && (
+      {/* 모달 - Portal로 body에 직접 렌더링 */}
+      {mounted && isOpen && createPortal(
         <div
           className="fixed inset-0 flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 9999 }}
@@ -245,7 +249,8 @@ export default function ShareCard({ result }: ShareCardProps) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
