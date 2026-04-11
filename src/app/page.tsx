@@ -268,6 +268,36 @@ export default function Home() {
             {/* 컨설팅 노트 */}
             <ConsultingNote note={result.consultingNote} jobName={result.jobName} lang={lang} />
 
+            {/* AI 코치 연결 버튼 */}
+            <div
+              className="rounded-2xl p-5 text-center"
+              style={{
+                background: "linear-gradient(135deg, #0D1B3E, #1a2d5a)",
+                border: "1px solid rgba(212,175,55,0.3)",
+                boxShadow: "0 4px 20px rgba(13,27,62,0.3)",
+              }}
+            >
+              <p className="text-base font-bold mb-1" style={{ color: "#F5D26B" }}>
+                🔮 더 궁금한 것이 있으신가요?
+              </p>
+              <p className="text-xs mb-4" style={{ color: "#7a9acc" }}>
+                AI 코치와 1:1 대화로 더 깊이 알아보세요
+              </p>
+              <a
+                href={`https://job-future-chat.vercel.app/?job=${encodeURIComponent(result.jobName)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-95"
+                style={{
+                  background: "linear-gradient(135deg, #D4AF37, #F5D26B)",
+                  color: "#0D1B3E",
+                  boxShadow: "0 4px 16px rgba(212,175,55,0.4)",
+                }}
+              >
+                AI 코치와 대화하기 →
+              </a>
+            </div>
+
             {/* 공유하기 */}
             <ShareCard result={result} lang={lang} />
 
