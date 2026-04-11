@@ -118,7 +118,7 @@ export default function GaugeChart({ rate, riskLevel, jobName, lang = "ko" }: Ga
 
   return (
     <div
-      className="flex flex-col items-center p-6 rounded-3xl border transition-all duration-500"
+      className="flex flex-col items-center p-4 sm:p-6 rounded-3xl border transition-all duration-500"
       style={{
         background: RISK_BG[riskLevel],
         borderColor: RISK_BORDER[riskLevel],

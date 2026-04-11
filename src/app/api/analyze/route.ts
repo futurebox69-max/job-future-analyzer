@@ -84,7 +84,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       too_long: `직업명은 ${MAX_JOB_LENGTH}자 이하로 입력해주세요.`,
       bad_chars: "직업명에 허용되지 않는 문자가 포함되어 있습니다.",
       bad_mode: "모드 값이 올바르지 않습니다.",
-      not_job: "유효한 직업명이 아닙니다. '간호사', '변호사', '회계사' 등 실제 직업명을 입력해주세요.",
+      not_job: "유효한 직업명이 아닙니다. '간호사', '유튜버', '프리랜서' 등 직업명을 입력해주세요.",
       rate_limit: (reset: string) => `오늘의 분석 한도(20회)를 초과했습니다. ${reset}에 초기화됩니다.`,
       failed: "분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
     },

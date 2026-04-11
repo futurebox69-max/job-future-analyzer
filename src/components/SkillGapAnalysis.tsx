@@ -98,7 +98,7 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
 
   return (
     <section
-      className="rounded-2xl border p-6"
+      className="rounded-2xl border p-4 sm:p-6"
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <div className="flex items-center justify-between mb-1">

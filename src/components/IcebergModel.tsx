@@ -47,7 +47,7 @@ export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps)
 
   return (
     <div
-      className="rounded-3xl border p-6"
+      className="rounded-3xl border p-4 sm:p-6"
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <h3 className="font-semibold text-lg mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
@@ -57,21 +57,21 @@ export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps)
       <div className="space-y-3">
         {sorted.map((layer, i) => {
           const style = LAYER_STYLES[i] ?? LAYER_STYLES[3];
-          const widthClass = ["w-full", "w-11/12", "w-10/12", "w-9/12"][i] ?? "w-9/12";
+          const widthClass = ["w-full", "w-full sm:w-11/12", "w-full sm:w-10/12", "w-full sm:w-9/12"][i] ?? "w-full sm:w-9/12";
 
           return (
             <div
               key={layer.level}
-              className={`${widthClass} rounded-2xl p-4 border transition-all duration-300 hover:scale-[1.01]`}
+              className={`${widthClass} rounded-2xl p-3 sm:p-4 border transition-all duration-300 hover:scale-[1.01]`}
               style={{ background: style.bg, borderColor: style.border }}
             >
-              <div className="flex items-start gap-3">
-                <span className="text-xl flex-shrink-0">{style.icon}</span>
-                <div>
-                  <div className="text-xs font-semibold mb-1" style={{ color: style.textColor }}>
+              <div className="flex items-start gap-2 sm:gap-3">
+                <span className="text-lg sm:text-xl flex-shrink-0 mt-0.5">{style.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs sm:text-sm font-semibold mb-1 break-words" style={{ color: style.textColor }}>
                     {layer.title}
                   </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>
+                  <p className="text-xs sm:text-sm leading-relaxed break-words" style={{ color: "#374151" }}>
                     {layer.content}
                   </p>
                 </div>

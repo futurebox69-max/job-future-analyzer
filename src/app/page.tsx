@@ -152,7 +152,7 @@ export default function Home() {
             <LanguageSelector lang={lang} onChange={(l) => { setLang(l); setResult(null); setError(null); }} />
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold mb-3" style={{ color: "#1E1B4B" }}>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3" style={{ color: "#1E1B4B" }}>
             {t.title.split(" ").slice(0, -1).join(" ")}{t.title.split(" ").length > 1 ? " " : ""}
             <span
               style={{

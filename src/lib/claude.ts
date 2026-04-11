@@ -152,12 +152,39 @@ const INJECTION_KEYWORDS = [
   "disregard", "instead", "actually", "위에", "이전", "앞의",
 ];
 
+// 신규 디지털/크리에이터/프리랜서 직업 화이트리스트 (Haiku가 거부하는 문제 방지)
+const MODERN_JOBS_WHITELIST = new Set([
+  // 크리에이터/인플루언서
+  "유튜버", "youtuber", "크리에이터", "creator", "콘텐츠 크리에이터", "content creator",
+  "인플루언서", "influencer", "스트리머", "streamer", "틱톡커", "tiktoker",
+  "bj", "비제이", "팟캐스터", "podcaster", "블로거", "blogger", "브이로거", "vlogger",
+  // 디지털 노마드/프리랜서
+  "프리랜서", "freelancer", "디지털 노마드", "digital nomad", "1인 기업가",
+  "솔로프레너", "solopreneur", "긱워커", "gig worker",
+  // AI/테크
+  "프롬프트 엔지니어", "prompt engineer", "ai 트레이너", "ai trainer",
+  "데이터 라벨러", "data labeler", "노코더", "no-coder", "노코드 개발자",
+  // 이커머스/마케팅
+  "쇼핑몰 운영자", "셀러", "seller", "스마트스토어", "드롭시퍼", "dropshipper",
+  "퍼포먼스 마케터", "그로스 해커", "growth hacker", "seo 전문가",
+  // 교육/코칭
+  "온라인 강사", "에듀테크", "코치", "coach", "라이프 코치", "life coach",
+  "멘토", "mentor", "커리어 코치", "career coach",
+  // 기타 신규
+  "웹툰 작가", "웹소설 작가", "이모티콘 작가", "nft 아티스트",
+  "메타버스 디자이너", "게임 스트리머", "먹방 유튜버", "뷰티 유튜버",
+  "여행 유튜버", "키즈 유튜버", "숏폼 크리에이터", "릴스 크리에이터",
+]);
+
 export async function validateJobName(job: string): Promise<boolean> {
   // 1차: 키워드 블랙리스트 (즉시 차단)
-  const lower = job.toLowerCase();
+  const lower = job.toLowerCase().trim();
   if (INJECTION_KEYWORDS.some((kw) => lower.includes(kw))) return false;
 
-  // 2차: Haiku로 실제 직업명 여부 확인 (빠름, 저렴)
+  // 2차: 신규 직업 화이트리스트 (즉시 통과, Haiku 호출 불필요)
+  if (MODERN_JOBS_WHITELIST.has(lower)) return true;
+
+  // 3차: Haiku로 실제 직업명 여부 확인 (빠름, 저렴)
   try {
     const res = await getClient().messages.create({
       model: "claude-haiku-4-5-20251001",
@@ -166,7 +193,7 @@ export async function validateJobName(job: string): Promise<boolean> {
       messages: [
         {
           role: "user",
-          content: `"${job}"이 실제 직업명인가요? YES 또는 NO만 답하세요.`,
+          content: `"${job}"이(가) 사람들이 돈을 벌기 위해 하는 활동(직업, 직종, 부업, 프리랜서 활동 포함)인가요? 전통 직업뿐 아니라 유튜버, 크리에이터, 인플루언서, 프리랜서, 스트리머, 코치, 셀러 등 새로운 형태의 직업도 모두 YES입니다. YES 또는 NO만 답하세요.`,
         },
       ],
     });

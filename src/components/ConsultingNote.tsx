@@ -45,7 +45,7 @@ export default function ConsultingNote({ note, jobName, lang = "ko" }: Props) {
 
   return (
     <section
-      className="rounded-2xl border p-6"
+      className="rounded-2xl border p-4 sm:p-6"
       style={{
         background: "linear-gradient(135deg, #F5F4FF 0%, #EDE9FE 100%)",
         borderColor: "#DDD6FE",

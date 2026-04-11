@@ -108,7 +108,7 @@ export default function TransitionCards({ cards, mode, lang = "ko" }: Transition
 
   return (
     <div
-      className="rounded-3xl border p-6"
+      className="rounded-3xl border p-4 sm:p-6"
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <h3 className="font-semibold text-lg mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
