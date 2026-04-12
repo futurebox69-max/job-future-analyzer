@@ -57,7 +57,7 @@ export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps)
       <div className="space-y-3">
         {sorted.map((layer, i) => {
           const style = LAYER_STYLES[i] ?? LAYER_STYLES[3];
-          const widthClass = ["w-full", "w-full sm:w-11/12", "w-full sm:w-10/12", "w-full sm:w-9/12"][i] ?? "w-full sm:w-9/12";
+          const widthClass = ["w-full", "w-[95%]", "w-[88%]", "w-[80%]"][i] ?? "w-[80%]";
 
           return (
             <div
