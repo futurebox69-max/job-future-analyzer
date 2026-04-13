@@ -114,16 +114,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = () => {
-    // 즉시 스토리지/쿠키 삭제
-    localStorage.clear();
-    sessionStorage.clear();
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+    // localStorage에서 Supabase 세션 삭제 (핵심)
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sb-")) localStorage.removeItem(key);
     });
-    // signOut은 백그라운드 (await 없이)
-    supabase.auth.signOut({ scope: "global" }).catch(() => {});
-    // 즉시 리다이렉트
-    window.location.replace("/");
+    localStorage.removeItem("supabase.auth.token");
+    sessionStorage.clear();
+    // 페이지 리로드 (세션 없이 다시 시작)
+    window.location.href = "/";
   };
 
   return (
