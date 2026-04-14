@@ -965,7 +965,7 @@ export default function Home() {
         </div>
 
         {/* 요금제 카드 그리드 */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", alignItems: "stretch" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", alignItems: "stretch" }}>
 
           {/* FREE */}
           {(() => {
@@ -1071,6 +1071,7 @@ export default function Home() {
                   position: "relative",
                   overflow: "hidden",
                   display: "flex", flexDirection: "column",
+                  minHeight: "420px",
                 }}
               >
                 {/* 뱃지 */}
