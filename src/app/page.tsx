@@ -959,7 +959,7 @@ export default function Home() {
         </div>
 
         {/* 요금제 카드 그리드 */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", alignItems: "stretch" }}>
 
           {/* FREE */}
           {(() => {
@@ -1064,6 +1064,7 @@ export default function Home() {
                       : "0 2px 12px rgba(108,99,255,0.06)",
                   position: "relative",
                   overflow: "hidden",
+                  display: "flex", flexDirection: "column",
                 }}
               >
                 {/* 뱃지 */}
@@ -1095,7 +1096,7 @@ export default function Home() {
                 </div>
                 <div style={{ fontSize: "12px", color: plan.dark ? "#A5B4FC" : "#9CA3AF", marginBottom: "20px" }}>{plan.sub}</div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "22px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "22px", flex: 1 }}>
                   {plan.features.map((f) => (
                     <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: plan.dark ? "#C7D2FE" : "#374151", lineHeight: 1.4 }}>
                       <span style={{ color: plan.dark ? "#D4AF37" : plan.tagColor, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>
