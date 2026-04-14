@@ -959,7 +959,7 @@ export default function Home() {
         </div>
 
         {/* 요금제 카드 그리드 */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", alignItems: "start" }}>
 
           {/* FREE */}
           {(() => {
@@ -982,7 +982,7 @@ export default function Home() {
                 name: "₩9,900", price: "/월", sub: "곧 출시 예정",
                 dark: false, highlight: false, comingSoon: true,
                 features: [
-                  "기본 분석 무제한",
+                  "기본 분석 10회",
                   "업무별 세부 대체 분석",
                   "AI 불안 심리 케어",
                   "AI 협업 역량 점수",
@@ -994,7 +994,7 @@ export default function Home() {
                 dark: false, highlight: true, comingSoon: true,
                 badge: "인기",
                 features: [
-                  "BASIC 포함",
+                  "기본 분석 20회",
                   "비전 시나리오 3가지",
                   "직업 추천 + 역량 로드맵",
                   "연봉 협상 도우미",
@@ -1007,7 +1007,7 @@ export default function Home() {
                 name: "₩39,900", price: "/월", sub: "곧 출시 예정",
                 dark: true, highlight: false, comingSoon: true,
                 features: [
-                  "STANDARD 포함",
+                  "기본 분석 30회",
                   "가족 진단 (자녀 3인)",
                   "전공·학교 추천",
                   "AI 챗봇 무제한",
@@ -1026,6 +1026,23 @@ export default function Home() {
                   "연간 구독 33% 절감",
                 ],
               },
+              {
+                tag: "EDU", tagColor: "#059669", tagBg: "#ECFDF5",
+                name: "₩1,000,000", price: "/년", sub: "학교·학원 30명 기준",
+                dark: false, highlight: false, comingSoon: true,
+                badge: "기관용",
+                features: [
+                  "학생 30명 계정",
+                  "청소년 전용 진로 분석",
+                  "학과·대학 진출 경로 추천",
+                  "선생님 대시보드",
+                  "학급 단위 진로 리포트",
+                  "AI 진로 코치 (청소년 모드)",
+                  "학부모 결과 공유",
+                  "그룹 진로 통계 분석",
+                  "전담 온라인 상담 지원",
+                ],
+              },
             ];
 
             return plans.map((plan) => (
@@ -1033,15 +1050,17 @@ export default function Home() {
                 key={plan.tag}
                 style={{
                   borderRadius: "22px",
-                  border: plan.highlight ? "2px solid #7C3AED" : plan.dark ? "2px solid #4F46E5" : "1.5px solid #EDE9FE",
+                  border: plan.highlight ? "2px solid #7C3AED" : plan.dark ? "2px solid #4F46E5" : plan.tag === "EDU" ? "2px solid #059669" : "1.5px solid #EDE9FE",
                   background: plan.dark
                     ? "linear-gradient(145deg, #1E1B4B 0%, #312E81 100%)"
+                    : plan.tag === "EDU" ? "linear-gradient(145deg, #F0FDF4 0%, #DCFCE7 100%)"
                     : "white",
                   padding: "24px 20px 24px",
                   boxShadow: plan.highlight
                     ? "0 8px 32px rgba(124,58,237,0.2)"
                     : plan.dark
                       ? "0 4px 24px rgba(79,70,229,0.2)"
+                      : plan.tag === "EDU" ? "0 4px 24px rgba(5,150,105,0.15)"
                       : "0 2px 12px rgba(108,99,255,0.06)",
                   position: "relative",
                   overflow: "hidden",
@@ -1051,9 +1070,9 @@ export default function Home() {
                 {plan.badge && (
                   <div style={{
                     position: "absolute", top: "16px", right: "16px",
-                    background: "linear-gradient(135deg, #D4AF37, #F5D26B)",
+                    background: plan.tag === "EDU" ? "linear-gradient(135deg, #059669, #34D399)" : "linear-gradient(135deg, #D4AF37, #F5D26B)",
                     borderRadius: "100px", padding: "3px 10px",
-                    fontSize: "11px", fontWeight: 700, color: "#78350F",
+                    fontSize: "11px", fontWeight: 700, color: plan.tag === "EDU" ? "#fff" : "#78350F",
                   }}>{plan.badge}</div>
                 )}
 
