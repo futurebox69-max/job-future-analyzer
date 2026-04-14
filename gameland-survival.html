@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GameLand — 서바이벌 역량 측정</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
+:root{--bg:#0a0a1a;--surface:#14142a;--primary:#6C63FF;--accent:#4ECDC4;--gold:#FFE66D;--pink:#F472B6;--red:#FF6B6B;--green:#34D399;--text:#E8E6F0;--dim:#666680}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden}
+canvas{display:block}
+.overlay{position:fixed;inset:0;background:rgba(10,10,26,0.92);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.overlay h1{font-size:28px;font-weight:900;margin-bottom:6px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.overlay p{font-size:13px;color:var(--dim);max-width:300px;margin-bottom:20px;line-height:1.6}
+.overlay .btn{padding:16px 40px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary),#8B5CF6);color:#fff;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 8px 32px rgba(108,99,255,0.4);touch-action:manipulation}
+.overlay.hidden{display:none}
+
+.hud{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:16px;background:rgba(10,10,26,0.8);padding:8px 16px;border-radius:12px;border:1px solid rgba(108,99,255,0.2)}
+.hud-item{text-align:center}
+.hud-val{font-size:16px;font-weight:900;font-variant-numeric:tabular-nums}
+.hud-label{font-size:9px;color:var(--dim);text-transform:uppercase}
+
+.decision-panel{position:fixed;bottom:0;left:0;right:0;z-index:20;padding:16px;background:linear-gradient(0deg,rgba(10,10,26,0.95) 80%,transparent);max-width:480px;margin:0 auto}
+.decision-panel.hidden{display:none}
+.dp-question{font-size:14px;font-weight:600;margin-bottom:12px;text-align:center;line-height:1.5}
+.dp-choices{display:flex;flex-direction:column;gap:8px}
+.dp-btn{padding:12px 16px;border-radius:12px;background:var(--surface);border:1.5px solid rgba(108,99,255,0.2);color:var(--text);font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.dp-btn:hover{border-color:var(--primary);background:rgba(108,99,255,0.1)}
+.dp-btn:active{transform:scale(0.98)}
+.dp-key{width:26px;height:26px;border-radius:6px;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);flex-shrink:0}
+
+.result-bars{width:100%;max-width:320px;margin:16px 0}
+.rb-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.rb-icon{font-size:16px;width:22px;text-align:center}
+.rb-info{flex:1}
+.rb-name{font-size:10px;color:var(--text);display:flex;justify-content:space-between;margin-bottom:2px}
+.rb-val{color:var(--accent);font-weight:700}
+.rb-track{height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.rb-fill{height:100%;border-radius:3px;transition:width 1s ease}
+
+@media(min-width:481px){body{max-width:480px;margin:0 auto}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="intro">
+  <div style="font-size:48px;margin-bottom:12px">🏝️</div>
+  <h1>아일랜드 서바이벌</h1>
+  <p>무인도에 표류했습니다! 5일간 생존하세요.<br><br>
+  🎮 <b>플레이 방법</b><br>
+  ① 화면 상단에 체력❤️ · 식량🍖 · 물💧이 표시됩니다<br>
+  ② 매일 상황이 주어지면 <b>하단의 4가지 선택지 중 하나를 터치</b>하세요<br>
+  ③ 선택에 따라 자원이 변하고, 쉘터/불/뗏목을 만들 수 있습니다<br>
+  ④ 체력이 0이 되면 실패, 5일 생존하면 성공!<br><br>
+  <span style="color:var(--accent);font-size:11px">💡 정답은 없습니다. 당신의 생존 방식이 역량을 드러냅니다.</span></p>
+  <button class="btn" id="startBtn">서바이벌 시작</button>
+</div>
+
+<div class="overlay hidden" id="result">
+  <div style="font-size:48px;margin-bottom:12px" id="resEmoji"></div>
+  <h1 id="resTitle"></h1>
+  <p id="resDesc"></p>
+  <div class="result-bars" id="resBars"></div>
+  <button class="btn" id="retryBtn">다시 도전</button>
+</div>
+
+<canvas id="c"></canvas>
+
+<div class="hud" id="hud" style="display:none">
+  <div class="hud-item"><div class="hud-val" style="color:var(--red)" id="hpV">100</div><div class="hud-label">체력</div></div>
+  <div class="hud-item"><div class="hud-val" style="color:var(--gold)" id="foodV">50</div><div class="hud-label">식량</div></div>
+  <div class="hud-item"><div class="hud-val" style="color:var(--accent)" id="waterV">50</div><div class="hud-label">물</div></div>
+  <div class="hud-item"><div class="hud-val" style="color:var(--green)" id="dayV">1</div><div class="hud-label">일차</div></div>
+</div>
+
+<div class="decision-panel hidden" id="decPanel">
+  <div class="dp-question" id="dpQ"></div>
+  <div class="dp-choices" id="dpC"></div>
+</div>
+
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=Math.min(480,window.innerWidth);canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+
+let state={hp:100,food:50,water:50,day:1,shelter:false,fire:false,raft:0};
+let scores={structural:0,creative:0,emotional:0,adaptive:0,ethical:0,collab:0};
+let playing=false;
+let currentEvent=null;
+let dayPhase='morning'; // morning, event, night
+
+const events=[
+  {day:1,q:'첫째 날 아침. 해변에 표류물이 보인다. 뭘 먼저 하겠는가?',
+    choices:[
+      {text:'주변 지형을 높은 곳에서 관찰하고 지도를 그린다',skills:{structural:3,adaptive:1},food:0,water:-5,hp:0,fb:'전략적 탐색'},
+      {text:'표류물에서 쓸 수 있는 것을 최대한 수집한다',skills:{adaptive:3,structural:1},food:10,water:0,hp:0,fb:'자원 확보 우선'},
+      {text:'혹시 다른 생존자가 없는지 해변을 따라 걸으며 찾아본다',skills:{emotional:3,collab:1},food:-5,water:-5,hp:0,fb:'사람을 먼저 찾는 마음'},
+      {text:'비가 오기 전에 임시 쉘터를 만든다',skills:{creative:3,ethical:1},food:-5,water:0,hp:0,shelter:true,fb:'안전을 설계하다'}
+    ]},
+  {day:2,q:'물이 부족하다. 멀리 숲 안쪽에서 물소리가 들린다. 하지만 어두워지고 있다.',
+    choices:[
+      {text:'위험하지만 물을 찾으러 간다. 탈수가 더 위험하다',skills:{adaptive:3,ethical:1},food:-5,water:30,hp:-10,fb:'리스크를 감수하는 결단'},
+      {text:'오늘은 이슬을 모아 버티고, 내일 아침에 간다',skills:{structural:3,ethical:1},food:0,water:5,hp:0,fb:'인내의 전략'},
+      {text:'나뭇잎으로 빗물 집수 장치를 만든다',skills:{creative:3,structural:1},food:0,water:15,hp:0,fb:'도구를 창조하다'},
+      {text:'해변 모래를 파서 지하수 필터를 시도한다',skills:{adaptive:2,creative:2},food:0,water:10,hp:0,fb:'실험정신'}
+    ]},
+  {day:3,q:'밤에 이상한 소리가 들린다. 무언가 캠프 주변을 돌고 있다.',
+    choices:[
+      {text:'불을 크게 피우고 소리를 내서 쫓아낸다',skills:{adaptive:3,creative:1},food:-5,water:0,hp:0,fire:true,fb:'즉각 대응'},
+      {text:'조용히 관찰한다. 뭔지 알아야 대응할 수 있다',skills:{structural:3,ethical:1},food:0,water:0,hp:-5,fb:'정보 수집 우선'},
+      {text:'높은 곳으로 이동해서 안전을 확보한다',skills:{ethical:3,adaptive:1},food:0,water:-5,hp:0,fb:'안전 우선'},
+      {text:'함정을 만든다. 위협을 자원으로 전환',skills:{creative:3,structural:1},food:10,water:0,hp:0,fb:'위기를 기회로'}
+    ]},
+  {day:4,q:'다른 생존자를 발견했다! 하지만 그 사람이 당신의 식량을 훔치려 했다.',
+    choices:[
+      {text:'"왜 그랬어?" 사정을 먼저 듣는다',skills:{emotional:3,ethical:1},food:-10,water:0,hp:0,fb:'판단 전에 이해'},
+      {text:'함께하자고 제안한다. 혼자보다 둘이 생존률이 높다',skills:{collab:3,emotional:1},food:-5,water:-5,hp:0,fb:'협력의 힘'},
+      {text:'식량을 나누되, 역할을 분담하자고 규칙을 정한다',skills:{structural:3,collab:1},food:-10,water:0,hp:0,fb:'구조로 신뢰를 만들다'},
+      {text:'경계를 유지하며 거리를 둔다. 신뢰는 검증 후에',skills:{ethical:3,adaptive:1},food:0,water:0,hp:0,fb:'신중한 판단'}
+    ]},
+  {day:5,q:'구조 신호를 보낼 기회! 하지만 재료가 부족하다. 뗏목을 만들 것인가, 연기 신호를 올릴 것인가?',
+    choices:[
+      {text:'해변에 큰 SOS를 만들고 연기 신호를 올린다',skills:{structural:3,creative:1},food:-10,water:-10,hp:-5,fb:'체계적 구조 요청'},
+      {text:'뗏목을 만들어 직접 탈출을 시도한다',skills:{adaptive:3,creative:1},food:-15,water:-15,hp:-10,raft:1,fb:'직접 운명을 개척'},
+      {text:'둘 다 동시에 진행한다. 연기 신호 + 뗏목 병행',skills:{collab:2,structural:2},food:-20,water:-20,hp:-10,raft:1,fb:'올인 전략'},
+      {text:'먼저 체력과 자원을 비축한다. 지금은 생존이 우선',skills:{ethical:3,adaptive:1},food:5,water:5,hp:5,fb:'장기적 관점'}
+    ]}
+];
+
+function startGame(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('hud').style.display='flex';
+  playing=true;
+  showEvent(0);
+  drawIsland();
+}
+
+function showEvent(idx){
+  if(idx>=events.length){endGame();return}
+  currentEvent=idx;
+  const e=events[idx];
+  state.day=e.day;
+  updateHUD();
+
+  const panel=document.getElementById('decPanel');
+  panel.classList.remove('hidden');
+  document.getElementById('dpQ').textContent=`Day ${e.day}: ${e.q}`;
+  const cc=document.getElementById('dpC');cc.innerHTML='';
+  const keys=['A','B','C','D'];
+  e.choices.forEach((c,i)=>{
+    const btn=document.createElement('div');btn.className='dp-btn';
+    btn.innerHTML=`<div class="dp-key">${keys[i]}</div>${c.text}`;
+    btn.addEventListener('click',()=>choose(idx,i));
+    btn.addEventListener('touchend',e=>{e.preventDefault();choose(idx,i)});
+    cc.appendChild(btn);
+  });
+}
+
+function choose(evtIdx,choiceIdx){
+  const c=events[evtIdx].choices[choiceIdx];
+  // Apply effects
+  state.food=Math.max(0,Math.min(100,state.food+(c.food||0)));
+  state.water=Math.max(0,Math.min(100,state.water+(c.water||0)));
+  state.hp=Math.max(0,Math.min(100,state.hp+(c.hp||0)));
+  if(c.shelter)state.shelter=true;
+  if(c.fire)state.fire=true;
+  if(c.raft)state.raft+=c.raft;
+
+  // Apply skills
+  for(const[k,v]of Object.entries(c.skills))scores[k]+=v;
+
+  // Daily decay
+  state.food=Math.max(0,state.food-8);
+  state.water=Math.max(0,state.water-10);
+  if(state.food<=0)state.hp-=10;
+  if(state.water<=0)state.hp-=15;
+  if(state.shelter)state.hp=Math.min(100,state.hp+3);
+
+  updateHUD();
+  drawIsland();
+
+  // Feedback
+  document.getElementById('decPanel').classList.add('hidden');
+
+  if(state.hp<=0||evtIdx>=events.length-1){
+    setTimeout(()=>endGame(),800);
+  }else{
+    setTimeout(()=>showEvent(evtIdx+1),1200);
+  }
+}
+
+function updateHUD(){
+  document.getElementById('hpV').textContent=Math.round(state.hp);
+  document.getElementById('foodV').textContent=Math.round(state.food);
+  document.getElementById('waterV').textContent=Math.round(state.water);
+  document.getElementById('dayV').textContent=state.day;
+}
+
+function drawIsland(){
+  const w=canvas.width,h=canvas.height;
+  // Sky
+  const sky=ctx.createLinearGradient(0,0,0,h*0.5);
+  sky.addColorStop(0,'#0a1628');sky.addColorStop(1,'#162d54');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h*0.5);
+  // Stars
+  for(let i=0;i<30;i++){
+    ctx.fillStyle=`rgba(255,255,255,${Math.random()*0.5+0.2})`;
+    ctx.fillRect(Math.random()*w,Math.random()*h*0.4,1.5,1.5);
+  }
+  // Moon
+  ctx.fillStyle='rgba(255,230,109,0.8)';ctx.beginPath();ctx.arc(w*0.8,h*0.15,20,0,Math.PI*2);ctx.fill();
+  // Sea
+  const sea=ctx.createLinearGradient(0,h*0.45,0,h);
+  sea.addColorStop(0,'#0f2140');sea.addColorStop(1,'#0a1628');
+  ctx.fillStyle=sea;ctx.fillRect(0,h*0.45,w,h*0.55);
+  // Island
+  ctx.fillStyle='#2a4a30';
+  ctx.beginPath();ctx.moveTo(w*0.15,h*0.55);ctx.quadraticCurveTo(w*0.5,h*0.3,w*0.85,h*0.55);ctx.lineTo(w*0.85,h*0.6);ctx.lineTo(w*0.15,h*0.6);ctx.fill();
+  // Sand
+  ctx.fillStyle='#c9a84c33';ctx.fillRect(w*0.15,h*0.55,w*0.7,h*0.05);
+  // Palm tree
+  ctx.fillStyle='#4a3520';ctx.fillRect(w*0.35,h*0.35,6,h*0.2);
+  ctx.fillStyle='#2d6a2d';
+  ctx.beginPath();ctx.moveTo(w*0.35,h*0.35);ctx.lineTo(w*0.25,h*0.3);ctx.lineTo(w*0.38,h*0.32);ctx.fill();
+  ctx.beginPath();ctx.moveTo(w*0.38,h*0.35);ctx.lineTo(w*0.48,h*0.28);ctx.lineTo(w*0.38,h*0.33);ctx.fill();
+  // Shelter
+  if(state.shelter){
+    ctx.fillStyle='#5a4a30';ctx.beginPath();ctx.moveTo(w*0.55,h*0.42);ctx.lineTo(w*0.5,h*0.5);ctx.lineTo(w*0.65,h*0.5);ctx.fill();
+  }
+  // Fire
+  if(state.fire){
+    ctx.fillStyle='#FF6B6B';ctx.beginPath();ctx.arc(w*0.6,h*0.52,5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#FFE66D';ctx.beginPath();ctx.arc(w*0.6,h*0.51,3,0,Math.PI*2);ctx.fill();
+  }
+  // Raft
+  if(state.raft>0){
+    ctx.fillStyle='#8B6914';ctx.fillRect(w*0.7,h*0.56,30,8);
+    ctx.fillStyle='#aaa';ctx.fillRect(w*0.78,h*0.48,2,10);
+  }
+  // Player
+  ctx.font='20px serif';ctx.textAlign='center';
+  ctx.fillText('🧑',w*0.5,h*0.52);
+  // Day indicator
+  ctx.fillStyle='rgba(255,255,255,0.1)';ctx.font='bold 60px sans-serif';ctx.textAlign='center';
+  ctx.fillText(`DAY ${state.day}`,w*0.5,h*0.75);
+}
+
+function endGame(){
+  playing=false;
+  document.getElementById('hud').style.display='none';
+  document.getElementById('decPanel').classList.add('hidden');
+
+  const survived=state.hp>0;
+  const maxS=Math.max(...Object.values(scores))||1;
+  const topKey=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const SKILLS={structural:{icon:'🧩',name:'구조적 사고',color:'#6C63FF'},creative:{icon:'🎨',name:'창의적 재설계',color:'#FF6B6B'},emotional:{icon:'💫',name:'감성 연결',color:'#F472B6'},adaptive:{icon:'⚡',name:'적응 민첩성',color:'#FFE66D'},ethical:{icon:'⚖️',name:'윤리적 판단',color:'#A78BFA'},collab:{icon:'🤝',name:'협업 지능',color:'#34D399'}};
+
+  const res=document.getElementById('result');res.classList.remove('hidden');
+  document.getElementById('resEmoji').textContent=survived?'🏝️':'💀';
+  document.getElementById('resTitle').textContent=survived?`${state.day}일 생존 성공!`:'아쉽게 실패...';
+  document.getElementById('resDesc').textContent=
+    `체력 ${Math.round(state.hp)} · 식량 ${Math.round(state.food)} · 물 ${Math.round(state.water)}\n`+
+    `${state.shelter?'쉘터 건설 ✓':''} ${state.fire?'불 피움 ✓':''} ${state.raft?'뗏목 제작 ✓':''}\n\n`+
+    `당신의 생존 방식: ${SKILLS[topKey].name} 중심`;
+
+  const bars=document.getElementById('resBars');bars.innerHTML='';
+  Object.entries(scores).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const s=SKILLS[k];const pct=Math.round(v/maxS*100);
+    const row=document.createElement('div');row.className='rb-row';
+    row.innerHTML=`<div class="rb-icon">${s.icon}</div><div class="rb-info"><div class="rb-name"><span>${s.name}</span><span class="rb-val">${pct}%</span></div><div class="rb-track"><div class="rb-fill" style="width:${pct}%;background:${s.color}"></div></div></div>`;
+    bars.appendChild(row);
+  });
+}
+
+drawIsland();
+
+// Event listeners (avoid inline onclick for mobile compatibility)
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame()});
+document.getElementById('retryBtn').addEventListener('click',()=>location.reload());
+document.getElementById('retryBtn').addEventListener('touchend',e=>{e.preventDefault();location.reload()});
+</script>
+</body>
+</html>

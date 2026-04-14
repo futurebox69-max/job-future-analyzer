@@ -7,6 +7,10 @@ import { analyzeJob, validateJobName } from "@/lib/claude";
 import { LangCode } from "@/lib/i18n";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { AnalyzeRequest, AnalysisResult } from "@/types/analysis";
+import { getProfileFromToken, incrementUsage } from "@/lib/supabase-admin";
+
+const FREE_LIMIT = 3;
+const ADMIN_EMAIL = "naeyou69@gmail.com";
 
 // 한국어 + 영어 + 중국어 + 일본어(히라가나/가타카나) + 스페인어 라틴 확장 + 공통 기호
 const JOB_PATTERN = /^[\uAC00-\uD7A3a-zA-Z0-9\s\-\/\(\)·\u4E00-\u9FFF\u3400-\u4DBF\u3040-\u309F\u30A0-\u30FF\uFF65-\uFF9F\u00C0-\u024F\u0027\u2019·,\.]+$/;
@@ -31,7 +35,7 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-async function trackStats(type: "request" | "cache_hit" | "claude_call", job: string) {
+async function trackStats(type: "request" | "cache_hit" | "claude_call", job: string, lang: string, mode: string) {
   const d = today();
   const month = d.slice(0, 7);
   try {
@@ -50,6 +54,9 @@ async function trackStats(type: "request" | "cache_hit" | "claude_call", job: st
         ? redis.incr(`stats:claude:${month}`)
         : Promise.resolve(),
       redis.zincrby(`stats:jobs:${month}`, 1, job.trim().toLowerCase()),
+      redis.zincrby(`stats:lang:${month}`, 1, lang),
+      redis.zincrby(`stats:mode:${month}`, 1, mode),
+      redis.zincrby(`stats:hour:${d}`, 1, String(new Date().getHours())),
     ]);
   } catch (e) {
     console.warn("통계 기록 실패 (무시):", e);
@@ -138,6 +145,54 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!JOB_PATTERN.test(trimmed)) return err400(E.bad_chars);
   if (!mode || !["adult", "youth"].includes(mode)) return err400(E.bad_mode);
 
+  // 2. 사용자 권한 & 사용량 체크
+  const authHeader = request.headers.get("Authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  let userRole: "free" | "premium" | "admin" | "guest" = "guest";
+  let userId: string | null = null;
+  let monthlyUsage = 0;
+
+  if (token) {
+    const profile = await getProfileFromToken(token);
+    if (profile) {
+      userRole = profile.email === ADMIN_EMAIL ? "admin" : profile.role;
+      userId = profile.id;
+      monthlyUsage = profile.monthly_usage;
+
+      // 월 초기화 체크 (매월 1일)
+      const resetAt = new Date(profile.usage_reset_at);
+      const currentMonth = new Date();
+      currentMonth.setDate(1); currentMonth.setHours(0,0,0,0);
+      if (resetAt < currentMonth) monthlyUsage = 0;
+    }
+  }
+
+  // 비로그인: 분석 불가 (서버에서도 차단)
+  if (userRole === "guest") {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "로그인 후 이용할 수 있습니다.",
+        code: "LOGIN_REQUIRED",
+      }),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  // 무료 로그인: 3회 제한
+  // 관리자/프리미엄: 무제한
+  if (userRole === "free" && monthlyUsage >= FREE_LIMIT) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "무료 분석 3회를 모두 사용하셨습니다. 프리미엄으로 업그레이드하면 무제한 분석이 가능합니다.",
+        code: "USAGE_LIMIT",
+      }),
+      { status: 429, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   // 2. 직업명 유효성 검증 (프롬프트 인젝션 방어)
   const isValidJob = await validateJobName(trimmed);
   if (!isValidJob) return err400(E.not_job);
@@ -147,9 +202,17 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     const cached = await redis.get<AnalysisResult>(cacheKey);
     if (cached) {
-      await trackStats("cache_hit", trimmed);
+      await trackStats("cache_hit", trimmed, safeLang, mode);
+      // 로그인 사용자면 usage 증가
+      let newUsage = monthlyUsage;
+      if (userId && token && userRole !== "admin" && userRole !== "premium") {
+        const result = await incrementUsage(token, userId);
+        if (result) newUsage = result.monthly_usage;
+      }
+      const remaining = userRole === "admin" || userRole === "premium"
+        ? 999 : Math.max(0, FREE_LIMIT - newUsage);
       return new Response(
-        JSON.stringify({ success: true, data: cached, remaining: 20, fromCache: true }),
+        JSON.stringify({ success: true, data: cached, remaining, fromCache: true }),
         { headers: { "Content-Type": "application/json", "X-Cache": "HIT" } }
       );
     }
@@ -200,17 +263,25 @@ export async function POST(request: NextRequest): Promise<Response> {
 
         clearInterval(keepAlive);
 
-        // 캐시 저장 + 통계
+        // 캐시 저장 + 통계 + usage 증가
+        let newUsage = monthlyUsage;
+        if (userId && token && userRole !== "admin" && userRole !== "premium") {
+          const usageResult = await incrementUsage(token, userId);
+          if (usageResult) newUsage = usageResult.monthly_usage;
+        }
         await Promise.all([
           redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL }).catch(() => {}),
-          trackStats("claude_call", trimmed),
+          trackStats("claude_call", trimmed, safeLang, mode),
         ]);
+
+        const remaining = userRole === "admin" || userRole === "premium"
+          ? 999 : Math.max(0, FREE_LIMIT - newUsage);
 
         send({
           type: "result",
           success: true,
           data: result,
-          remaining: rateLimit.remaining,
+          remaining,
           fromCache: false,
         });
       } catch (error) {

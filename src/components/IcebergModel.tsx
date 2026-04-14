@@ -35,10 +35,10 @@ const LABELS: Record<LangCode, {
 };
 
 const LAYER_STYLES = [
-  { bg: "#EFF6FF", border: "#BFDBFE", icon: "🌊", textColor: "#1D4ED8", label: "수면 위" },
-  { bg: "#EEF2FF", border: "#C7D2FE", icon: "🔵", textColor: "#3730A3", label: "얕은 층" },
-  { bg: "#E0E7FF", border: "#A5B4FC", icon: "🔷", textColor: "#4338CA", label: "깊은 층" },
-  { bg: "#C7D2FE", border: "#818CF8", icon: "⚓", textColor: "#3730A3", label: "근본" },
+  { bg: "#EFF6FF", border: "#BFDBFE", icon: "🌊", textColor: "#1D4ED8" },
+  { bg: "#EEF2FF", border: "#C7D2FE", icon: "🔵", textColor: "#3730A3" },
+  { bg: "#E0E7FF", border: "#A5B4FC", icon: "🔷", textColor: "#4338CA" },
+  { bg: "#C7D2FE", border: "#818CF8", icon: "⚓", textColor: "#3730A3" },
 ];
 
 export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps) {
@@ -50,28 +50,27 @@ export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps)
       className="rounded-3xl border p-4 sm:p-6"
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
-      <h3 className="font-semibold text-lg mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
+      <h3 className="font-semibold text-xl mb-5 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         {L.title}
       </h3>
 
       <div className="space-y-3">
         {sorted.map((layer, i) => {
           const style = LAYER_STYLES[i] ?? LAYER_STYLES[3];
-          const widthClass = ["w-full", "w-[95%]", "w-[88%]", "w-[80%]"][i] ?? "w-[80%]";
 
           return (
             <div
               key={layer.level}
-              className={`${widthClass} rounded-2xl p-3 sm:p-4 border transition-all duration-300 hover:scale-[1.01]`}
+              className="w-full rounded-2xl p-4 sm:p-5 border transition-all duration-300 hover:scale-[1.01]"
               style={{ background: style.bg, borderColor: style.border }}
             >
-              <div className="flex items-start gap-2 sm:gap-3">
-                <span className="text-lg sm:text-xl flex-shrink-0 mt-0.5">{style.icon}</span>
+              <div className="flex items-start gap-3">
+                <span className="text-xl flex-shrink-0 mt-0.5">{style.icon}</span>
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs sm:text-sm font-semibold mb-1 break-words" style={{ color: style.textColor }}>
+                  <div className="text-base font-semibold mb-2 break-words" style={{ color: style.textColor }}>
                     {layer.title}
                   </div>
-                  <p className="text-xs sm:text-sm leading-relaxed break-words" style={{ color: "#374151" }}>
+                  <p className="text-sm sm:text-base leading-relaxed break-words" style={{ color: "#374151" }}>
                     {layer.content}
                   </p>
                 </div>
@@ -81,7 +80,7 @@ export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps)
         })}
       </div>
 
-      <p className="mt-4 text-xs text-center" style={{ color: "#9CA3AF" }}>
+      <p className="mt-4 text-sm text-center" style={{ color: "#9CA3AF" }}>
         {L.footer}
       </p>
     </div>

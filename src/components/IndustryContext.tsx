@@ -76,7 +76,7 @@ export default function IndustryContext({ data, lang = "ko" }: Props) {
       <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         <span>🏭</span> {L.title.replace("🏭 ", "")}
       </h2>
-      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
+      <p className="text-sm mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {CONTEXTS.map(({ key, icon, label, color, bg, border }) => (

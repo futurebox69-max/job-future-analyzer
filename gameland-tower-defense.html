@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GameLand — 타워디펜스 역량 측정</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
+:root{--bg:#0a0a1a;--surface:#14142a;--primary:#6C63FF;--accent:#4ECDC4;--gold:#FFE66D;--pink:#F472B6;--red:#FF6B6B;--green:#34D399;--text:#E8E6F0;--dim:#666680}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow:hidden}
+
+.game-ui{position:fixed;top:0;left:0;right:0;z-index:10;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(10,10,26,0.95),transparent)}
+.ui-left,.ui-right{display:flex;gap:12px;align-items:center}
+.stat{text-align:center}
+.stat-val{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
+.stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.wave-badge{background:var(--primary);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700}
+
+canvas{display:block;touch-action:none}
+
+/* Tower selector */
+.tower-bar{position:fixed;bottom:0;left:0;right:0;z-index:10;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(10,10,26,0.95),transparent);display:flex;gap:8px;justify-content:center}
+.tower-btn{width:64px;padding:8px 4px;border-radius:12px;background:var(--surface);border:2px solid rgba(108,99,255,0.2);text-align:center;cursor:pointer;transition:all 0.2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.tower-btn.selected{border-color:var(--primary);background:rgba(108,99,255,0.15);box-shadow:0 0 16px rgba(108,99,255,0.3)}
+.tower-btn:active{transform:scale(0.95)}
+.tb-icon{font-size:24px}
+.tb-name{font-size:9px;font-weight:600;color:var(--text);margin-top:2px}
+.tb-cost{font-size:10px;color:var(--gold);font-weight:700}
+
+/* Screens */
+.overlay{position:fixed;inset:0;background:rgba(10,10,26,0.92);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.overlay h1{font-size:28px;font-weight:900;margin-bottom:6px;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.overlay p{font-size:13px;color:var(--dim);text-align:center;max-width:300px;margin-bottom:20px;line-height:1.6}
+.overlay .start-btn{padding:16px 40px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary),#8B5CF6);color:#fff;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 8px 32px rgba(108,99,255,0.4);touch-action:manipulation}
+.overlay.hidden{display:none}
+
+/* Result overlay */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:320px;margin:16px 0}
+.rg-card{background:var(--surface);border-radius:10px;padding:10px;text-align:center;border:1px solid rgba(108,99,255,0.15)}
+.rg-card .rg-icon{font-size:20px}
+.rg-card .rg-val{font-size:16px;font-weight:900;margin:2px 0}
+.rg-card .rg-label{font-size:9px;color:var(--dim)}
+
+@media(min-width:481px){body{max-width:480px;margin:0 auto}}
+</style>
+</head>
+<body>
+
+<!-- Intro -->
+<div class="overlay" id="introScreen">
+  <div style="font-size:48px;margin-bottom:12px">🏰</div>
+  <h1>마인드 디펜스</h1>
+  <p>타워를 배치하고 적을 막으세요.<br>당신의 전략이 미래역량을 드러냅니다.<br><br>
+  🧩 분석탑 — 적 속도 감소<br>
+  🎨 창조탑 — 범위 공격<br>
+  💫 공감탑 — 아군 회복<br>
+  ⚡ 적응탑 — 빠른 공격<br>
+  </p>
+  <button class="start-btn" id="startBtn">게임 시작</button>
+</div>
+
+<!-- Result -->
+<div class="overlay hidden" id="resultScreen">
+  <div style="font-size:48px;margin-bottom:12px" id="resEmoji">🏆</div>
+  <h1 id="resTitle">분석 완료</h1>
+  <p id="resDesc"></p>
+  <div class="result-grid" id="resGrid"></div>
+  <button class="start-btn" id="retryBtn">다시 도전</button>
+</div>
+
+<!-- Game UI -->
+<div class="game-ui" id="gameUI" style="display:none">
+  <div class="ui-left">
+    <div class="wave-badge" id="waveBadge">WAVE 1</div>
+    <div class="stat"><div class="stat-val" style="color:var(--red)" id="hpVal">20</div><div class="stat-label">생명</div></div>
+  </div>
+  <div class="ui-right">
+    <div class="stat"><div class="stat-val" style="color:var(--gold)" id="goldVal">100</div><div class="stat-label">골드</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="killVal">0</div><div class="stat-label">처치</div></div>
+  </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<div class="tower-bar" id="towerBar" style="display:none">
+  <div class="tower-btn selected" data-tower="analyze" onclick="selectTower('analyze',this)">
+    <div class="tb-icon">🧩</div>
+    <div class="tb-name">분석</div>
+    <div class="tb-cost">20G</div>
+  </div>
+  <div class="tower-btn" data-tower="create" onclick="selectTower('create',this)">
+    <div class="tb-icon">🎨</div>
+    <div class="tb-name">창조</div>
+    <div class="tb-cost">30G</div>
+  </div>
+  <div class="tower-btn" data-tower="empathy" onclick="selectTower('empathy',this)">
+    <div class="tb-icon">💫</div>
+    <div class="tb-name">공감</div>
+    <div class="tb-cost">25G</div>
+  </div>
+  <div class="tower-btn" data-tower="adapt" onclick="selectTower('adapt',this)">
+    <div class="tb-icon">⚡</div>
+    <div class="tb-name">적응</div>
+    <div class="tb-cost">20G</div>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+
+// Responsive canvas
+function resize(){
+  canvas.width=Math.min(480,window.innerWidth);
+  canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+// Game state
+let playing=false;
+let gold=100, hp=20, kills=0, wave=1;
+let towers=[], enemies=[], bullets=[];
+let selectedTowerType='analyze';
+let waveTimer=0, spawnTimer=0, enemiesPerWave=5, enemiesSpawned=0;
+let behaviorLog={towerTypes:{analyze:0,create:0,empathy:0,adapt:0},placements:[],reactionTimes:[],waveClears:[]};
+
+// Path (zigzag)
+const pathPoints=[
+  {x:0,y:0.3},{x:0.7,y:0.3},{x:0.7,y:0.5},{x:0.3,y:0.5},{x:0.3,y:0.7},{x:1,y:0.7}
+];
+function getPath(){return pathPoints.map(p=>({x:p.x*canvas.width,y:p.y*canvas.height}))}
+
+// Tower definitions
+const TOWERS={
+  analyze:{emoji:'🧩',cost:20,range:80,damage:1,speed:60,color:'#6C63FF',effect:'slow',skill:'structural'},
+  create:{emoji:'🎨',cost:30,range:100,damage:2,speed:90,color:'#FF6B6B',effect:'splash',skill:'creative'},
+  empathy:{emoji:'💫',cost:25,range:70,damage:0.5,speed:45,color:'#F472B6',effect:'heal',skill:'emotional'},
+  adapt:{emoji:'⚡',cost:20,range:60,damage:1.5,speed:30,color:'#FFE66D',effect:'fast',skill:'adaptive'}
+};
+
+function selectTower(type,el){
+  selectedTowerType=type;
+  document.querySelectorAll('.tower-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function startGame(){
+  document.getElementById('introScreen').classList.add('hidden');
+  document.getElementById('gameUI').style.display='flex';
+  document.getElementById('towerBar').style.display='flex';
+  playing=true;
+  requestAnimationFrame(gameLoop);
+}
+
+// Place tower on tap
+function placeTower(px,py){
+  if(!playing)return;
+  const rect=canvas.getBoundingClientRect();
+  const x=px-rect.left, y=py-rect.top;
+  const t=TOWERS[selectedTowerType];
+  if(gold<t.cost)return;
+  // Check not on path
+  const path=getPath();
+  let onPath=false;
+  for(let i=0;i<path.length-1;i++){
+    const d=distToSegment(x,y,path[i],path[i+1]);
+    if(d<25){onPath=true;break}
+  }
+  if(onPath)return;
+  // Check not too close to other towers
+  if(towers.some(tw=>Math.hypot(tw.x-x,tw.y-y)<36))return;
+
+  gold-=t.cost;
+  towers.push({x,y,type:selectedTowerType,...t,cooldown:0});
+  behaviorLog.towerTypes[selectedTowerType]++;
+  behaviorLog.placements.push({type:selectedTowerType,x:x/canvas.width,y:y/canvas.height,wave,time:Date.now()});
+  updateUI();
+}
+canvas.addEventListener('click',e=>placeTower(e.clientX,e.clientY));
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault();
+  const touch=e.changedTouches[0];
+  placeTower(touch.clientX,touch.clientY);
+},{passive:false});
+
+function distToSegment(px,py,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y;
+  const t=Math.max(0,Math.min(1,((px-a.x)*dx+(py-a.y)*dy)/(dx*dx+dy*dy)));
+  return Math.hypot(px-(a.x+t*dx),py-(a.y+t*dy));
+}
+
+function spawnEnemy(){
+  const path=getPath();
+  const baseHp=3+wave*2;
+  const speed=0.5+wave*0.1;
+  enemies.push({x:path[0].x,y:path[0].y,hp:baseHp,maxHp:baseHp,speed,pathIdx:0,progress:0,slowed:0});
+}
+
+function updateUI(){
+  document.getElementById('goldVal').textContent=gold;
+  document.getElementById('hpVal').textContent=hp;
+  document.getElementById('killVal').textContent=kills;
+  document.getElementById('waveBadge').textContent=`WAVE ${wave}`;
+}
+
+let lastTime=0;
+function gameLoop(time){
+  if(!playing)return;
+  const dt=Math.min((time-lastTime)/1000,0.05);
+  lastTime=time;
+
+  // Spawn
+  spawnTimer+=dt;
+  if(spawnTimer>1&&enemiesSpawned<enemiesPerWave){
+    spawnEnemy();enemiesSpawned++;spawnTimer=0;
+  }
+
+  // Move enemies
+  const path=getPath();
+  enemies.forEach(e=>{
+    if(e.pathIdx>=path.length-1){hp--;e.dead=true;updateUI();return}
+    const target=path[e.pathIdx+1];
+    const dx=target.x-e.x,dy=target.y-e.y;
+    const dist=Math.hypot(dx,dy);
+    const spd=(e.slowed>0?e.speed*0.5:e.speed)*60*dt;
+    if(dist<spd){e.x=target.x;e.y=target.y;e.pathIdx++}
+    else{e.x+=dx/dist*spd;e.y+=dy/dist*spd}
+    if(e.slowed>0)e.slowed-=dt;
+  });
+
+  // Tower attack
+  towers.forEach(t=>{
+    t.cooldown-=dt*60;
+    if(t.cooldown>0)return;
+    const target=enemies.filter(e=>!e.dead&&Math.hypot(e.x-t.x,e.y-t.y)<t.range).sort((a,b)=>b.pathIdx-a.pathIdx||b.progress-a.progress)[0];
+    if(!target)return;
+    t.cooldown=t.speed;
+    if(t.effect==='splash'){
+      enemies.filter(e=>!e.dead&&Math.hypot(e.x-target.x,e.y-target.y)<50).forEach(e=>e.hp-=t.damage);
+    }else if(t.effect==='slow'){
+      target.hp-=t.damage;target.slowed=2;
+    }else if(t.effect==='heal'){
+      // "Heals" by giving gold
+      gold+=1;updateUI();target.hp-=t.damage;
+    }else{
+      target.hp-=t.damage;
+    }
+    bullets.push({x:t.x,y:t.y,tx:target.x,ty:target.y,color:t.color,life:0.15});
+  });
+
+  // Kill check
+  enemies.forEach(e=>{if(!e.dead&&e.hp<=0){e.dead=true;kills++;gold+=5+wave;updateUI()}});
+  enemies=enemies.filter(e=>!e.dead);
+  bullets=bullets.filter(b=>{b.life-=dt;return b.life>0});
+
+  // Wave check
+  if(enemiesSpawned>=enemiesPerWave&&enemies.length===0){
+    if(wave>=5){endGame();return}
+    behaviorLog.waveClears.push({wave,time:Date.now()});
+    wave++;enemiesPerWave+=3;enemiesSpawned=0;
+    updateUI();
+  }
+
+  if(hp<=0){endGame();return}
+
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Draw path
+  const path=getPath();
+  ctx.strokeStyle='rgba(108,99,255,0.15)';ctx.lineWidth=30;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();path.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
+  ctx.strokeStyle='rgba(108,99,255,0.3)';ctx.lineWidth=2;
+  ctx.beginPath();path.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
+
+  // Towers
+  towers.forEach(t=>{
+    ctx.font='24px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(t.emoji,t.x,t.y);
+    // Range circle on hover
+    ctx.strokeStyle=`${t.color}22`;ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(t.x,t.y,t.range,0,Math.PI*2);ctx.stroke();
+  });
+
+  // Enemies
+  enemies.forEach(e=>{
+    const ratio=e.hp/e.maxHp;
+    ctx.fillStyle=e.slowed>0?'#6C63FF':'#FF6B6B';
+    ctx.beginPath();ctx.arc(e.x,e.y,10,0,Math.PI*2);ctx.fill();
+    // HP bar
+    ctx.fillStyle='#333';ctx.fillRect(e.x-12,e.y-18,24,4);
+    ctx.fillStyle=ratio>0.5?'#34D399':'#FF6B6B';ctx.fillRect(e.x-12,e.y-18,24*ratio,4);
+  });
+
+  // Bullets
+  bullets.forEach(b=>{
+    ctx.strokeStyle=b.color;ctx.lineWidth=2;ctx.globalAlpha=b.life/0.15;
+    ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.tx,b.ty);ctx.stroke();
+    ctx.globalAlpha=1;
+  });
+}
+
+function endGame(){
+  playing=false;
+  document.getElementById('gameUI').style.display='none';
+  document.getElementById('towerBar').style.display='none';
+
+  // Analyze behavior
+  const tt=behaviorLog.towerTypes;
+  const total=Object.values(tt).reduce((s,v)=>s+v,0)||1;
+  const scores={
+    structural:Math.round(tt.analyze/total*100),
+    creative:Math.round(tt.create/total*100),
+    emotional:Math.round(tt.empathy/total*100),
+    adaptive:Math.round(tt.adapt/total*100),
+    ethical:Math.round(((hp/20)*50+kills*2)),
+    collab:Math.round((tt.empathy+tt.analyze)/total*80)
+  };
+  const maxS=Math.max(...Object.values(scores))||1;
+
+  // Find archetype
+  const topKey=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const typeMap={structural:'🧩 전략가',creative:'🎨 크리에이터',emotional:'💫 서포터',adaptive:'⚡ 어댑터',ethical:'⚖️ 가디언',collab:'🤝 커넥터'};
+
+  const res=document.getElementById('resultScreen');res.classList.remove('hidden');
+  document.getElementById('resEmoji').textContent=typeMap[topKey].split(' ')[0];
+  document.getElementById('resTitle').textContent=typeMap[topKey].split(' ')[1];
+  document.getElementById('resDesc').textContent=
+    `WAVE ${wave} 클리어 · ${kills}킬 · 타워 ${total}개 배치\n`+
+    `가장 많이 사용한 타워: ${TOWERS[Object.entries(tt).sort((a,b)=>b[1]-a[1])[0][0]].emoji}\n`+
+    `당신의 플레이 스타일이 역량을 드러냅니다.`;
+
+  const grid=document.getElementById('resGrid');grid.innerHTML='';
+  const SKILL_INFO={structural:{icon:'🧩',name:'구조적 사고'},creative:{icon:'🎨',name:'창의적 재설계'},emotional:{icon:'💫',name:'감성 연결'},adaptive:{icon:'⚡',name:'적응 민첩성'},ethical:{icon:'⚖️',name:'윤리적 판단'},collab:{icon:'🤝',name:'협업 지능'}};
+  Object.entries(scores).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const card=document.createElement('div');card.className='rg-card';
+    card.innerHTML=`<div class="rg-icon">${SKILL_INFO[k].icon}</div><div class="rg-val">${Math.min(Math.round(v/maxS*100),100)}%</div><div class="rg-label">${SKILL_INFO[k].name}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// Event listeners (avoid inline onclick for mobile compatibility)
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame()});
+document.getElementById('retryBtn').addEventListener('click',()=>location.reload());
+document.getElementById('retryBtn').addEventListener('touchend',e=>{e.preventDefault();location.reload()});
+document.querySelectorAll('.tower-btn').forEach(btn=>{
+  btn.addEventListener('touchend',e=>{
+    e.preventDefault();
+    selectTower(btn.dataset.tower,btn);
+  });
+});
+</script>
+</body>
+</html>

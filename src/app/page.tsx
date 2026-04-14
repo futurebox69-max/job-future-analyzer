@@ -21,6 +21,9 @@ import { useAuth } from "@/context/AuthContext";
 import { AnalysisResult } from "@/types/analysis";
 import { getLang, LangCode } from "@/lib/i18n";
 import { FREE_LIMIT } from "@/lib/supabase";
+import CompetencyAssessment from "@/components/CompetencyAssessment";
+import CompetencyResultTab from "@/components/CompetencyResult";
+import { CompetencyResult as CompetencyResultType } from "@/types/competency";
 
 
 const POPULAR_JOBS_KO = [
@@ -117,6 +120,9 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authReason, setAuthReason] = useState<string | undefined>();
   const [showUpgradePopup, setShowUpgradePopup] = useState(false);
+  const [competencyResult, setCompetencyResult] = useState<CompetencyResultType | null>(null);
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [assessmentCompleted, setAssessmentCompleted] = useState(false);
 
   const popularJobs =
     lang === "ko" ? POPULAR_JOBS_KO :
@@ -127,6 +133,7 @@ export default function Home() {
 
   const SECTIONS = [
     { id: "overview",    icon: "📊", label: t.section_overview },
+    { id: "competency",  icon: "🧠", label: "미래역량" },
     { id: "dimensions",  icon: "🎯", label: t.section_dimensions },
     { id: "horizon",     icon: "⏳", label: t.section_horizon },
     { id: "skills",      icon: "🎓", label: t.section_skills },
@@ -179,6 +186,9 @@ export default function Home() {
     // ────────────────────────────────────────────
 
     setIsLoading(true);
+    setShowAssessment(true);
+    setAssessmentCompleted(false);
+    setCompetencyResult(null);
     setError(null);
     setResult(null);
     setLoadingMsg(t.loading[0]);
@@ -629,38 +639,56 @@ export default function Home() {
       ═══════════════════════════════════════ */}
       <div className="max-w-4xl mx-auto px-4 pb-16">
 
-        {/* 로딩 스피너 */}
-        {isLoading && (
-          <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
-            <div className="relative w-20 h-20">
-              <div
-                className="absolute inset-0 rounded-full border-4 animate-spin"
-                style={{ borderColor: "rgba(108,99,255,0.15)", borderTopColor: "#6C63FF" }}
-              />
-              <div
-                className="absolute inset-3 rounded-full border-4 animate-spin"
-                style={{
-                  borderColor: "rgba(167,139,250,0.15)",
-                  borderBottomColor: "#A78BFA",
-                  animationDirection: "reverse",
-                  animationDuration: "1.5s",
+        {/* 로딩: 역량검사 또는 대기 스피너 */}
+        {isLoading && !result && (
+          showAssessment && !assessmentCompleted ? (
+            <div className="py-8">
+              <CompetencyAssessment
+                mode={mode}
+                onComplete={(res) => {
+                  setCompetencyResult(res);
+                  setAssessmentCompleted(true);
                 }}
+                onSkip={() => setAssessmentCompleted(true)}
               />
             </div>
-            <p className="text-sm font-medium" style={{ color: "#4B5563" }}>
-              {loadingMsg || t.loading[0]}
-            </p>
-            <div className="flex gap-1.5">
-              {t.loading.map((_, i) => (
+          ) : (
+            <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
+              <div className="relative w-20 h-20">
                 <div
-                  key={i}
-                  className="w-1.5 h-1.5 rounded-full transition-all duration-500"
-                  style={{ background: i <= loadingStageIdx ? "#6C63FF" : "#E5E7EB" }}
+                  className="absolute inset-0 rounded-full border-4 animate-spin"
+                  style={{ borderColor: "rgba(108,99,255,0.15)", borderTopColor: "#6C63FF" }}
                 />
-              ))}
+                <div
+                  className="absolute inset-3 rounded-full border-4 animate-spin"
+                  style={{
+                    borderColor: "rgba(167,139,250,0.15)",
+                    borderBottomColor: "#A78BFA",
+                    animationDirection: "reverse",
+                    animationDuration: "1.5s",
+                  }}
+                />
+              </div>
+              <p className="text-sm font-medium" style={{ color: "#4B5563" }}>
+                {loadingMsg || t.loading[0]}
+              </p>
+              {assessmentCompleted && competencyResult && (
+                <p style={{ color: "#6C63FF", fontSize: "13px", fontWeight: 600 }}>
+                  ✅ 역량 검사 완료! AI 분석 결과를 기다리는 중...
+                </p>
+              )}
+              <div className="flex gap-1.5">
+                {t.loading.map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-500"
+                    style={{ background: i <= loadingStageIdx ? "#6C63FF" : "#E5E7EB" }}
+                  />
+                ))}
+              </div>
+              <p className="text-xs" style={{ color: "#9CA3AF" }}>{t.loading_hint}</p>
             </div>
-            <p className="text-xs" style={{ color: "#9CA3AF" }}>{t.loading_hint}</p>
-          </div>
+          )
         )}
 
         {/* 에러 */}
@@ -912,6 +940,24 @@ export default function Home() {
 
               {/* 우측 콘텐츠 영역 */}
               <div className="flex-1 min-w-0">
+                {activeSection === "competency" && competencyResult ? (
+                  <CompetencyResultTab
+                    competencyResult={competencyResult}
+                    analysisResult={result}
+                    jobName={result.jobName}
+                    mode={mode}
+                  />
+                ) : activeSection === "competency" && !competencyResult ? (
+                  <div style={{ textAlign: "center", padding: "60px 20px" }}>
+                    <div style={{ fontSize: "48px", marginBottom: "16px" }}>🧠</div>
+                    <p style={{ color: "#6B7280", fontSize: "15px", marginBottom: "8px" }}>
+                      역량 검사를 진행하지 않았습니다.
+                    </p>
+                    <p style={{ color: "#9CA3AF", fontSize: "13px" }}>
+                      다음 번 분석 시 역량 검사를 함께 진행하세요.
+                    </p>
+                  </div>
+                ) : null}
                 {activeSection === "overview"    && <GaugeChart rate={result.overallRate} riskLevel={result.riskLevel} jobName={result.jobName} lang={lang} />}
                 {activeSection === "dimensions"  && <SixDimensions dimensions={result.dimensions} lang={lang} />}
                 {activeSection === "horizon"     && <TimeHorizonChart data={result.timeHorizon} lang={lang} />}

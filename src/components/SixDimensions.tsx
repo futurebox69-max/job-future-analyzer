@@ -271,33 +271,33 @@ export default function SixDimensions({ dimensions, lang = "ko" }: Props) {
       <h3 className="font-semibold text-lg mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         {L.title}
       </h3>
-      <p className="text-xs mb-3" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
+      <p className="text-sm mb-3" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       {/* 왜 8차원인가 */}
       <div className="rounded-xl p-4 mb-5 border" style={{ background: "#F5F4FF", borderColor: "#EDE9FE" }}>
-        <p className="text-xs font-semibold mb-2" style={{ color: "#6C63FF" }}>{L.why_title}</p>
-        <p className="text-xs leading-relaxed" style={{ color: "#4B5563" }}>
+        <p className="text-sm font-semibold mb-2" style={{ color: "#6C63FF" }}>{L.why_title}</p>
+        <p className="text-sm leading-relaxed" style={{ color: "#4B5563" }}>
           {L.why_body} <strong>{L.why_risk_strong}</strong>{lang === "ko" ? "와" : lang === "es" ? " como" : lang === "zh" ? "和" : lang === "ja" ? "と" : " and"} <strong>{L.why_human_strong}</strong>{lang === "ko" ? "을 함께 측정합니다." : lang === "es" ? " simultáneamente." : lang === "zh" ? "。" : lang === "ja" ? "を同時に測定します。" : "."}
         </p>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
-            <p className="text-xs font-medium mb-1" style={{ color: "#DC2626" }}>{L.danger_label}</p>
-            <ul className="text-xs space-y-0.5" style={{ color: "#6B7280" }}>
+            <p className="text-sm font-medium mb-1" style={{ color: "#DC2626" }}>{L.danger_label}</p>
+            <ul className="text-sm space-y-0.5" style={{ color: "#6B7280" }}>
               {L.dim_descs.danger.map((d, i) => (
                 <li key={i}>• <strong>{d.split(" — ")[0]}</strong>{d.includes(" — ") ? ` — ${d.split(" — ")[1]}` : ""}</li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="text-xs font-medium mb-1" style={{ color: "#16A34A" }}>{L.safe_label}</p>
-            <ul className="text-xs space-y-0.5" style={{ color: "#6B7280" }}>
+            <p className="text-sm font-medium mb-1" style={{ color: "#16A34A" }}>{L.safe_label}</p>
+            <ul className="text-sm space-y-0.5" style={{ color: "#6B7280" }}>
               {L.dim_descs.safe.map((d, i) => (
                 <li key={i}>• <strong>{d.split(" — ")[0]}</strong>{d.includes(" — ") ? ` — ${d.split(" — ")[1]}` : ""}</li>
               ))}
             </ul>
           </div>
         </div>
-        <p className="text-xs mt-3 pt-2 border-t" style={{ borderColor: "#EDE9FE", color: "#9CA3AF" }}>
+        <p className="text-sm mt-3 pt-2 border-t" style={{ borderColor: "#EDE9FE", color: "#9CA3AF" }}>
           {L.ref_note}
         </p>
       </div>
@@ -314,11 +314,11 @@ export default function SixDimensions({ dimensions, lang = "ko" }: Props) {
                   <span>{dim.icon}</span>
                   <span>{L.dim_names[key]}</span>
                   {isInverse && (
-                    <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0" }}>{L.shield_badge}</span>
+                    <span className="text-sm px-1.5 py-0.5 rounded-full" style={{ color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0" }}>{L.shield_badge}</span>
                   )}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs" style={{ color: "#9CA3AF" }}>{WEIGHTS[key]}{isInverse ? ` (${L.inverse_suffix})` : ""}</span>
+                  <span className="text-sm" style={{ color: "#9CA3AF" }}>{WEIGHTS[key]}{isInverse ? ` (${L.inverse_suffix})` : ""}</span>
                   <span className="text-sm font-semibold tabular-nums" style={{ color }}>
                     {dim.score}%
                   </span>
@@ -333,14 +333,14 @@ export default function SixDimensions({ dimensions, lang = "ko" }: Props) {
                   }}
                 />
               </div>
-              <p className="text-xs mt-1 leading-relaxed" style={{ color: "#6B7280" }}>{dim.description}</p>
+              <p className="text-sm mt-1 leading-relaxed" style={{ color: "#6B7280" }}>{dim.description}</p>
             </div>
           );
         })}
       </div>
 
       <div className="mt-5 pt-4 border-t" style={{ borderColor: "#F3F4F6" }}>
-        <p className="text-xs text-center" style={{ color: "#9CA3AF" }}>
+        <p className="text-sm text-center" style={{ color: "#9CA3AF" }}>
           {L.weight_summary}
         </p>
       </div>

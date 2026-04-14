@@ -106,13 +106,13 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
           <span>🎯</span> {L.title}
         </h2>
         <span
-          className="text-xs px-3 py-1 rounded-full font-semibold"
+          className="text-sm px-3 py-1 rounded-full font-semibold"
           style={{ background: `${urgencyColor}15`, color: urgencyColor, border: `1.5px solid ${urgencyColor}35` }}
         >
           {L.urgency_prefix} {urgencyLabel}
         </span>
       </div>
-      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
+      <p className="text-sm mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* 유지 스킬 */}
@@ -124,7 +124,7 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
           <ul className="space-y-2">
             {data.keepSkills.map((skill, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-0.5 text-xs font-bold" style={{ color: "#16A34A" }}>✓</span>
+                <span className="mt-0.5 text-sm font-bold" style={{ color: "#16A34A" }}>✓</span>
                 <span className="text-sm" style={{ color: "#374151" }}>{skill}</span>
               </li>
             ))}
@@ -140,7 +140,7 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
           <ul className="space-y-2">
             {data.loseSkills.map((skill, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-0.5 text-xs font-bold" style={{ color: "#DC2626" }}>✗</span>
+                <span className="mt-0.5 text-sm font-bold" style={{ color: "#DC2626" }}>✗</span>
                 <span className="text-sm line-through" style={{ color: "#9CA3AF", textDecorationColor: "#FCA5A5" }}>{skill}</span>
               </li>
             ))}
@@ -156,7 +156,7 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
           <ul className="space-y-2">
             {data.gainSkills.map((skill, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-0.5 text-xs font-bold" style={{ color: "#6C63FF" }}>→</span>
+                <span className="mt-0.5 text-sm font-bold" style={{ color: "#6C63FF" }}>→</span>
                 <span className="text-sm font-medium" style={{ color: "#374151" }}>{skill}</span>
               </li>
             ))}

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORIZON - 관리자 대시보드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&display=swap');
+
+  :root {
+    --navy-900: #0a1628;
+    --navy-800: #0f2140;
+    --navy-700: #162d54;
+    --navy-600: #1e3a6a;
+    --navy-500: #2a4f8f;
+    --gold-500: #c9a84c;
+    --gold-400: #d4b85c;
+    --gold-300: #e0c96e;
+    --gold-200: #f0dda0;
+    --gold-100: #faf3e0;
+    --warm-white: #faf8f5;
+    --warm-gray: #f0ece6;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a5a;
+    --text-muted: #8a8a9a;
+    --green: #4caf50;
+    --green-bg: #e8f5e9;
+    --red: #e53935;
+    --red-bg: #ffebee;
+    --blue: #2196f3;
+    --blue-bg: #e3f2fd;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--warm-white);
+    min-height: 100vh;
+    color: var(--text-primary);
+  }
+
+  /* Sidebar */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 240px;
+    background: var(--navy-900);
+    padding: 24px 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-brand {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 16px;
+  }
+  .sidebar-brand h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 3px;
+  }
+  .sidebar-brand span {
+    font-size: 11px;
+    color: var(--gold-500);
+    letter-spacing: 1px;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 0 12px;
+  }
+  .nav-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 12px 12px 8px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.8);
+  }
+  .sidebar-item.active {
+    background: rgba(201,168,76,0.12);
+    color: var(--gold-400);
+    font-weight: 500;
+  }
+  .sidebar-item .s-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .sidebar-item .badge {
+    margin-left: auto;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-500), var(--gold-300));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: var(--navy-900);
+  }
+  .sidebar-user-info {
+    flex: 1;
+  }
+  .sidebar-user-name {
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
+  }
+  .sidebar-user-role {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Main content */
+  .main {
+    flex: 1;
+    padding: 28px;
+    overflow-y: auto;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .page-title span {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .page-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--navy-700), var(--navy-600));
+    color: #fff;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(10,22,40,0.2);
+    transform: translateY(-1px);
+  }
+  .btn-outline {
+    background: #fff;
+    border: 1.5px solid #e0dcd6;
+    color: var(--text-primary);
+  }
+  .btn-outline:hover {
+    border-color: var(--gold-500);
+    background: var(--gold-100);
+  }
+
+  /* Stats cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-label .stat-icon {
+    font-size: 14px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .stat-change {
+    font-size: 11px;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-change.up { color: var(--green); }
+  .stat-change.down { color: var(--red); }
+
+  /* Content grid */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+  }
+
+  /* Card component */
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--warm-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .card-action {
+    font-size: 12px;
+    color: var(--navy-500);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .card-body {
+    padding: 20px;
+  }
+
+  /* Member list */
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f3ef;
+  }
+  .member-row:last-child { border-bottom: none; }
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--warm-gray);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: var(--navy-600);
+  }
+  .member-info { flex: 1; }
+  .member-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .member-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .member-status {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .status-active {
+    background: var(--green-bg);
+    color: var(--green);
+  }
+  .status-inactive {
+    background: var(--red-bg);
+    color: var(--red);
+  }
+
+  /* Response chart */
+  .response-chart {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    height: 140px;
+    padding: 12px 0;
+  }
+  .chart-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .chart-bars {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 100px;
+  }
+  .chart-bar {
+    width: 16px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.5s ease;
+  }
+  .bar-hold { background: var(--gold-400); }
+  .bar-pause { background: var(--navy-500); }
+  .bar-entrust { background: #5a9a4a; }
+  .chart-label {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+  }
+
+  /* Recent cards list */
+  .recent-card-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f3ef;
+  }
+  .recent-card-item:last-child { border-bottom: none; }
+  .rci-date {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .rci-date .day {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+  .rci-date .month {
+    font-size: 9px;
+    color: var(--gold-400);
+  }
+  .rci-info { flex: 1; }
+  .rci-title {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .rci-verse {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .rci-stat {
+    text-align: right;
+  }
+  .rci-views {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .rci-label {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 16px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-value { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1>HORIZON</h1>
+      <span>관리자</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">메인</div>
+      <div class="sidebar-item active">
+        <span class="s-icon">📊</span> 대시보드
+      </div>
+      <div class="sidebar-item">
+        <span class="s-icon">📇</span> 카드 관리
+        <span class="badge">2</span>
+      </div>
+      <div class="sidebar-item">
+        <span class="s-icon">👥</span> 성도 관리
+      </div>
+
+      <div class="nav-section-title">콘텐츠</div>
+      <div class="sidebar-item">
+        <span class="s-icon">📖</span> 말씀 입력
+      </div>
+      <div class="sidebar-item">
+        <span class="s-icon">💡</span> Claim 생성
+      </div>
+      <div class="sidebar-item">
+        <span class="s-icon">✦</span> 질문 편집
+      </div>
+
+      <div class="nav-section-title">분석</div>
+      <div class="sidebar-item">
+        <span class="s-icon">📈</span> 참여 통계
+      </div>
+      <div class="sidebar-item">
+        <span class="s-icon">🤲</span> 응답 분석
+      </div>
+
+      <div class="nav-section-title">설정</div>
+      <div class="sidebar-item">
+        <span class="s-icon">⚙</span> 시스템 설정
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar">P</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">PAUL</div>
+        <div class="sidebar-user-role">담임 관리자</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">
+        대시보드
+        <span>2026년 4월 11일 기준</span>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-outline">내보내기</button>
+        <button class="btn btn-primary">+ 새 카드 작성</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label"><span class="stat-icon">👥</span> 전체 성도</div>
+        <div class="stat-value">127</div>
+        <div class="stat-change up">↑ 3 이번 주 신규</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="stat-icon">📇</span> 오늘 카드 조회</div>
+        <div class="stat-value">89</div>
+        <div class="stat-change up">↑ 70% 참여율</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="stat-icon">🤲</span> 삼분 응답</div>
+        <div class="stat-value">64</div>
+        <div class="stat-change up">↑ 12% 전주 대비</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><span class="stat-icon">🎯</span> 미션 완료</div>
+        <div class="stat-value">41</div>
+        <div class="stat-change down">↓ 5% 전주 대비</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-grid">
+      <!-- Left: Charts & Members -->
+      <div>
+        <!-- Response Chart -->
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-header">
+            <div class="card-title">주간 삼분 응답 추이</div>
+            <div class="card-action">상세 보기 →</div>
+          </div>
+          <div class="card-body">
+            <div class="response-chart">
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:60px"></div>
+                  <div class="chart-bar bar-pause" style="height:30px"></div>
+                  <div class="chart-bar bar-entrust" style="height:45px"></div>
+                </div>
+                <div class="chart-label">월</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:50px"></div>
+                  <div class="chart-bar bar-pause" style="height:40px"></div>
+                  <div class="chart-bar bar-entrust" style="height:55px"></div>
+                </div>
+                <div class="chart-label">화</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:70px"></div>
+                  <div class="chart-bar bar-pause" style="height:25px"></div>
+                  <div class="chart-bar bar-entrust" style="height:40px"></div>
+                </div>
+                <div class="chart-label">수</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:55px"></div>
+                  <div class="chart-bar bar-pause" style="height:35px"></div>
+                  <div class="chart-bar bar-entrust" style="height:65px"></div>
+                </div>
+                <div class="chart-label">목</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:45px"></div>
+                  <div class="chart-bar bar-pause" style="height:50px"></div>
+                  <div class="chart-bar bar-entrust" style="height:50px"></div>
+                </div>
+                <div class="chart-label">금</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:80px"></div>
+                  <div class="chart-bar bar-pause" style="height:20px"></div>
+                  <div class="chart-bar bar-entrust" style="height:70px"></div>
+                </div>
+                <div class="chart-label">토</div>
+              </div>
+              <div class="chart-bar-group">
+                <div class="chart-bars">
+                  <div class="chart-bar bar-hold" style="height:90px"></div>
+                  <div class="chart-bar bar-pause" style="height:15px"></div>
+                  <div class="chart-bar bar-entrust" style="height:85px"></div>
+                </div>
+                <div class="chart-label">일</div>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--gold-400)"></div> 붙들어야</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--navy-500)"></div> 보류</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#5a9a4a"></div> 맡김</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Members -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">최근 활동 성도</div>
+            <div class="card-action">전체 보기 →</div>
+          </div>
+          <div class="card-body">
+            <div class="member-row">
+              <div class="member-avatar">김</div>
+              <div class="member-info">
+                <div class="member-name">김은혜</div>
+                <div class="member-meta">오늘 08:32 · 카드 조회 + 삼분 응답</div>
+              </div>
+              <div class="member-status status-active">활동</div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">이</div>
+              <div class="member-info">
+                <div class="member-name">이준서</div>
+                <div class="member-meta">오늘 09:15 · 카드 조회</div>
+              </div>
+              <div class="member-status status-active">활동</div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">박</div>
+              <div class="member-info">
+                <div class="member-name">박지현</div>
+                <div class="member-meta">어제 21:40 · 미션 완료</div>
+              </div>
+              <div class="member-status status-active">활동</div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">최</div>
+              <div class="member-info">
+                <div class="member-name">최수아</div>
+                <div class="member-meta">3일 전 마지막 접속</div>
+              </div>
+              <div class="member-status status-inactive">미접속</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Recent Cards -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">최근 발행 카드</div>
+            <div class="card-action">전체 →</div>
+          </div>
+          <div class="card-body">
+            <div class="recent-card-item">
+              <div class="rci-date">
+                <span class="day">11</span>
+                <span class="month">APR</span>
+              </div>
+              <div class="rci-info">
+                <div class="rci-title">포도나무와 가지</div>
+                <div class="rci-verse">요한복음 15:5</div>
+              </div>
+              <div class="rci-stat">
+                <div class="rci-views">89</div>
+                <div class="rci-label">조회</div>
+              </div>
+            </div>
+            <div class="recent-card-item">
+              <div class="rci-date">
+                <span class="day">10</span>
+                <span class="month">APR</span>
+              </div>
+              <div class="rci-info">
+                <div class="rci-title">두려워하지 말라</div>
+                <div class="rci-verse">이사야 41:10</div>
+              </div>
+              <div class="rci-stat">
+                <div class="rci-views">102</div>
+                <div class="rci-label">조회</div>
+              </div>
+            </div>
+            <div class="recent-card-item">
+              <div class="rci-date">
+                <span class="day">09</span>
+                <span class="month">APR</span>
+              </div>
+              <div class="rci-info">
+                <div class="rci-title">새 힘을 얻으리니</div>
+                <div class="rci-verse">이사야 40:31</div>
+              </div>
+              <div class="rci-stat">
+                <div class="rci-views">95</div>
+                <div class="rci-label">조회</div>
+              </div>
+            </div>
+            <div class="recent-card-item">
+              <div class="rci-date">
+                <span class="day">08</span>
+                <span class="month">APR</span>
+              </div>
+              <div class="rci-info">
+                <div class="rci-title">여호와를 의지하라</div>
+                <div class="rci-verse">잠언 3:5-6</div>
+              </div>
+              <div class="rci-stat">
+                <div class="rci-views">88</div>
+                <div class="rci-label">조회</div>
+              </div>
+            </div>
+            <div class="recent-card-item">
+              <div class="rci-date">
+                <span class="day">07</span>
+                <span class="month">APR</span>
+              </div>
+              <div class="rci-info">
+                <div class="rci-title">항상 기뻐하라</div>
+                <div class="rci-verse">데살로니가전서 5:16-18</div>
+              </div>
+              <div class="rci-stat">
+                <div class="rci-views">91</div>
+                <div class="rci-label">조회</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

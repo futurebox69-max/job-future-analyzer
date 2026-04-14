@@ -96,7 +96,7 @@ export default function TimeHorizonChart({ data, lang = "ko" }: Props) {
       <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         <span>⏳</span> {L.title.replace("⏳ ", "")}
       </h2>
-      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
+      <p className="text-sm mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       {/* 바 차트 */}
       <div className="grid grid-cols-4 gap-3 mb-6">
@@ -106,7 +106,7 @@ export default function TimeHorizonChart({ data, lang = "ko" }: Props) {
           const riskKey = getRiskKey(value);
           return (
             <div key={y.key} className="flex flex-col items-center gap-2">
-              <span className="text-xs" style={{ color: "#6B7280" }}>{y.label}</span>
+              <span className="text-sm" style={{ color: "#6B7280" }}>{y.label}</span>
               <div className="relative w-full h-32 flex items-end justify-center">
                 <div
                   className="w-full rounded-t-lg transition-all duration-700"
@@ -121,7 +121,7 @@ export default function TimeHorizonChart({ data, lang = "ko" }: Props) {
               </div>
               <span className="font-bold text-lg" style={{ color: "#1E1B4B" }}>{value}%</span>
               <span
-                className="text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
+                className="text-sm px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
                 style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
               >
                 {L.riskMap[riskKey]}

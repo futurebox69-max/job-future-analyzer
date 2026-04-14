@@ -135,7 +135,7 @@ export default function TransitionCards({ cards, mode, lang = "ko" }: Transition
               <div className="flex items-center justify-between">
                 <span className="text-2xl">{style.icon}</span>
                 <span
-                  className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                  className="text-sm px-2 py-0.5 rounded-full font-semibold"
                   style={{ background: style.badgeBg, color: style.badgeColor }}
                 >
                   {typeLabel}
@@ -145,7 +145,7 @@ export default function TransitionCards({ cards, mode, lang = "ko" }: Transition
               {/* 제목 */}
               <div>
                 <div className="font-semibold" style={{ color: style.color }}>{card.title}</div>
-                <div className="text-xs mt-0.5" style={{ color: "#9CA3AF" }}>{typeDesc}</div>
+                <div className="text-sm mt-0.5" style={{ color: "#9CA3AF" }}>{typeDesc}</div>
               </div>
 
               {/* 설명 */}
@@ -156,12 +156,12 @@ export default function TransitionCards({ cards, mode, lang = "ko" }: Transition
               {/* 예시 직함 */}
               {card.examples.length > 0 && (
                 <div>
-                  <div className="text-xs mb-1.5" style={{ color: "#9CA3AF" }}>{L.examples_label}</div>
+                  <div className="text-sm mb-1.5" style={{ color: "#9CA3AF" }}>{L.examples_label}</div>
                   <div className="flex flex-wrap gap-1.5">
                     {card.examples.map((ex, i) => (
                       <span
                         key={i}
-                        className="text-xs px-2 py-0.5 rounded-lg"
+                        className="text-sm px-2 py-0.5 rounded-lg"
                         style={{ background: "#F3F4F6", color: "#6B7280", border: "1px solid #E5E7EB" }}
                       >
                         {ex}
@@ -174,12 +174,12 @@ export default function TransitionCards({ cards, mode, lang = "ko" }: Transition
               {/* 필요 스킬 */}
               {card.keySkills && card.keySkills.length > 0 && (
                 <div>
-                  <div className="text-xs mb-1.5" style={{ color: "#9CA3AF" }}>{L.skills_label}</div>
+                  <div className="text-sm mb-1.5" style={{ color: "#9CA3AF" }}>{L.skills_label}</div>
                   <div className="flex flex-wrap gap-1.5">
                     {card.keySkills.map((sk, i) => (
                       <span
                         key={i}
-                        className="text-xs px-2 py-0.5 rounded-lg border"
+                        className="text-sm px-2 py-0.5 rounded-lg border"
                         style={{ borderColor: "#DDD6FE", color: "#6C63FF", background: "#EDE9FE" }}
                       >
                         {sk}
@@ -190,7 +190,7 @@ export default function TransitionCards({ cards, mode, lang = "ko" }: Transition
               )}
 
               {/* 난이도 + 기간 */}
-              <div className="flex items-center justify-between text-xs" style={{ color: "#9CA3AF" }}>
+              <div className="flex items-center justify-between text-sm" style={{ color: "#9CA3AF" }}>
                 <span>
                   {L.difficulty_label}:{" "}
                   <span className="font-semibold" style={{ color: DIFFICULTY_COLORS[card.difficulty] }}>

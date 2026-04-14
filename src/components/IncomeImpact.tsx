@@ -69,25 +69,25 @@ export default function IncomeImpact({ data, lang = "ko" }: Props) {
       <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
         <span>💰</span> {L.title.replace("💰 ", "")}
       </h2>
-      <p className="text-xs mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
+      <p className="text-sm mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
         <div className="rounded-xl p-4 border" style={{ background: "#FFFBEB", borderColor: "#FDE68A" }}>
-          <div className="text-xs font-semibold mb-2 flex items-center gap-1" style={{ color: "#D97706" }}>
+          <div className="text-sm font-semibold mb-2 flex items-center gap-1" style={{ color: "#D97706" }}>
             {L.short}
           </div>
           <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{data.shortTerm}</p>
         </div>
 
         <div className="rounded-xl p-4 border" style={{ background: "#FFF7ED", borderColor: "#FED7AA" }}>
-          <div className="text-xs font-semibold mb-2 flex items-center gap-1" style={{ color: "#EA580C" }}>
+          <div className="text-sm font-semibold mb-2 flex items-center gap-1" style={{ color: "#EA580C" }}>
             {L.mid}
           </div>
           <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{data.midTerm}</p>
         </div>
 
         <div className="rounded-xl p-4 border" style={{ background: "#FEF2F2", borderColor: "#FECACA" }}>
-          <div className="text-xs font-semibold mb-2 flex items-center gap-1" style={{ color: "#DC2626" }}>
+          <div className="text-sm font-semibold mb-2 flex items-center gap-1" style={{ color: "#DC2626" }}>
             {L.long}
           </div>
           <p className="text-sm leading-relaxed" style={{ color: "#374151" }}>{data.longTerm}</p>

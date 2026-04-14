@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HORIZON - Daily Card</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&display=swap');
+
+  :root {
+    --navy-900: #0a1628;
+    --navy-800: #0f2140;
+    --navy-700: #162d54;
+    --navy-600: #1e3a6a;
+    --navy-500: #2a4f8f;
+    --gold-500: #c9a84c;
+    --gold-400: #d4b85c;
+    --gold-300: #e0c96e;
+    --gold-200: #f0dda0;
+    --gold-100: #faf3e0;
+    --warm-white: #faf8f5;
+    --warm-gray: #f0ece6;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a5a;
+    --text-muted: #8a8a9a;
+    --border-light: rgba(201, 168, 76, 0.2);
+    --shadow-card: 0 8px 32px rgba(10, 22, 40, 0.12);
+    --shadow-soft: 0 2px 12px rgba(10, 22, 40, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 30%, var(--warm-white) 30%);
+    min-height: 100vh;
+    color: var(--text-primary);
+  }
+
+  /* Header */
+  .header {
+    background: transparent;
+    padding: 16px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-500), var(--gold-300));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; color: var(--navy-900);
+  }
+  .greeting {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+  }
+  .greeting strong {
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+  }
+  .header-right {
+    display: flex; gap: 12px;
+  }
+  .header-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .header-icon:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* Date bar */
+  .date-bar {
+    text-align: center;
+    padding: 20px 20px 24px;
+    color: #fff;
+  }
+  .date-bar .date-main {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold-400);
+    letter-spacing: 1px;
+  }
+  .date-bar .date-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Card Container */
+  .card-wrapper {
+    padding: 0 16px 24px;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .daily-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .daily-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold-500), var(--gold-300), var(--gold-500));
+  }
+
+  /* Section: 말씀 */
+  .section {
+    padding: 20px;
+    border-bottom: 1px solid var(--warm-gray);
+    position: relative;
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--navy-600);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .section-label .icon {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+
+  /* Section 1: 오늘의 말씀 */
+  .scripture-section {
+    background: linear-gradient(135deg, #fdfcfa, #f8f5ee);
+  }
+  .scripture-section .section-label .icon {
+    background: var(--gold-100);
+    color: var(--gold-500);
+  }
+  .scripture-ref {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 13px;
+    color: var(--gold-500);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .scripture-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  /* Section 2: Claim 핵심 */
+  .claim-section .section-label .icon {
+    background: #eef0ff;
+    color: var(--navy-500);
+  }
+  .claim-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+  .claim-highlight {
+    background: linear-gradient(to bottom, transparent 60%, rgba(201, 168, 76, 0.15) 60%);
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  /* Section 3: 오늘의 질문 - 강조 */
+  .question-section {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+    padding: 24px 20px;
+  }
+  .question-section .section-label {
+    color: var(--gold-300);
+  }
+  .question-section .section-label .icon {
+    background: rgba(201, 168, 76, 0.2);
+    color: var(--gold-400);
+  }
+  .question-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #fff;
+    font-weight: 400;
+    text-align: center;
+    padding: 8px 0;
+  }
+  .question-divider {
+    width: 40px;
+    height: 2px;
+    background: var(--gold-500);
+    margin: 0 auto 16px;
+    border-radius: 1px;
+  }
+
+  /* Section 4: 삼분 응답 */
+  .response-section .section-label .icon {
+    background: #f0f7ee;
+    color: #5a9a4a;
+  }
+  .response-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .response-tag {
+    flex: 1;
+    min-width: 90px;
+    padding: 14px 12px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    border: 1.5px solid transparent;
+  }
+  .response-tag:active {
+    transform: scale(0.97);
+  }
+  .tag-hold {
+    background: linear-gradient(135deg, #fef9ee, #fdf3dc);
+    border-color: rgba(201, 168, 76, 0.3);
+  }
+  .tag-hold .tag-icon { color: var(--gold-500); }
+  .tag-hold:hover { border-color: var(--gold-500); }
+
+  .tag-pause {
+    background: linear-gradient(135deg, #f0f4fa, #e6ecf5);
+    border-color: rgba(42, 79, 143, 0.2);
+  }
+  .tag-pause .tag-icon { color: var(--navy-500); }
+  .tag-pause:hover { border-color: var(--navy-500); }
+
+  .tag-entrust {
+    background: linear-gradient(135deg, #f0f7ee, #e6f2e3);
+    border-color: rgba(90, 154, 74, 0.2);
+  }
+  .tag-entrust .tag-icon { color: #5a9a4a; }
+  .tag-entrust:hover { border-color: #5a9a4a; }
+
+  .tag-icon {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  .tag-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .tag-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* Section 5: 기도 포인트 */
+  .prayer-section .section-label .icon {
+    background: #fef0f0;
+    color: #c45a5a;
+  }
+  .prayer-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding-left: 14px;
+    border-left: 2px solid var(--gold-400);
+  }
+
+  /* Section 6: 실천 미션 */
+  .mission-section {
+    background: linear-gradient(135deg, #fdfcfa, #f8f5ee);
+  }
+  .mission-section .section-label .icon {
+    background: #fff3e6;
+    color: #d4882c;
+  }
+  .mission-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+  }
+  .mission-check {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-400);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    flex-shrink: 0;
+  }
+  .mission-check:hover {
+    background: var(--gold-100);
+  }
+  .mission-check.checked {
+    background: var(--gold-500);
+    border-color: var(--gold-500);
+  }
+  .mission-check.checked::after {
+    content: '✓';
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .mission-content {
+    flex: 1;
+  }
+  .mission-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+  .mission-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Card Footer */
+  .card-footer {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--warm-gray);
+    border-radius: 0 0 20px 20px;
+  }
+  .footer-nav {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(10,22,40,0.15);
+    transition: all 0.2s;
+  }
+  .nav-dot.active {
+    width: 20px;
+    border-radius: 3px;
+    background: var(--gold-500);
+  }
+  .footer-share {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .footer-share:hover { color: var(--navy-600); }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid var(--warm-gray);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+    max-width: 440px;
+    margin: 0 auto;
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: color 0.2s;
+    color: var(--text-muted);
+  }
+  .nav-item.active {
+    color: var(--navy-700);
+  }
+  .nav-item .nav-icon {
+    font-size: 20px;
+  }
+  .nav-item .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .nav-item.active .nav-label {
+    color: var(--gold-500);
+    font-weight: 600;
+  }
+
+  /* Spacing for bottom nav */
+  .bottom-spacer { height: 72px; }
+
+  /* Swipe hint animation */
+  @keyframes swipeHint {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-8px); }
+  }
+  .swipe-hint {
+    text-align: center;
+    padding: 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    animation: swipeHint 2s ease-in-out infinite;
+  }
+
+  /* Responsive */
+  @media (min-width: 441px) {
+    body {
+      max-width: 440px;
+      margin: 0 auto;
+      box-shadow: 0 0 60px rgba(0,0,0,0.1);
+    }
+    .bottom-nav {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="avatar">P</div>
+    <div class="greeting">
+      <span>오늘도 함께합니다</span>
+      <strong>PAUL 성도님</strong>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-icon">🔔</div>
+    <div class="header-icon">⚙</div>
+  </div>
+</div>
+
+<!-- Date -->
+<div class="date-bar">
+  <div class="date-main">2026년 4월 11일</div>
+  <div class="date-sub">토요일 · 사순절 제6주</div>
+</div>
+
+<!-- Daily Card -->
+<div class="card-wrapper">
+  <div class="daily-card">
+
+    <!-- 1. 오늘의 말씀 -->
+    <div class="section scripture-section">
+      <div class="section-label">
+        <span class="icon">📖</span>
+        오늘의 말씀
+      </div>
+      <div class="scripture-ref">요한복음 15:5</div>
+      <div class="scripture-text">
+        나는 포도나무요 너희는 가지라<br>
+        그가 내 안에, 내가 그 안에 거하면<br>
+        사람이 열매를 많이 맺나니
+      </div>
+    </div>
+
+    <!-- 2. Claim 핵심 -->
+    <div class="section claim-section">
+      <div class="section-label">
+        <span class="icon">💡</span>
+        CLAIM 핵심
+      </div>
+      <div class="claim-text">
+        연결 없이는 열매도 없습니다. 오늘 하루의 모든 일이
+        <span class="claim-highlight">그분과의 연결 위에서</span>
+        이루어질 때, 우리의 수고는 비로소 의미 있는 열매가 됩니다.
+        가지가 스스로 열매 맺을 수 없듯, 우리도
+        <span class="claim-highlight">머무름</span>이 먼저입니다.
+      </div>
+    </div>
+
+    <!-- 3. 오늘의 질문 (강조) -->
+    <div class="section question-section">
+      <div class="section-label">
+        <span class="icon">✦</span>
+        오늘의 질문
+      </div>
+      <div class="question-divider"></div>
+      <div class="question-text">
+        오늘 내가 '머물러야 할 곳'은<br>
+        어디인가요?
+      </div>
+    </div>
+
+    <!-- 4. 삼분 응답: 붙들어야 / 보류 / 맡김 -->
+    <div class="section response-section">
+      <div class="section-label">
+        <span class="icon">🤲</span>
+        삼분 응답
+      </div>
+      <div class="response-tags">
+        <div class="response-tag tag-hold" onclick="selectTag(this)">
+          <div class="tag-icon">✊</div>
+          <div class="tag-label">붙들어야</div>
+          <div class="tag-desc">내가 해야 할 일</div>
+        </div>
+        <div class="response-tag tag-pause" onclick="selectTag(this)">
+          <div class="tag-icon">⏸</div>
+          <div class="tag-label">보류</div>
+          <div class="tag-desc">때를 기다림</div>
+        </div>
+        <div class="response-tag tag-entrust" onclick="selectTag(this)">
+          <div class="tag-icon">🕊</div>
+          <div class="tag-label">맡김</div>
+          <div class="tag-desc">하나님께 위탁</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 기도 포인트 -->
+    <div class="section prayer-section">
+      <div class="section-label">
+        <span class="icon">🙏</span>
+        기도 포인트
+      </div>
+      <div class="prayer-text">
+        주님, 오늘 하루 제가 무엇을 하든지 먼저 주님 안에 머물게 하소서.
+        조급함 대신 신뢰로, 불안 대신 평안으로 이 하루를 채워주소서.
+        내 힘으로 되는 것이 아님을 고백합니다. 아멘.
+      </div>
+    </div>
+
+    <!-- 6. 실천 미션 -->
+    <div class="section mission-section">
+      <div class="section-label">
+        <span class="icon">🎯</span>
+        오늘의 실천
+      </div>
+      <div class="mission-card">
+        <div class="mission-check" onclick="toggleCheck(this)"></div>
+        <div class="mission-content">
+          <div class="mission-title">5분간 조용히 말씀 묵상하기</div>
+          <div class="mission-detail">일상 속 작은 머무름을 실천합니다</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <div class="footer-nav">
+        <div class="nav-dot"></div>
+        <div class="nav-dot active"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="footer-share" onclick="shareCard()">
+        공유 ↗
+      </div>
+    </div>
+
+  </div>
+
+  <div class="swipe-hint">← 좌우로 밀어 이전/다음 카드 →</div>
+</div>
+
+<div class="bottom-spacer"></div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <span class="nav-icon">📇</span>
+    <span class="nav-label">카드</span>
+  </div>
+  <div class="nav-item">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">기록</span>
+  </div>
+  <div class="nav-item">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">통계</span>
+  </div>
+  <div class="nav-item">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">내 정보</span>
+  </div>
+</div>
+
+<script>
+function selectTag(el) {
+  document.querySelectorAll('.response-tag').forEach(t => {
+    t.style.transform = '';
+    t.style.boxShadow = '';
+  });
+  el.style.transform = 'scale(1.03)';
+  el.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+}
+
+function shareCard() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'HORIZON Daily Card',
+      text: '요한복음 15:5 - 나는 포도나무요 너희는 가지라'
+    });
+  }
+}
+</script>
+
+</body>
+</html>

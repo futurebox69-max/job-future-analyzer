@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GameLand — 퍼즐 역량 측정</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
+:root{--bg:#08080f;--surface:#12121c;--surface2:#1a1a2a;--border:rgba(108,99,255,0.15);--primary:#6C63FF;--accent:#4ECDC4;--gold:#FFE66D;--pink:#F472B6;--red:#FF6B6B;--green:#34D399;--text:#E8E6F0;--dim:#666680}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;-webkit-tap-highlight-color:transparent}
+button,div[onclick]{cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+.overlay{position:fixed;inset:0;background:rgba(8,8,15,0.95);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.overlay h1{font-size:28px;font-weight:900;margin-bottom:6px;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.overlay p{font-size:13px;color:var(--dim);max-width:300px;margin-bottom:20px;line-height:1.6}
+.overlay .btn{padding:16px 40px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary),#8B5CF6);color:#fff;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 8px 32px rgba(108,99,255,0.4);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.overlay.hidden{display:none}
+
+.hud{padding:14px 20px;display:flex;justify-content:space-between;align-items:center;width:100%;max-width:440px;border-bottom:1px solid var(--border)}
+.hud-left{display:flex;gap:12px;align-items:center}
+.hud-badge{background:var(--primary);padding:4px 12px;border-radius:10px;font-size:11px;font-weight:700}
+.hud-timer{font-size:22px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}
+.hud-score{font-size:14px;font-weight:700;color:var(--accent)}
+
+/* Puzzle container */
+.puzzle-area{flex:1;width:100%;max-width:440px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Pattern matching puzzle */
+.pattern-grid{display:grid;gap:6px;margin-bottom:20px}
+.pattern-cell{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid var(--border);transition:all 0.2s}
+.pattern-cell.highlight{border-color:var(--gold);background:rgba(255,230,109,0.1);box-shadow:0 0 12px rgba(255,230,109,0.2)}
+.pattern-cell.correct{border-color:var(--green);background:rgba(52,211,153,0.15)}
+.pattern-cell.wrong{border-color:var(--red);background:rgba(255,107,107,0.15)}
+
+.puzzle-question{font-size:15px;font-weight:600;text-align:center;margin-bottom:16px;line-height:1.5;color:var(--text)}
+
+.answer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:360px}
+.answer-btn{padding:14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--border);cursor:pointer;text-align:center;transition:all 0.25s;font-family:'Noto Sans KR',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.answer-btn:hover{border-color:var(--primary);background:rgba(108,99,255,0.08)}
+.answer-btn:active{transform:scale(0.97)}
+.answer-btn.selected{border-color:var(--accent);background:rgba(78,205,196,0.1)}
+.answer-btn .ab-emoji{font-size:28px;margin-bottom:4px}
+.answer-btn .ab-text{font-size:12px;color:var(--text)}
+
+/* Connection puzzle */
+.connect-area{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.connect-node{width:56px;height:56px;border-radius:50%;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;transition:all 0.25s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.connect-node.active{border-color:var(--primary);box-shadow:0 0 16px rgba(108,99,255,0.4)}
+.connect-node.matched{border-color:var(--green);background:rgba(52,211,153,0.15)}
+
+/* Word association */
+.word-cloud{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.word-chip{padding:10px 16px;border-radius:20px;background:var(--surface);border:1.5px solid var(--border);font-size:13px;cursor:pointer;transition:all 0.2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.word-chip:hover{border-color:var(--primary)}
+.word-chip.selected{background:rgba(108,99,255,0.15);border-color:var(--primary);color:var(--primary)}
+
+/* Sequence puzzle */
+.seq-slots{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.seq-slot{width:52px;height:52px;border-radius:10px;background:var(--surface2);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;transition:all 0.2s}
+.seq-slot.filled{border-style:solid;border-color:var(--accent)}
+.seq-options{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.seq-opt{width:48px;height:48px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all 0.2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.seq-opt:hover{border-color:var(--primary)}
+.seq-opt.used{opacity:0.3;pointer-events:none}
+
+.confirm-btn{padding:12px 32px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--primary),#8B5CF6);color:#fff;font-size:14px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:12px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+/* Result */
+.result-bars{width:100%;max-width:340px;margin:16px 0}
+.rb-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.rb-icon{font-size:16px;width:22px;text-align:center}
+.rb-info{flex:1}
+.rb-name{font-size:10px;display:flex;justify-content:space-between;margin-bottom:2px}
+.rb-val{color:var(--accent);font-weight:700}
+.rb-track{height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.rb-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.result-meta{font-size:12px;color:var(--dim);text-align:center;max-width:300px;margin:8px auto;line-height:1.6}
+
+@media(min-width:481px){body{max-width:480px;margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,.3)}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="intro">
+  <div style="font-size:48px;margin-bottom:12px">🧩</div>
+  <h1>마인드 퍼즐</h1>
+  <p>패턴을 찾고, 연결하고, 조합하세요.<br>5개의 퍼즐이 당신의 사고방식을 측정합니다.<br><br>
+  정답의 정확도뿐 아니라<br>풀이 속도와 접근 방식까지 분석합니다.</p>
+  <button class="btn" id="startBtn">퍼즐 시작</button>
+</div>
+
+<div class="overlay hidden" id="result">
+  <div style="font-size:48px;margin-bottom:12px" id="resEmoji"></div>
+  <h1 id="resTitle"></h1>
+  <p id="resDesc"></p>
+  <div class="result-bars" id="resBars"></div>
+  <div class="result-meta" id="resMeta"></div>
+  <button class="btn" id="retryBtn">다시 도전</button>
+</div>
+
+<div class="hud" id="hud" style="display:none">
+  <div class="hud-left">
+    <div class="hud-badge" id="levelBadge">퍼즐 1/5</div>
+  </div>
+  <div class="hud-timer" id="timer">30</div>
+  <div class="hud-score" id="scoreDisplay">0점</div>
+</div>
+
+<div class="puzzle-area" id="puzzleArea" style="display:none"></div>
+
+<script>
+const SKILLS={structural:{icon:'🧩',name:'구조적 사고',color:'#6C63FF'},creative:{icon:'🎨',name:'창의적 재설계',color:'#FF6B6B'},emotional:{icon:'💫',name:'감성 연결',color:'#F472B6'},adaptive:{icon:'⚡',name:'적응 민첩성',color:'#FFE66D'},ethical:{icon:'⚖️',name:'윤리적 판단',color:'#A78BFA'},collab:{icon:'🤝',name:'협업 지능',color:'#34D399'}};
+
+let currentPuzzle=0;
+let totalScore=0;
+let scores={structural:0,creative:0,emotional:0,adaptive:0,ethical:0,collab:0};
+let behaviorLog=[];
+let timerInterval;
+let timeLeft;
+let puzzleStartTime;
+
+const puzzles=[
+  // 1. 패턴 인식 (구조적 사고)
+  {type:'pattern',title:'패턴을 찾으세요',
+    question:'다음 이모지 시퀀스의 빈칸을 채우세요',
+    sequence:['🌑','🌒','🌓','🌔','?'],
+    options:[
+      {emoji:'🌕',text:'보름달',correct:true,skills:{structural:4}},
+      {emoji:'🌙',text:'초승달',correct:false,skills:{creative:2}},
+      {emoji:'⭐',text:'별',correct:false,skills:{emotional:2}},
+      {emoji:'☀️',text:'태양',correct:false,skills:{adaptive:2}}
+    ]},
+  // 2. 연결 짓기 (창의적 사고)
+  {type:'connect',title:'숨겨진 연결을 찾으세요',
+    question:'"물고기 🐟, 새 🐦, 비행기 ✈️"의 공통점은?',
+    options:[
+      {emoji:'🌊',text:'물과 관련',correct:false,skills:{emotional:2}},
+      {emoji:'🪶',text:'날개/지느러미로 이동',correct:true,skills:{creative:4}},
+      {emoji:'🌍',text:'지구에 산다',correct:false,skills:{ethical:2}},
+      {emoji:'📏',text:'크기가 다양',correct:false,skills:{structural:2}}
+    ]},
+  // 3. 우선순위 판단 (윤리적 판단)
+  {type:'priority',title:'우선순위를 정하세요',
+    question:'자율주행차가 사고 직전! 다음 중 AI가 가장 먼저 보호해야 하는 것은?',
+    options:[
+      {emoji:'👶',text:'어린이 보행자',correct:true,skills:{ethical:4,emotional:1}},
+      {emoji:'🚗',text:'차량 탑승자',correct:false,skills:{adaptive:2}},
+      {emoji:'📊',text:'확률적 최적해',correct:false,skills:{structural:3}},
+      {emoji:'⚖️',text:'답이 없다 (딜레마)',correct:false,skills:{ethical:3,creative:1}}
+    ]},
+  // 4. 단어 연상 (감성 + 협업)
+  {type:'words',title:'떠오르는 단어 3개를 고르세요',
+    question:'"미래의 나"하면 떠오르는 것은?',
+    words:['도전','안정','자유','성장','가족','돈','건강','창의','봉사','권력','행복','기술'],
+    wordSkills:{
+      '도전':{adaptive:2},'안정':{structural:2},'자유':{creative:2},'성장':{adaptive:1,structural:1},
+      '가족':{emotional:2},'돈':{adaptive:1,ethical:1},'건강':{ethical:2},'창의':{creative:2},
+      '봉사':{emotional:1,collab:1},'권력':{structural:1,adaptive:1},'행복':{emotional:2},'기술':{structural:1,creative:1}
+    }},
+  // 5. 시퀀스 조합 (적응 + 협업)
+  {type:'sequence',title:'올바른 순서를 만드세요',
+    question:'스타트업 성공의 올바른 순서는?',
+    correctOrder:['💡','👥','🔨','📊','🚀'],
+    labels:['아이디어','팀 빌딩','제품 개발','시장 검증','출시'],
+    sequenceSkills:{
+      correct:{structural:3,collab:2},
+      partial:{adaptive:2,creative:1},
+      wrong:{creative:2}
+    }}
+];
+
+function startGame(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('puzzleArea').style.display='flex';
+  loadPuzzle(0);
+}
+
+function loadPuzzle(idx){
+  if(idx>=puzzles.length){endGame();return}
+  currentPuzzle=idx;
+  const p=puzzles[idx];
+  document.getElementById('levelBadge').textContent=`퍼즐 ${idx+1}/${puzzles.length}`;
+  document.getElementById('scoreDisplay').textContent=`${totalScore}점`;
+
+  const area=document.getElementById('puzzleArea');
+  area.innerHTML='';
+
+  timeLeft=30;puzzleStartTime=Date.now();
+  const timerEl=document.getElementById('timer');timerEl.textContent=timeLeft;
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timeLeft--;timerEl.textContent=timeLeft;
+    if(timeLeft<=0){clearInterval(timerInterval);autoAnswer()}
+  },1000);
+
+  if(p.type==='pattern')renderPattern(p,area);
+  else if(p.type==='connect')renderConnect(p,area);
+  else if(p.type==='priority')renderPriority(p,area);
+  else if(p.type==='words')renderWords(p,area);
+  else if(p.type==='sequence')renderSequence(p,area);
+}
+
+function renderPattern(p,area){
+  area.innerHTML=`
+    <div class="puzzle-question">${p.question}</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px">
+      ${p.sequence.map(s=>`<div class="pattern-cell ${s==='?'?'highlight':''}">${s==='?'?'❓':s}</div>`).join('')}
+    </div>
+    <div class="answer-grid">
+      ${p.options.map((o,i)=>`<div class="answer-btn" onclick="answerOption(${i})"><div class="ab-emoji">${o.emoji}</div><div class="ab-text">${o.text}</div></div>`).join('')}
+    </div>`;
+}
+
+function renderConnect(p,area){renderPattern(p,area)} // Same layout
+function renderPriority(p,area){renderPattern(p,area)} // Same layout
+
+function renderWords(p,area){
+  let selected=[];
+  area.innerHTML=`
+    <div class="puzzle-question">${p.question}</div>
+    <div class="word-cloud" id="wordCloud">
+      ${p.words.map(w=>`<div class="word-chip" data-word="${w}" onclick="toggleWord(this,'${w}')">${w}</div>`).join('')}
+    </div>
+    <div style="text-align:center;font-size:12px;color:var(--dim);margin-bottom:8px" id="wordCount">0/3 선택</div>
+    <button class="confirm-btn" id="wordConfirm" onclick="submitWords()" disabled>확인</button>`;
+  window._wordSelected=[];
+}
+
+function toggleWord(el,word){
+  if(el.classList.contains('selected')){
+    el.classList.remove('selected');
+    window._wordSelected=window._wordSelected.filter(w=>w!==word);
+  }else if(window._wordSelected.length<3){
+    el.classList.add('selected');
+    window._wordSelected.push(word);
+  }
+  document.getElementById('wordCount').textContent=`${window._wordSelected.length}/3 선택`;
+  document.getElementById('wordConfirm').disabled=window._wordSelected.length!==3;
+}
+
+function submitWords(){
+  clearInterval(timerInterval);
+  const p=puzzles[currentPuzzle];
+  const elapsed=Date.now()-puzzleStartTime;
+  window._wordSelected.forEach(w=>{
+    const ws=p.wordSkills[w];
+    if(ws)for(const[k,v]of Object.entries(ws))scores[k]+=v;
+  });
+  totalScore+=15;
+  behaviorLog.push({puzzle:currentPuzzle,type:'words',words:window._wordSelected,time:elapsed});
+  document.getElementById('scoreDisplay').textContent=`${totalScore}점`;
+  setTimeout(()=>loadPuzzle(currentPuzzle+1),600);
+}
+
+function renderSequence(p,area){
+  let placed=[];
+  area.innerHTML=`
+    <div class="puzzle-question">${p.question}</div>
+    <div class="seq-slots" id="seqSlots">
+      ${p.correctOrder.map((_,i)=>`<div class="seq-slot" id="slot${i}" data-idx="${i}"></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px;flex-wrap:wrap">
+      ${p.labels.map((l,i)=>`<span style="font-size:9px;color:var(--dim)">${i+1}.${l}</span>`).join(' ')}
+    </div>
+    <div class="seq-options" id="seqOpts">
+      ${shuffle(p.correctOrder.map((e,i)=>({emoji:e,idx:i}))).map(o=>`<div class="seq-opt" data-eidx="${o.idx}" onclick="placeSeq(this,'${o.emoji}',${o.idx})">${o.emoji}</div>`).join('')}
+    </div>
+    <button class="confirm-btn" id="seqConfirm" onclick="submitSeq()" disabled>확인</button>`;
+  window._seqPlaced=[];
+}
+
+function placeSeq(el,emoji,eidx){
+  if(window._seqPlaced.length>=5)return;
+  const slotIdx=window._seqPlaced.length;
+  const slot=document.getElementById('slot'+slotIdx);
+  slot.textContent=emoji;slot.classList.add('filled');
+  el.classList.add('used');
+  window._seqPlaced.push({emoji,eidx});
+  document.getElementById('seqConfirm').disabled=window._seqPlaced.length!==5;
+}
+
+function submitSeq(){
+  clearInterval(timerInterval);
+  const p=puzzles[currentPuzzle];
+  const elapsed=Date.now()-puzzleStartTime;
+  const userOrder=window._seqPlaced.map(s=>s.emoji);
+  let correctCount=0;
+  userOrder.forEach((e,i)=>{if(e===p.correctOrder[i])correctCount++});
+
+  if(correctCount===5){
+    for(const[k,v]of Object.entries(p.sequenceSkills.correct))scores[k]+=v;
+    totalScore+=25;
+  }else if(correctCount>=3){
+    for(const[k,v]of Object.entries(p.sequenceSkills.partial))scores[k]+=v;
+    totalScore+=15;
+  }else{
+    for(const[k,v]of Object.entries(p.sequenceSkills.wrong))scores[k]+=v;
+    totalScore+=5;
+  }
+  behaviorLog.push({puzzle:currentPuzzle,type:'sequence',order:userOrder,correct:correctCount,time:elapsed});
+  document.getElementById('scoreDisplay').textContent=`${totalScore}점`;
+  setTimeout(()=>loadPuzzle(currentPuzzle+1),600);
+}
+
+function answerOption(idx){
+  clearInterval(timerInterval);
+  const p=puzzles[currentPuzzle];
+  const o=p.options[idx];
+  const elapsed=Date.now()-puzzleStartTime;
+
+  for(const[k,v]of Object.entries(o.skills))scores[k]+=v;
+  const bonus=o.correct?20:5;
+  const speedBonus=timeLeft>20?5:timeLeft>10?3:0;
+  totalScore+=bonus+speedBonus;
+
+  behaviorLog.push({puzzle:currentPuzzle,type:p.type,choice:idx,correct:!!o.correct,time:elapsed});
+
+  document.querySelectorAll('.answer-btn').forEach((b,i)=>{
+    b.style.pointerEvents='none';
+    if(i===idx)b.classList.add('selected');
+  });
+
+  document.getElementById('scoreDisplay').textContent=`${totalScore}점`;
+  setTimeout(()=>loadPuzzle(currentPuzzle+1),800);
+}
+
+function autoAnswer(){
+  const p=puzzles[currentPuzzle];
+  if(p.type==='words'){window._wordSelected=['도전','성장','기술'];submitWords()}
+  else if(p.type==='sequence'){
+    window._seqPlaced=puzzles[currentPuzzle].correctOrder.map((e,i)=>({emoji:e,eidx:i}));submitSeq()
+  }
+  else answerOption(0);
+}
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5)}
+
+function endGame(){
+  document.getElementById('hud').style.display='none';
+  document.getElementById('puzzleArea').style.display='none';
+  clearInterval(timerInterval);
+
+  const maxS=Math.max(...Object.values(scores))||1;
+  const topKey=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+
+  const res=document.getElementById('result');res.classList.remove('hidden');
+  document.getElementById('resEmoji').textContent=SKILLS[topKey].icon;
+  document.getElementById('resTitle').textContent=`${SKILLS[topKey].name} 우세`;
+  document.getElementById('resDesc').textContent=`총점: ${totalScore}점\n정답률: ${behaviorLog.filter(b=>b.correct).length}/${behaviorLog.filter(b=>b.hasOwnProperty('correct')).length}`;
+
+  const bars=document.getElementById('resBars');bars.innerHTML='';
+  Object.entries(scores).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const s=SKILLS[k];const pct=Math.round(v/maxS*100);
+    const row=document.createElement('div');row.className='rb-row';
+    row.innerHTML=`<div class="rb-icon">${s.icon}</div><div class="rb-info"><div class="rb-name"><span>${s.name}</span><span class="rb-val">${pct}%</span></div><div class="rb-track"><div class="rb-fill" style="width:${pct}%;background:${s.color}"></div></div></div>`;
+    bars.appendChild(row);
+  });
+
+  const avgTime=behaviorLog.reduce((s,b)=>s+b.time,0)/behaviorLog.length/1000;
+  document.getElementById('resMeta').textContent=
+    `평균 풀이 시간: ${avgTime.toFixed(1)}초 · `+
+    (avgTime<8?'빠른 직관형 문제 해결자':'신중한 분석형 문제 해결자')+
+    ` · 퍼즐 접근 방식이 실제 업무 사고력과 높은 상관관계를 보입니다.`;
+}
+
+// Event listeners (avoid inline onclick for mobile compatibility)
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('startBtn').addEventListener('touchend',e=>{e.preventDefault();startGame()});
+document.getElementById('retryBtn').addEventListener('click',()=>location.reload());
+document.getElementById('retryBtn').addEventListener('touchend',e=>{e.preventDefault();location.reload()});
+</script>
+</body>
+</html>

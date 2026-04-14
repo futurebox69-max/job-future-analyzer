@@ -22,11 +22,11 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
     const trimmed = job.trim();
 
     if (!trimmed) {
-      setError(lang === "ko" ? "직업명을 입력해주세요." : lang === "zh" ? "请输入职业名称。" : lang === "ja" ? "職業名を入力してください。" : lang === "es" ? "Por favor ingresa un puesto de trabajo." : "Please enter a job title.");
+      setError(t.error_empty);
       return;
     }
     if (trimmed.length > 50) {
-      setError(lang === "ko" ? "직업명은 50자 이하로 입력해주세요." : lang === "zh" ? "职业名称请在50字以内。" : lang === "ja" ? "職業名は50文字以内で入力してください。" : lang === "es" ? "El puesto debe tener menos de 50 caracteres." : "Job title must be under 50 characters.");
+      setError(t.error_too_long);
       return;
     }
 
@@ -47,26 +47,30 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
           placeholder={placeholder}
           maxLength={50}
           disabled={isLoading}
-          className="w-full px-6 py-4 pr-36 rounded-2xl text-lg transition-all duration-200 disabled:opacity-50 outline-none"
+          className="w-full px-6 py-5 pr-36 rounded-2xl text-xl transition-all duration-200 disabled:opacity-50 outline-none"
           style={{
             background: "#FFFFFF",
-            border: "1.5px solid #EDE9FE",
+            border: `1.5px solid ${error ? "#EF4444" : "#EDE9FE"}`,
             color: "#1E1B4B",
-            boxShadow: "0 2px 12px rgba(108,99,255,0.08)",
+            boxShadow: error ? "0 0 0 3px rgba(239,68,68,0.10)" : "0 2px 12px rgba(108,99,255,0.08)",
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = "#6C63FF";
-            e.currentTarget.style.boxShadow = "0 0 0 3px rgba(108,99,255,0.12), 0 2px 12px rgba(108,99,255,0.08)";
+            if (!error) {
+              e.currentTarget.style.borderColor = "#6C63FF";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(108,99,255,0.12), 0 2px 12px rgba(108,99,255,0.08)";
+            }
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = "#EDE9FE";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(108,99,255,0.08)";
+            if (!error) {
+              e.currentTarget.style.borderColor = "#EDE9FE";
+              e.currentTarget.style.boxShadow = "0 2px 12px rgba(108,99,255,0.08)";
+            }
           }}
         />
         <button
           type="submit"
           disabled={isLoading || !job.trim()}
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center gap-2 text-white"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-3 rounded-xl font-medium text-base transition-all duration-200 flex items-center gap-2 text-white"
           style={{
             background: isLoading || !job.trim() ? "#D1D5DB" : "#6C63FF",
             cursor: isLoading || !job.trim() ? "not-allowed" : "pointer",
@@ -92,7 +96,7 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
         </p>
       )}
 
-      <p className="mt-2 text-xs text-center" style={{ color: "#9CA3AF" }}>
+      <p className="mt-2 text-sm text-center" style={{ color: "#9CA3AF" }}>
         {t.daily_limit}
       </p>
     </form>

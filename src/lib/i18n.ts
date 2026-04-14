@@ -41,6 +41,47 @@ export const UI_STRINGS: Record<LangCode, {
   risk_caution: string;
   risk_danger: string;
   risk_critical: string;
+  // Hero
+  hero_line1: string;
+  hero_line2: string;
+  hero_tagline: string;
+  analyzed_before: string;
+  analyzed_after: string;
+  // Update badge
+  update_badge: string;
+  update_tag: string;
+  // Search card
+  popular_jobs_title: string;
+  // Results
+  result_subtitle: string;
+  analyzing_job_label: string;
+  // Process steps
+  step1_title: string;
+  step1_desc: string;
+  step2_title: string;
+  step2_desc: string;
+  step3_title: string;
+  step3_desc: string;
+  // AI Coach
+  ai_coach: string;
+  ai_coach_full: string;
+  // Sidebar sections
+  section_overview: string;
+  section_dimensions: string;
+  section_horizon: string;
+  section_skills: string;
+  section_iceberg: string;
+  section_income: string;
+  section_industry: string;
+  section_transitions: string;
+  section_consulting: string;
+  section_coach: string;
+  // Error messages
+  error_analyze: string;
+  error_network: string;
+  error_empty: string;
+  error_too_long: string;
+  analyzed_job_done: string;
 }> = {
   ko: {
     title: "내 직업의 미래",
@@ -52,7 +93,7 @@ export const UI_STRINGS: Record<LangCode, {
     placeholder_youth: "관심 있는 직업을 입력하세요 (예: 선생님, 의사, 프로게이머)",
     analyze_btn: "분석하기",
     analyzing_btn: "분석 중",
-    daily_limit: "하루 20회 무료 분석 · AI 분석 결과는 참고용입니다",
+    daily_limit: "로그인 후 무료 3회 분석 · AI 분석 결과는 참고용입니다",
     loading_hint: "처음 분석은 30~90초 소요됩니다 · 같은 직업은 즉시 로드",
     loading: [
       "Claude AI가 직업 데이터를 수집하고 있습니다...",
@@ -79,6 +120,39 @@ export const UI_STRINGS: Record<LangCode, {
     risk_caution: "주의",
     risk_danger: "위험",
     risk_critical: "매우위험",
+    hero_line1: "당신의 직업,",
+    hero_line2: "AI 시대에 살아남을까요?",
+    hero_tagline: "8차원 분석 · 10년 예측 · 스킬 로드맵 · 무료",
+    analyzed_before: "",
+    analyzed_after: "명이 이미 분석했습니다",
+    update_badge: "매월 1일 데이터 업데이트",
+    update_tag: "AI 변화속도 반영",
+    popular_jobs_title: "인기 직업 바로 분석",
+    result_subtitle: "AI 대체율 분석 결과",
+    analyzing_job_label: "분석 중인 직업",
+    step1_title: "직업 입력",
+    step1_desc: "직업명을 검색창에 입력",
+    step2_title: "8차원 분석",
+    step2_desc: "AI가 8가지 차원으로 분석",
+    step3_title: "결과 확인",
+    step3_desc: "상세 리포트 즉시 제공",
+    ai_coach: "🔮 AI 코치 대화",
+    ai_coach_full: "🔮 AI 코치와 대화하기 →",
+    section_overview: "종합 대체율",
+    section_dimensions: "8차원 분석",
+    section_horizon: "10년 예측",
+    section_skills: "스킬 갭",
+    section_iceberg: "빙산 모델",
+    section_income: "소득 영향",
+    section_industry: "업종 분석",
+    section_transitions: "전환 경로",
+    section_consulting: "컨설팅 노트",
+    section_coach: "🔮 AI 코치 대화",
+    error_analyze: "분석에 실패했습니다. 다시 시도해주세요.",
+    error_network: "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.",
+    error_empty: "직업명을 입력해주세요.",
+    error_too_long: "직업명은 50자 이하로 입력해주세요.",
+    analyzed_job_done: "분석 완료",
   },
   en: {
     title: "Future of My Job",
@@ -90,7 +164,7 @@ export const UI_STRINGS: Record<LangCode, {
     placeholder_youth: "Enter your dream job (e.g. Teacher, Doctor, Game Developer)",
     analyze_btn: "Analyze",
     analyzing_btn: "Analyzing",
-    daily_limit: "20 free analyses per day · Results are for reference only",
+    daily_limit: "3 free analyses after login · Results are for reference only",
     loading_hint: "First analysis takes 30~90s · Same job loads instantly",
     loading: [
       "Claude AI is gathering job data...",
@@ -117,6 +191,39 @@ export const UI_STRINGS: Record<LangCode, {
     risk_caution: "Caution",
     risk_danger: "At Risk",
     risk_critical: "Critical",
+    hero_line1: "Your Job,",
+    hero_line2: "Will It Survive the AI Era?",
+    hero_tagline: "8D Analysis · 10-Year Forecast · Skill Roadmap · Free",
+    analyzed_before: "",
+    analyzed_after: " have already analyzed",
+    update_badge: "Monthly Data Update",
+    update_tag: "AI Speed Tracked",
+    popular_jobs_title: "Quick Analyze Popular Jobs",
+    result_subtitle: "AI Replacement Analysis",
+    analyzing_job_label: "Analyzing Job",
+    step1_title: "Enter Job",
+    step1_desc: "Type your job title in search",
+    step2_title: "8D Analysis",
+    step2_desc: "AI analyzes across 8 dimensions",
+    step3_title: "View Results",
+    step3_desc: "Detailed report instantly",
+    ai_coach: "🔮 AI Coach Chat",
+    ai_coach_full: "🔮 Chat with AI Coach →",
+    section_overview: "Overall Risk",
+    section_dimensions: "8D Analysis",
+    section_horizon: "10-Year Forecast",
+    section_skills: "Skill Gap",
+    section_iceberg: "Iceberg Model",
+    section_income: "Income Impact",
+    section_industry: "Industry Context",
+    section_transitions: "Career Paths",
+    section_consulting: "Consulting Note",
+    section_coach: "🔮 AI Coach Chat",
+    error_analyze: "Analysis failed. Please try again.",
+    error_network: "Network error. Please check your internet connection.",
+    error_empty: "Please enter a job title.",
+    error_too_long: "Job title must be under 50 characters.",
+    analyzed_job_done: "Analysis Complete",
   },
   zh: {
     title: "我的职业未来",
@@ -128,7 +235,7 @@ export const UI_STRINGS: Record<LangCode, {
     placeholder_youth: "输入感兴趣的职业（例：教师、医生、游戏开发者）",
     analyze_btn: "开始分析",
     analyzing_btn: "分析中",
-    daily_limit: "每天20次免费分析 · 分析结果仅供参考",
+    daily_limit: "登录后免费分析3次 · 分析结果仅供参考",
     loading_hint: "首次分析需30~90秒 · 相同职业即时加载",
     loading: [
       "Claude AI正在收集职业数据...",
@@ -155,6 +262,39 @@ export const UI_STRINGS: Record<LangCode, {
     risk_caution: "注意",
     risk_danger: "危险",
     risk_critical: "极危",
+    hero_line1: "您的职业，",
+    hero_line2: "能在AI时代存活吗？",
+    hero_tagline: "8维分析 · 10年预测 · 技能路线图 · 免费",
+    analyzed_before: "",
+    analyzed_after: "人已完成分析",
+    update_badge: "每月1日数据更新",
+    update_tag: "跟踪AI变化速度",
+    popular_jobs_title: "热门职业快速分析",
+    result_subtitle: "AI替代率分析结果",
+    analyzing_job_label: "分析中的职业",
+    step1_title: "输入职业",
+    step1_desc: "在搜索框输入职业名称",
+    step2_title: "8维分析",
+    step2_desc: "AI从8个维度进行分析",
+    step3_title: "查看结果",
+    step3_desc: "立即提供详细报告",
+    ai_coach: "🔮 AI教练对话",
+    ai_coach_full: "🔮 与AI教练对话 →",
+    section_overview: "综合替代率",
+    section_dimensions: "8维分析",
+    section_horizon: "10年预测",
+    section_skills: "技能差距",
+    section_iceberg: "冰山模型",
+    section_income: "收入影响",
+    section_industry: "行业分析",
+    section_transitions: "转型路径",
+    section_consulting: "咨询笔记",
+    section_coach: "🔮 AI教练对话",
+    error_analyze: "分析失败，请重试。",
+    error_network: "网络错误，请检查您的网络连接。",
+    error_empty: "请输入职业名称。",
+    error_too_long: "职业名称请在50字以内。",
+    analyzed_job_done: "分析完成",
   },
   ja: {
     title: "私の仕事の未来",
@@ -166,7 +306,7 @@ export const UI_STRINGS: Record<LangCode, {
     placeholder_youth: "興味のある職業を入力（例：教師、医師、ゲーム開発者）",
     analyze_btn: "分析する",
     analyzing_btn: "分析中",
-    daily_limit: "1日20回まで無料 · 分析結果は参考値です",
+    daily_limit: "ログイン後3回まで無料 · 分析結果は参考値です",
     loading_hint: "初回分析は30〜90秒かかります · 同じ職業は即時ロード",
     loading: [
       "Claude AIが職業データを収集中...",
@@ -193,6 +333,39 @@ export const UI_STRINGS: Record<LangCode, {
     risk_caution: "注意",
     risk_danger: "危険",
     risk_critical: "非常に危険",
+    hero_line1: "あなたの仕事は、",
+    hero_line2: "AI時代に生き残れるか？",
+    hero_tagline: "8次元分析 · 10年予測 · スキルロードマップ · 無料",
+    analyzed_before: "",
+    analyzed_after: "人が分析済み",
+    update_badge: "毎月1日データ更新",
+    update_tag: "AI変化速度を反映",
+    popular_jobs_title: "人気職業をすぐ分析",
+    result_subtitle: "AI代替率分析結果",
+    analyzing_job_label: "分析中の職業",
+    step1_title: "職業入力",
+    step1_desc: "検索欄に職業名を入力",
+    step2_title: "8次元分析",
+    step2_desc: "AIが8つの次元で分析",
+    step3_title: "結果確認",
+    step3_desc: "詳細レポートを即時提供",
+    ai_coach: "🔮 AIコーチ対話",
+    ai_coach_full: "🔮 AIコーチと対話する →",
+    section_overview: "総合代替率",
+    section_dimensions: "8次元分析",
+    section_horizon: "10年予測",
+    section_skills: "スキルギャップ",
+    section_iceberg: "アイスバーグモデル",
+    section_income: "収入影響",
+    section_industry: "業種分析",
+    section_transitions: "転職経路",
+    section_consulting: "コンサルノート",
+    section_coach: "🔮 AIコーチ対話",
+    error_analyze: "分析に失敗しました。もう一度お試しください。",
+    error_network: "ネットワークエラーが発生しました。インターネット接続を確認してください。",
+    error_empty: "職業名を入力してください。",
+    error_too_long: "職業名は50文字以内で入力してください。",
+    analyzed_job_done: "分析完了",
   },
   es: {
     title: "El Futuro de Mi Trabajo",
@@ -204,7 +377,7 @@ export const UI_STRINGS: Record<LangCode, {
     placeholder_youth: "Ingresa tu trabajo soñado (ej: Maestro/a, Médico, Desarrollador)",
     analyze_btn: "Analizar",
     analyzing_btn: "Analizando",
-    daily_limit: "20 análisis gratuitos por día · Los resultados son de referencia",
+    daily_limit: "3 análisis gratuitos al registrarse · Los resultados son de referencia",
     loading_hint: "El primer análisis tarda 30~90s · El mismo trabajo carga al instante",
     loading: [
       "Claude AI está recopilando datos laborales...",
@@ -231,6 +404,39 @@ export const UI_STRINGS: Record<LangCode, {
     risk_caution: "Precaución",
     risk_danger: "En Riesgo",
     risk_critical: "Crítico",
+    hero_line1: "Tu Trabajo,",
+    hero_line2: "¿Sobrevivirá la Era de la IA?",
+    hero_tagline: "Análisis 8D · Pronóstico 10 años · Hoja de ruta · Gratis",
+    analyzed_before: "",
+    analyzed_after: " ya han analizado",
+    update_badge: "Actualización mensual de datos",
+    update_tag: "Ritmo IA monitoreado",
+    popular_jobs_title: "Analizar trabajos populares",
+    result_subtitle: "Análisis de Reemplazo IA",
+    analyzing_job_label: "Trabajo analizado",
+    step1_title: "Ingresar trabajo",
+    step1_desc: "Escribe el título del trabajo",
+    step2_title: "Análisis 8D",
+    step2_desc: "IA analiza en 8 dimensiones",
+    step3_title: "Ver resultado",
+    step3_desc: "Reporte detallado al instante",
+    ai_coach: "🔮 Chat con Coach IA",
+    ai_coach_full: "🔮 Hablar con Coach IA →",
+    section_overview: "Riesgo general",
+    section_dimensions: "Análisis 8D",
+    section_horizon: "Pronóstico 10 años",
+    section_skills: "Brecha de habilidades",
+    section_iceberg: "Modelo Iceberg",
+    section_income: "Impacto salarial",
+    section_industry: "Contexto sectorial",
+    section_transitions: "Rutas de carrera",
+    section_consulting: "Nota consultoría",
+    section_coach: "🔮 Chat Coach IA",
+    error_analyze: "Análisis fallido. Por favor intenta de nuevo.",
+    error_network: "Error de red. Por favor verifica tu conexión a internet.",
+    error_empty: "Por favor ingresa un puesto de trabajo.",
+    error_too_long: "El puesto debe tener menos de 50 caracteres.",
+    analyzed_job_done: "Análisis Completo",
   },
 };
 

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>미래역량 시뮬레이터 — 세분화 고도화 버전</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+:root {
+  --bg:#08080f; --surface:#12121c; --surface2:#1a1a2a;
+  --border:rgba(108,99,255,0.15); --primary:#6C63FF;
+  --accent:#FF6B6B; --accent2:#4ECDC4; --accent3:#FFE66D;
+  --accent4:#A78BFA; --accent5:#F472B6; --accent6:#34D399;
+  --text:#E8E6F0; --text-dim:#8888A0; --text-bright:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* PROFILE SETUP */
+#profile{align-items:center;justify-content:center;padding:24px}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:400px}
+.profile-title{font-size:22px;font-weight:700;margin-bottom:4px;text-align:center}
+.profile-sub{font-size:13px;color:var(--text-dim);text-align:center;margin-bottom:24px}
+.field{margin-bottom:16px}
+.field-label{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:1px}
+.field-input{width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border 0.2s}
+.field-input:focus{border-color:var(--primary)}
+.field-input::placeholder{color:#555}
+select.field-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888A0' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select.field-input option{background:var(--surface);color:var(--text)}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:20px;font-size:12px;font-weight:500;background:var(--surface2);border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;color:var(--text-dim);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.chip:hover{border-color:var(--primary);color:var(--text)}
+.chip.selected{background:rgba(108,99,255,0.2);border-color:var(--primary);color:var(--primary)}
+
+.profile-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary),#8B5CF6);color:#fff;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:8px;transition:all 0.3s;box-shadow:0 8px 32px rgba(108,99,255,0.3)}
+.profile-btn:hover{transform:translateY(-2px)}
+.profile-btn:disabled{opacity:0.4;transform:none;cursor:not-allowed}
+
+/* QUESTION TYPE SELECT */
+#qtype{align-items:center;justify-content:center;padding:24px}
+.qtype-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:6px}
+.qtype-sub{font-size:13px;color:var(--text-dim);text-align:center;margin-bottom:24px;max-width:340px}
+.qtype-grid{display:flex;flex-direction:column;gap:12px;width:100%;max-width:400px}
+.qtype-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.qtype-card:hover{border-color:var(--primary);transform:translateX(4px)}
+.qtype-card.selected{border-color:var(--primary);background:rgba(108,99,255,0.1);box-shadow:0 0 24px rgba(108,99,255,0.15)}
+.qtype-icon{font-size:28px;width:44px;height:44px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qtype-info h3{font-size:14px;font-weight:600;color:var(--text-bright);margin-bottom:2px}
+.qtype-info p{font-size:11px;color:var(--text-dim);line-height:1.4}
+.qtype-meta{font-size:10px;color:var(--accent3);font-weight:600;margin-top:4px;display:inline-block;padding:2px 8px;background:rgba(255,230,109,0.1);border-radius:4px}
+
+/* GAME SCREEN */
+#game{padding:0}
+.game-header{padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:var(--surface)}
+.progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;flex:1;margin:0 14px}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent2));transition:width 0.5s}
+.game-round{font-size:12px;color:var(--text-dim);white-space:nowrap}
+.game-timer{font-size:20px;font-weight:700;color:var(--accent);min-width:36px;text-align:right;font-variant-numeric:tabular-nums}
+.game-timer.warning{animation:blink .5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.game-body{flex:1;padding:20px;max-width:480px;margin:0 auto;width:100%;display:flex;flex-direction:column}
+.scenario-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+.scenario-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent2),var(--accent3))}
+.scenario-context{font-size:11px;color:var(--accent2);font-weight:600;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase}
+.scenario-persona{font-size:11px;color:var(--accent5);background:rgba(244,114,182,0.1);display:inline-block;padding:3px 10px;border-radius:6px;margin-bottom:10px}
+.scenario-emoji{font-size:36px;margin-bottom:10px;display:block}
+.scenario-text{font-size:15px;line-height:1.7;color:var(--text-bright)}
+
+.choices{display:flex;flex-direction:column;gap:10px;flex:1}
+
+/* Type A: 텍스트 시나리오 */
+.choice-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;text-align:left;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:12px;font-family:'Noto Sans KR',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.choice-btn:hover{border-color:var(--primary);background:rgba(108,99,255,0.08);transform:translateX(4px)}
+.choice-btn.selected{border-color:var(--primary);background:rgba(108,99,255,0.15);box-shadow:0 0 20px rgba(108,99,255,0.2)}
+.choice-key{width:30px;height:30px;border-radius:8px;background:rgba(108,99,255,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--primary);flex-shrink:0}
+.choice-text{font-size:13px;line-height:1.5;color:var(--text)}
+
+/* Type B: 이미지 선택 */
+.image-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.image-choice{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all 0.25s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.image-choice:hover{border-color:var(--primary)}
+.image-choice.selected{border-color:var(--accent2);background:rgba(78,205,196,0.1)}
+.image-choice .ic-emoji{font-size:40px;margin-bottom:8px}
+.image-choice .ic-label{font-size:12px;color:var(--text);font-weight:500}
+.image-choice .ic-desc{font-size:10px;color:var(--text-dim);margin-top:2px}
+
+/* Type C: 순위 매기기 */
+.rank-list{display:flex;flex-direction:column;gap:8px}
+.rank-item{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:grab;transition:all 0.2s;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.rank-item:active{cursor:grabbing;background:rgba(108,99,255,0.08)}
+.rank-item.dragging{opacity:0.5;border-color:var(--primary)}
+.rank-num{width:24px;height:24px;border-radius:6px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.rank-text{font-size:13px;color:var(--text);flex:1}
+.rank-handle{color:var(--text-dim);font-size:16px}
+
+/* Type D: 게임 비유 */
+.game-scenario-visual{text-align:center;padding:8px 0}
+.game-scenario-visual .gsv-title{font-size:13px;color:var(--accent3);font-weight:600;margin-bottom:4px}
+.game-scenario-visual .gsv-game{font-size:11px;color:var(--text-dim)}
+
+/* Feedback */
+.feedback-flash{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:100;pointer-events:none;opacity:0;transition:opacity 0.3s}
+.feedback-flash.show{opacity:1}
+.fb-content{background:var(--surface);border:2px solid var(--primary);border-radius:20px;padding:24px 32px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.fb-emoji{font-size:44px;margin-bottom:6px}
+.fb-text{font-size:14px;color:var(--text)}
+.fb-skill{margin-top:6px;font-size:11px;color:var(--accent2);font-weight:600}
+
+/* RESULT */
+#result{align-items:center;padding:24px;min-height:100vh}
+.result-header{text-align:center;margin:20px 0 28px}
+.result-badge{display:inline-block;padding:6px 16px;background:rgba(78,205,196,0.15);color:var(--accent2);border-radius:20px;font-size:12px;font-weight:600;border:1px solid rgba(78,205,196,0.3);margin-bottom:12px}
+.result-archetype{font-size:48px;margin-bottom:8px}
+.result-title{font-size:26px;font-weight:900;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.result-subtitle{font-size:13px;color:var(--text-dim);line-height:1.5;max-width:320px;margin:0 auto}
+
+.result-card{width:100%;max-width:380px;background:var(--surface);border-radius:20px;padding:20px;border:1px solid var(--border);margin-bottom:16px}
+.rc-title{font-size:12px;font-weight:600;color:var(--primary);letter-spacing:1px;margin-bottom:14px;text-transform:uppercase}
+
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.score-row:last-child{margin-bottom:0}
+.score-icon{font-size:18px;width:24px;text-align:center}
+.score-info{flex:1}
+.score-name{font-size:11px;color:var(--text);display:flex;justify-content:space-between;margin-bottom:3px}
+.score-val{color:var(--accent2);font-weight:700}
+.score-track{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+
+.meta-insight{background:rgba(255,230,109,0.08);border:1px solid rgba(255,230,109,0.15);border-radius:12px;padding:14px;margin-bottom:16px;width:100%;max-width:380px}
+.meta-insight h4{font-size:12px;color:var(--accent3);font-weight:600;margin-bottom:6px}
+.meta-insight p{font-size:12px;color:var(--text-dim);line-height:1.6}
+
+.result-actions{display:flex;gap:10px;width:100%;max-width:380px;margin-top:4px}
+.result-btn{flex:1;padding:14px;border-radius:12px;font-size:14px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;border:none;transition:all 0.2s}
+.result-btn-primary{background:linear-gradient(135deg,var(--primary),#8B5CF6);color:#fff;box-shadow:0 4px 16px rgba(108,99,255,0.3)}
+.result-btn-secondary{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:slideUp .35s ease forwards}
+
+@media(min-width:481px){body{max-width:480px;margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,.3)}}
+</style>
+</head>
+<body>
+
+<div class="feedback-flash" id="feedback">
+  <div class="fb-content">
+    <div class="fb-emoji" id="fbEmoji"></div>
+    <div class="fb-text" id="fbText"></div>
+    <div class="fb-skill" id="fbSkill"></div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen active" id="profile">
+  <div class="profile-card animate-in">
+    <div class="profile-title">나를 알려주세요</div>
+    <div class="profile-sub">당신에 맞는 시나리오를 만들어드립니다</div>
+
+    <div class="field">
+      <label class="field-label">나이대</label>
+      <select class="field-input" id="ageGroup" onchange="checkProfile()">
+        <option value="">선택하세요</option>
+        <option value="elementary">초등학생 (10-12세)</option>
+        <option value="middle">중학생 (13-15세)</option>
+        <option value="high">고등학생 (16-18세)</option>
+        <option value="college">대학생 (19-24세)</option>
+        <option value="young">사회초년생 (25-30세)</option>
+        <option value="mid">경력직 (31-45세)</option>
+        <option value="senior">시니어 (46세+)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">관심 분야 / 현재 직업</label>
+      <input class="field-input" id="jobInput" placeholder="예: 유튜버, 대형마트 수산부, 역사 전공..." oninput="checkProfile()">
+    </div>
+
+    <div class="field">
+      <label class="field-label">관심사 (복수 선택)</label>
+      <div class="chips" id="interestChips">
+        <div class="chip" onclick="toggleChip(this)" data-val="gaming">🎮 게임</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="youtube">📹 유튜브</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="music">🎵 음악</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="art">🎨 미술/디자인</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="sports">⚽ 스포츠</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="coding">💻 코딩/IT</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="science">🔬 과학</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="reading">📚 독서</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="cooking">🍳 요리</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="travel">✈️ 여행</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="finance">💰 재테크</div>
+        <div class="chip" onclick="toggleChip(this)" data-val="social">👥 사람 만나기</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">현재 상태</label>
+      <select class="field-input" id="situation" onchange="checkProfile()">
+        <option value="">선택하세요</option>
+        <option value="exploring">진로 탐색 중</option>
+        <option value="studying">공부/학습 중</option>
+        <option value="working">현재 직장 다니는 중</option>
+        <option value="switching">이직/전직 고민 중</option>
+        <option value="starting">창업 준비 중</option>
+        <option value="returning">재취업 준비 중</option>
+      </select>
+    </div>
+
+    <button class="profile-btn" id="profileBtn" disabled onclick="goToQType()">다음 →</button>
+  </div>
+</div>
+
+<!-- QUESTION TYPE -->
+<div class="screen" id="qtype">
+  <div class="qtype-title">질문 스타일을 골라주세요</div>
+  <div class="qtype-sub">같은 역량을 측정하지만 방식이 다릅니다. 선택 자체가 당신의 사고방식을 드러냅니다.</div>
+  <div class="qtype-grid">
+    <div class="qtype-card" onclick="selectQType('scenario',this)">
+      <div class="qtype-icon">📖</div>
+      <div class="qtype-info">
+        <h3>시나리오형</h3>
+        <p>현실적인 상황이 주어지고, 어떻게 행동할지 선택합니다</p>
+        <span class="qtype-meta">논리적 · 현실 지향</span>
+      </div>
+    </div>
+    <div class="qtype-card" onclick="selectQType('game',this)">
+      <div class="qtype-icon">🎮</div>
+      <div class="qtype-info">
+        <h3>게임 비유형</h3>
+        <p>롤, 포트나이트, 마크 등 게임 상황으로 질문합니다</p>
+        <span class="qtype-meta">은유적 · 게임 친화</span>
+      </div>
+    </div>
+    <div class="qtype-card" onclick="selectQType('image',this)">
+      <div class="qtype-icon">🖼</div>
+      <div class="qtype-info">
+        <h3>이미지 선택형</h3>
+        <p>두 가지 상징 중 끌리는 것을 고릅니다</p>
+        <span class="qtype-meta">직관적 · 감각형</span>
+      </div>
+    </div>
+    <div class="qtype-card" onclick="selectQType('rank',this)">
+      <div class="qtype-icon">📊</div>
+      <div class="qtype-info">
+        <h3>순위 매기기형</h3>
+        <p>가치와 행동에 우선순위를 매깁니다</p>
+        <span class="qtype-meta">분석적 · 체계형</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="game">
+  <div class="game-header">
+    <div class="game-round" id="roundLabel">1/8</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="game-timer" id="timer">20</div>
+  </div>
+  <div class="game-body">
+    <div class="scenario-card animate-in" id="scenarioCard">
+      <div class="scenario-context" id="scenarioContext"></div>
+      <div class="scenario-persona" id="scenarioPersona"></div>
+      <span class="scenario-emoji" id="scenarioEmoji"></span>
+      <div class="scenario-text" id="scenarioText"></div>
+    </div>
+    <div id="choicesContainer"></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result">
+  <div class="result-header">
+    <div class="result-badge">분석 완료</div>
+    <div class="result-archetype" id="resultEmoji"></div>
+    <h2 class="result-title" id="resultTitle"></h2>
+    <p class="result-subtitle" id="resultSubtitle"></p>
+  </div>
+  <div class="result-card">
+    <div class="rc-title">6차원 미래역량 프로필</div>
+    <div id="scoreBars"></div>
+  </div>
+  <div class="meta-insight" id="metaInsight">
+    <h4>🔍 사고방식 메타 분석</h4>
+    <p id="metaText"></p>
+  </div>
+  <div class="result-card">
+    <div class="rc-title">맞춤 인사이트</div>
+    <p id="personalInsight" style="font-size:13px;color:var(--text-dim);line-height:1.7"></p>
+  </div>
+  <div class="result-actions">
+    <button class="result-btn result-btn-primary" onclick="shareResult()">결과 공유</button>
+    <button class="result-btn result-btn-secondary" onclick="location.reload()">다시 도전</button>
+  </div>
+</div>
+
+<script>
+const SKILLS={
+  structural:{name:'구조적 사고',icon:'🧩',color:'#6C63FF'},
+  creative:{name:'창의적 재설계',icon:'🎨',color:'#FF6B6B'},
+  emotional:{name:'감성 연결',icon:'💫',color:'#F472B6'},
+  adaptive:{name:'적응 민첩성',icon:'⚡',color:'#FFE66D'},
+  ethical:{name:'윤리적 판단',icon:'⚖️',color:'#A78BFA'},
+  collab:{name:'협업 지능',icon:'🤝',color:'#34D399'}
+};
+
+const archetypes=[
+  {id:'structural',emoji:'🧩',title:'구조 해석자',subtitle:'복잡한 세상의 지도를 그리는 사람'},
+  {id:'creative',emoji:'🎨',title:'재설계자',subtitle:'틀을 깨고 새로운 가능성을 여는 사람'},
+  {id:'emotional',emoji:'💫',title:'감성 연결자',subtitle:'기술이 닿지 못하는 마음을 돌보는 사람'},
+  {id:'adaptive',emoji:'⚡',title:'변화 서퍼',subtitle:'파도를 두려워하지 않고 타는 사람'},
+  {id:'ethical',emoji:'⚖️',title:'기술의 양심',subtitle:'할 수 있다와 해야 한다 사이의 판단자'},
+  {id:'collab',emoji:'🤝',title:'시너지 설계자',subtitle:'사람과 AI의 다리를 놓는 사람'}
+];
+
+// SCENARIO BANKS — by age group and type
+const scenarioBanks={
+  // Youth + Game type
+  youth_game:[
+    {context:'롤 상황',emoji:'⚔️',text:'랭크 게임 중, 정글러가 갱을 3번 실패했다. 팀 채팅에 욕이 올라오기 시작한다.',
+      choices:[
+        {text:'"왜 실패했는지 같이 봐보자" — 리플레이 분석 제안',skills:{structural:3,collab:1},fb:'팀의 분석가'},
+        {text:'"괜찮아, 한타 때 캐리하면 돼" — 멘탈 케어',skills:{emotional:3,collab:1},fb:'팀의 힐러'},
+        {text:'말 없이 다른 라인 로밍으로 스스로 전세 뒤집기 시도',skills:{adaptive:3,creative:1},fb:'행동으로 보여주는 타입'},
+        {text:'"욕하면 게임 더 망해. 뮤트하고 플레이하자"',skills:{ethical:3,emotional:1},fb:'팀의 기강'}
+      ]},
+    {context:'마인크래프트 상황',emoji:'⛏️',text:'친구와 같이 만든 건축물을 다른 사람이 몰래 부쉈다. 백업은 없다.',
+      choices:[
+        {text:'누가 했는지 로그 추적 → 증거 확보 후 서버 관리자에게 신고',skills:{structural:3,ethical:1},fb:'증거 기반 사고'},
+        {text:'친구와 더 멋진 걸 새로 짓자고 제안 — 오히려 업그레이드 기회',skills:{creative:3,emotional:1},fb:'위기를 기회로'},
+        {text:'서버 보호 플러그인 설치 — 같은 일이 반복되지 않게 시스템 구축',skills:{adaptive:3,structural:1},fb:'시스템으로 방지'},
+        {text:'그 사람과 직접 대화 — 왜 그랬는지 먼저 물어보기',skills:{emotional:3,collab:1},fb:'대화로 해결'}
+      ]},
+    {context:'포트나이트 상황',emoji:'🏗️',text:'스쿼드 결승. 팀원 3명 다 죽고 나 혼자 남았다. 상대는 4명.',
+      choices:[
+        {text:'지형 분석 → 고지대 확보 → 하나씩 유인해서 각개격파',skills:{structural:3,adaptive:1},fb:'전략적 사고'},
+        {text:'예상 못한 루트로 기습 — 정석이 아닌 창의적 무빙',skills:{creative:3,adaptive:1},fb:'예측 불가능한 플레이'},
+        {text:'죽은 팀원에게 콜 받으면서 협동 — "왼쪽에서 온다!" 정보 활용',skills:{collab:3,emotional:1},fb:'팀이 죽어도 협업'},
+        {text:'무리하지 않고 생존 우선 — 링 이동하면서 어부지리 노림',skills:{adaptive:3,ethical:1},fb:'냉정한 판단력'}
+      ]},
+    {context:'로블록스 상황',emoji:'🎭',text:'네가 만든 게임에 친구가 "재미없다"고 했다. 조회수도 3명.',
+      choices:[
+        {text:'다른 인기 게임 분석 — 뭐가 다른지 구조적으로 비교',skills:{structural:3,creative:1},fb:'벤치마킹의 힘'},
+        {text:'완전히 새로운 컨셉으로 v2 도전',skills:{creative:3,adaptive:1},fb:'과감한 리빌드'},
+        {text:'친구한테 "정확히 어디가 재미없어?"라고 구체적으로 물어보기',skills:{emotional:3,collab:1},fb:'피드백의 가치'},
+        {text:'3명이라도 플레이한 사람에게 DM — "뭐가 좋았어?"',skills:{collab:3,structural:1},fb:'유저의 목소리'}
+      ]}
+  ],
+  // Adult + Scenario type
+  adult_scenario:[
+    {context:'직장 현실',emoji:'📊',text:'팀장이 AI 도입을 밀어붙이는데, 동료들이 "우리 일자리 없어지는 거 아냐?"라며 불안해한다. 당신은 중간 입장.',
+      choices:[
+        {text:'AI가 대체할 업무와 그렇지 않은 업무를 목록으로 정리해서 팀 미팅에서 공유',skills:{structural:3,collab:1},fb:'불안을 구조로 전환'},
+        {text:'동료들의 감정을 먼저 인정하고, 1:1로 각자의 걱정을 들어본다',skills:{emotional:3,ethical:1},fb:'감정이 먼저다'},
+        {text:'AI 도입한 다른 팀 사례를 빠르게 조사해서 "이렇게 됐더라"고 공유',skills:{adaptive:3,structural:1},fb:'사례가 불안을 줄인다'},
+        {text:'AI가 못하는 일을 우리 팀이 선점하자는 새로운 포지셔닝 제안',skills:{creative:3,adaptive:1},fb:'위기를 기회로 전환'}
+      ]},
+    {context:'이직 고민',emoji:'🔄',text:'연봉 30% 오르는 이직 제안. 하지만 지금 팀에서 중요한 프로젝트가 한창이고, 팀원들이 당신에게 의지하고 있다.',
+      choices:[
+        {text:'현재 프로젝트 마무리 일정, 이직처 입사 가능일을 구조적으로 정리하고 양쪽과 조율',skills:{structural:3,ethical:1},fb:'구조적 의사결정'},
+        {text:'팀원들에게 솔직하게 상황 공유 — 숨기는 것보다 함께 고민',skills:{emotional:3,collab:1},fb:'투명함의 힘'},
+        {text:'이직처에서 한 달 유예 요청 + 현재 프로젝트 인수인계 계획 수립',skills:{adaptive:3,collab:1},fb:'양쪽 다 잡기'},
+        {text:'연봉이 아니라 "3년 후 나의 성장"으로 기준을 재설정하고 판단',skills:{ethical:3,creative:1},fb:'장기적 관점'}
+      ]},
+    {context:'부업/창업',emoji:'💡',text:'퇴근 후 시작한 부업이 월 200만원. 본업 월급과 비슷해졌다. 풀타임 전환할까?',
+      choices:[
+        {text:'6개월 치 수입, 비용, 성장률 데이터로 분석. 감이 아닌 숫자로 결정',skills:{structural:3,adaptive:1},fb:'데이터 기반 결정'},
+        {text:'부업 고객 5명에게 직접 물어본다. "풀타임하면 더 쓸 의향 있어요?"',skills:{collab:3,emotional:1},fb:'고객이 답이다'},
+        {text:'본업을 줄이면서(파트타임, 무급휴직) 중간 단계를 먼저 시도',skills:{adaptive:3,ethical:1},fb:'리스크 분산'},
+        {text:'부업의 비즈니스 모델을 완전히 재설계해서 본업을 대체할 수준으로 만들기',skills:{creative:3,structural:1},fb:'스케일업 설계'}
+      ]},
+    {context:'가정',emoji:'👨‍👩‍👧',text:'초등학생 아이가 "유튜버 되고 싶다"고 한다. 배우자는 반대, 아이는 열정적.',
+      choices:[
+        {text:'"왜 유튜버?"를 깊이 물어본다. 영상 만들기가 좋은 건지, 유명해지고 싶은 건지',skills:{structural:3,emotional:1},fb:'동기의 구조를 파악'},
+        {text:'가족 회의 소집. 아이, 배우자 각자 의견을 공평하게 듣고 규칙을 함께 정한다',skills:{collab:3,ethical:1},fb:'함께 결정하는 힘'},
+        {text:'일단 해보게 한다. 한 달간 영상 3개 만들어보고 그 경험으로 다시 대화',skills:{adaptive:3,creative:1},fb:'체험이 판단을 바꾼다'},
+        {text:'유튜브 대신 영상 제작 수업을 제안. 꿈을 지지하되 기술을 먼저',skills:{creative:3,ethical:1},fb:'방향을 재설계'}
+      ]}
+  ],
+  // Image type
+  image_type:[
+    {context:'직감 선택 1',emoji:'',text:'두 장면 중 끌리는 것을 고르세요.',type:'image',
+      choices:[
+        {emoji:'🏔️',label:'혼자 정상에 선 사람',desc:'고독하지만 전체를 본다',skills:{structural:3,ethical:1}},
+        {emoji:'🎪',label:'축제에서 춤추는 사람들',desc:'함께여서 즐겁다',skills:{emotional:3,collab:1}}
+      ]},
+    {context:'직감 선택 2',emoji:'',text:'어떤 도구가 더 끌리나요?',type:'image',
+      choices:[
+        {emoji:'🔭',label:'망원경',desc:'멀리 내다보는 것',skills:{structural:2,ethical:2}},
+        {emoji:'🎨',label:'물감 팔레트',desc:'새로운 것을 만드는 것',skills:{creative:3,adaptive:1}}
+      ]},
+    {context:'직감 선택 3',emoji:'',text:'위기 상황. 어떤 역할이 더 끌리나요?',type:'image',
+      choices:[
+        {emoji:'🧭',label:'길을 찾는 항해사',desc:'방향을 정하는 사람',skills:{structural:2,adaptive:2}},
+        {emoji:'🩹',label:'상처를 치료하는 의료진',desc:'사람을 돌보는 사람',skills:{emotional:3,ethical:1}}
+      ]},
+    {context:'직감 선택 4',emoji:'',text:'팀에서 맡고 싶은 역할은?',type:'image',
+      choices:[
+        {emoji:'🎯',label:'전략가',desc:'계획을 세우는 사람',skills:{structural:3,creative:1}},
+        {emoji:'🤝',label:'중재자',desc:'사람들을 잇는 사람',skills:{collab:3,emotional:1}}
+      ]}
+  ],
+  // Rank type
+  rank_type:[
+    {context:'가치 순위',emoji:'⚖️',text:'AI 시대에 가장 중요한 순서로 배열하세요.',type:'rank',
+      items:['공감 능력','문제 해결력','빠른 적응력','윤리적 판단','창의적 사고','협업 능력'],
+      skillMap:['emotional','structural','adaptive','ethical','creative','collab']},
+    {context:'행동 순위',emoji:'🎯',text:'새 프로젝트 시작 시, 먼저 하는 순서대로.',type:'rank',
+      items:['사람들 의견 듣기','데이터 분석하기','일단 시작하기','계획 세우기','기존 사례 조사','목표 재정의'],
+      skillMap:['collab','structural','adaptive','structural','adaptive','creative']}
+  ]
+};
+
+// STATE
+let userProfile={};
+let selectedQType='';
+let qtypeMeta='';
+let currentRound=0;
+let scores={structural:0,creative:0,emotional:0,adaptive:0,ethical:0,collab:0};
+let behaviorData=[];
+let activeScenarios=[];
+let timerInterval;
+let timeLeft;
+let roundStartTime;
+
+function toggleChip(el){el.classList.toggle('selected');checkProfile()}
+function checkProfile(){
+  const age=document.getElementById('ageGroup').value;
+  const job=document.getElementById('jobInput').value.trim();
+  const sit=document.getElementById('situation').value;
+  const chips=document.querySelectorAll('.chip.selected');
+  document.getElementById('profileBtn').disabled=!(age&&job&&sit&&chips.length>0);
+}
+
+function goToQType(){
+  userProfile={
+    age:document.getElementById('ageGroup').value,
+    job:document.getElementById('jobInput').value.trim(),
+    situation:document.getElementById('situation').value,
+    interests:[...document.querySelectorAll('.chip.selected')].map(c=>c.dataset.val)
+  };
+  showScreen('qtype');
+}
+
+function selectQType(type,el){
+  document.querySelectorAll('.qtype-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedQType=type;
+  const metaMap={scenario:'논리적 · 현실지향',game:'은유적 · 게임친화',image:'직관적 · 감각형',rank:'분석적 · 체계형'};
+  qtypeMeta=metaMap[type];
+  setTimeout(()=>{buildScenarios();showScreen('game');loadRound()},400);
+}
+
+function buildScenarios(){
+  const isYouth=['elementary','middle','high'].includes(userProfile.age);
+  activeScenarios=[];
+  if(selectedQType==='scenario'){
+    activeScenarios=isYouth?scenarioBanks.youth_game.slice(0,4):scenarioBanks.adult_scenario.slice(0,4);
+    // Add 2 image + 2 rank for variety
+    activeScenarios.push(...scenarioBanks.image_type.slice(0,2));
+    activeScenarios.push(...scenarioBanks.rank_type.slice(0,2));
+  }else if(selectedQType==='game'){
+    activeScenarios=scenarioBanks.youth_game.slice(0,4);
+    activeScenarios.push(...scenarioBanks.adult_scenario.slice(0,2));
+    activeScenarios.push(...scenarioBanks.image_type.slice(0,2));
+  }else if(selectedQType==='image'){
+    activeScenarios=scenarioBanks.image_type.slice(0,4);
+    activeScenarios.push(...(isYouth?scenarioBanks.youth_game:scenarioBanks.adult_scenario).slice(0,2));
+    activeScenarios.push(...scenarioBanks.rank_type.slice(0,2));
+  }else{
+    activeScenarios=scenarioBanks.rank_type.slice(0,2);
+    activeScenarios.push(...scenarioBanks.image_type.slice(0,4));
+    activeScenarios.push(...(isYouth?scenarioBanks.youth_game:scenarioBanks.adult_scenario).slice(0,2));
+  }
+}
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+
+function loadRound(){
+  if(currentRound>=activeScenarios.length){showResult();return}
+  const s=activeScenarios[currentRound];
+  document.getElementById('roundLabel').textContent=`${currentRound+1}/${activeScenarios.length}`;
+  document.getElementById('progressFill').style.width=`${(currentRound/activeScenarios.length)*100}%`;
+  document.getElementById('scenarioContext').textContent=`⚡ ${s.context}`;
+  document.getElementById('scenarioPersona').textContent=`${userProfile.job} · ${userProfile.age==='elementary'?'초등':userProfile.age==='middle'?'중등':userProfile.age==='high'?'고등':userProfile.age==='college'?'대학생':userProfile.age==='young'?'사회초년생':userProfile.age==='mid'?'경력직':'시니어'}`;
+  document.getElementById('scenarioEmoji').textContent=s.emoji;
+  document.getElementById('scenarioText').textContent=s.text;
+
+  const container=document.getElementById('choicesContainer');
+  container.innerHTML='';
+
+  if(s.type==='image'){renderImageChoices(s,container)}
+  else if(s.type==='rank'){renderRankChoices(s,container)}
+  else{renderTextChoices(s,container)}
+
+  timeLeft=20;
+  const timerEl=document.getElementById('timer');
+  timerEl.textContent=timeLeft;timerEl.classList.remove('warning');
+  clearInterval(timerInterval);
+  roundStartTime=Date.now();
+  timerInterval=setInterval(()=>{
+    timeLeft--;timerEl.textContent=timeLeft;
+    if(timeLeft<=5)timerEl.classList.add('warning');
+    if(timeLeft<=0){clearInterval(timerInterval);autoSelect()}
+  },1000);
+}
+
+function renderTextChoices(s,container){
+  const div=document.createElement('div');div.className='choices';
+  const keys=['A','B','C','D'];
+  s.choices.forEach((c,i)=>{
+    const btn=document.createElement('div');btn.className='choice-btn animate-in';btn.style.animationDelay=`${i*.07}s`;
+    btn.innerHTML=`<div class="choice-key">${keys[i]}</div><div class="choice-text">${c.text}</div>`;
+    btn.onclick=()=>selectChoice(i,s);
+    div.appendChild(btn);
+  });
+  container.appendChild(div);
+}
+
+function renderImageChoices(s,container){
+  const div=document.createElement('div');div.className='image-choices';
+  s.choices.forEach((c,i)=>{
+    const card=document.createElement('div');card.className='image-choice animate-in';card.style.animationDelay=`${i*.1}s`;
+    card.innerHTML=`<div class="ic-emoji">${c.emoji}</div><div class="ic-label">${c.label}</div><div class="ic-desc">${c.desc}</div>`;
+    card.onclick=()=>selectChoice(i,s);
+    div.appendChild(card);
+  });
+  container.appendChild(div);
+}
+
+function renderRankChoices(s,container){
+  const div=document.createElement('div');div.className='rank-list';div.id='rankList';
+  const shuffled=[...s.items].sort(()=>Math.random()-.5);
+  shuffled.forEach((item,i)=>{
+    const row=document.createElement('div');row.className='rank-item animate-in';row.style.animationDelay=`${i*.06}s`;
+    row.draggable=true;row.dataset.item=item;
+    row.innerHTML=`<div class="rank-num">${i+1}</div><div class="rank-text">${item}</div><div class="rank-handle">⠿</div>`;
+    div.appendChild(row);
+  });
+  container.appendChild(div);
+  // Confirm button
+  const btn=document.createElement('button');btn.className='profile-btn';btn.style.marginTop='12px';btn.textContent='이 순서로 확정';
+  btn.onclick=()=>submitRank(s);
+  container.appendChild(btn);
+  // Simple drag reorder
+  enableDragReorder(div);
+}
+
+function enableDragReorder(list){
+  let dragEl=null;
+  // Desktop drag
+  list.addEventListener('dragstart',e=>{dragEl=e.target.closest('.rank-item');if(dragEl)dragEl.classList.add('dragging')});
+  list.addEventListener('dragend',()=>{if(dragEl)dragEl.classList.remove('dragging');dragEl=null;updateRankNums(list)});
+  list.addEventListener('dragover',e=>{e.preventDefault();if(!dragEl)return;const after=getDragAfterElement(list,e.clientY);if(after){list.insertBefore(dragEl,after)}else{list.appendChild(dragEl)}});
+  // Mobile touch
+  let touchStartY=0;
+  list.addEventListener('touchstart',e=>{
+    const item=e.target.closest('.rank-item');if(!item)return;
+    dragEl=item;dragEl.classList.add('dragging');
+    touchStartY=e.touches[0].clientY;
+  },{passive:true});
+  list.addEventListener('touchmove',e=>{
+    if(!dragEl)return;e.preventDefault();
+    const y=e.touches[0].clientY;
+    const after=getDragAfterElement(list,y);
+    if(after){list.insertBefore(dragEl,after)}else{list.appendChild(dragEl)}
+  },{passive:false});
+  list.addEventListener('touchend',()=>{
+    if(dragEl){dragEl.classList.remove('dragging');updateRankNums(list);dragEl=null}
+  });
+}
+function getDragAfterElement(list,y){
+  const els=[...list.querySelectorAll('.rank-item:not(.dragging)')];
+  return els.reduce((closest,child)=>{const box=child.getBoundingClientRect();const offset=y-box.top-box.height/2;if(offset<0&&offset>closest.offset)return{offset,element:child};return closest},{offset:Number.NEGATIVE_INFINITY}).element;
+}
+function updateRankNums(list){list.querySelectorAll('.rank-num').forEach((n,i)=>n.textContent=i+1)}
+
+function submitRank(s){
+  clearInterval(timerInterval);
+  const items=[...document.querySelectorAll('#rankList .rank-item')].map(r=>r.dataset.item);
+  // Top 2 get highest scores
+  items.forEach((item,i)=>{
+    const idx=s.items.indexOf(item);
+    const skillKey=s.skillMap[idx];
+    const pts=Math.max(4-i,0);
+    if(skillKey)scores[skillKey]+=pts;
+  });
+  behaviorData.push({round:currentRound,type:'rank',time:Date.now()-roundStartTime,order:items});
+  showFeedback('순위 기록 완료!',['structural','ethical']);
+  setTimeout(()=>{currentRound++;loadRound()},1000);
+}
+
+function selectChoice(idx,s){
+  clearInterval(timerInterval);
+  const c=s.choices[idx];
+  for(const[k,v]of Object.entries(c.skills))scores[k]+=v;
+  behaviorData.push({round:currentRound,type:s.type||'scenario',choiceIdx:idx,time:Date.now()-roundStartTime});
+
+  // Highlight
+  if(s.type==='image'){
+    document.querySelectorAll('.image-choice').forEach((el,i)=>{if(i===idx)el.classList.add('selected');el.style.pointerEvents='none'});
+  }else{
+    document.querySelectorAll('.choice-btn').forEach((el,i)=>{if(i===idx)el.classList.add('selected');el.style.pointerEvents='none'});
+  }
+
+  showFeedback(c.fb||'✨',Object.keys(c.skills));
+  setTimeout(()=>{currentRound++;loadRound()},1100);
+}
+
+function autoSelect(){
+  const s=activeScenarios[currentRound];
+  if(s.type==='rank'){submitRank(s)}
+  else{selectChoice(Math.floor(Math.random()*s.choices.length),s)}
+}
+
+function showFeedback(text,skillKeys){
+  const fb=document.getElementById('feedback');
+  document.getElementById('fbEmoji').textContent='✨';
+  document.getElementById('fbText').textContent=text;
+  document.getElementById('fbSkill').textContent=skillKeys.map(k=>SKILLS[k]?.name||k).join(' + ');
+  fb.classList.add('show');setTimeout(()=>fb.classList.remove('show'),900);
+}
+
+function showResult(){
+  showScreen('result');
+  const max=Math.max(...Object.values(scores))||1;
+  const topSkill=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const arch=archetypes.find(a=>a.id===topSkill);
+
+  document.getElementById('resultEmoji').textContent=arch.emoji;
+  document.getElementById('resultTitle').textContent=arch.title;
+  document.getElementById('resultSubtitle').textContent=arch.subtitle;
+
+  // Score bars
+  const bars=document.getElementById('scoreBars');bars.innerHTML='';
+  Object.entries(scores).sort((a,b)=>b[1]-a[1]).forEach(([k,v],i)=>{
+    const s=SKILLS[k];const pct=Math.round((v/max)*100);
+    const row=document.createElement('div');row.className='score-row animate-in';row.style.animationDelay=`${i*.1}s`;
+    row.innerHTML=`<div class="score-icon">${s.icon}</div><div class="score-info"><div class="score-name"><span>${s.name}</span><span class="score-val">${pct}%</span></div><div class="score-track"><div class="score-fill" style="width:${pct}%;background:${s.color}"></div></div></div>`;
+    bars.appendChild(row);
+  });
+
+  // Meta insight
+  const avgTime=behaviorData.reduce((s,d)=>s+d.time,0)/behaviorData.length;
+  const fastRounds=behaviorData.filter(d=>d.time<5000).length;
+  document.getElementById('metaText').textContent=
+    `질문 유형 선택: "${qtypeMeta}" — 당신의 정보 처리 방식을 반영합니다. `+
+    `평균 응답 시간 ${(avgTime/1000).toFixed(1)}초. `+
+    (fastRounds>4?'빠른 직관형 의사결정자입니다. ':'신중하게 고민하는 숙고형입니다. ')+
+    `${userProfile.job} 분야에서 ${arch.title}의 역량은 AI와의 차별화 포인트가 됩니다.`;
+
+  // Personal insight
+  document.getElementById('personalInsight').textContent=
+    `${userProfile.job} 종사자/관심자로서, 당신의 핵심 강점인 "${SKILLS[topSkill].name}"은 이 분야에서 AI가 대체하기 어려운 영역입니다. `+
+    `현재 "${userProfile.situation==='switching'?'이직 고민':userProfile.situation==='exploring'?'진로 탐색':userProfile.situation==='starting'?'창업 준비':'성장'}" 단계에서 `+
+    `이 역량을 의식적으로 활용하면 전환의 속도가 달라집니다.`;
+}
+
+function shareResult(){
+  const topSkill=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const arch=archetypes.find(a=>a.id===topSkill);
+  const text=`[미래역량 시뮬레이터]\n나의 유형: ${arch.emoji} ${arch.title}\n${arch.subtitle}\n\n${userProfile.job} · ${qtypeMeta}\n\n나도 테스트하기 →`;
+  if(navigator.share){navigator.share({title:'미래역량 시뮬레이터',text})}
+  else{navigator.clipboard.writeText(text);alert('클립보드에 복사됐습니다!')}
+}
+</script>
+</body>
+</html>

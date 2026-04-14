@@ -25,6 +25,16 @@ function lastNDays(n: number): string[] {
   });
 }
 
+// zrange withScores 결과 파싱 → [{ name, count }]
+function parseZrangeScores(raw: unknown[]): { name: string; count: number }[] {
+  const result: { name: string; count: number }[] = [];
+  if (!Array.isArray(raw)) return result;
+  for (let i = 0; i < raw.length; i += 2) {
+    result.push({ name: String(raw[i]), count: Number(raw[i + 1]) });
+  }
+  return result;
+}
+
 export async function GET(request: NextRequest) {
   // 관리자 키 확인
   const key = request.nextUrl.searchParams.get("key");
@@ -36,14 +46,14 @@ export async function GET(request: NextRequest) {
   const m = thisMonth();
   const days = lastNDays(30);
 
-  // Redis에서 병렬 조회
+  // Redis에서 병렬 조회 (1차 — 기존 지표)
   const [
     todayReq,
     todayHit,
     todayClaude,
     monthReq,
     monthClaude,
-    topJobs,
+    totalAllTime,
     ...dailyReqs
   ] = await Promise.all([
     redis.get<number>(`stats:req:${d}`),
@@ -51,8 +61,16 @@ export async function GET(request: NextRequest) {
     redis.get<number>(`stats:claude:${d}`),
     redis.get<number>(`stats:req:${m}`),
     redis.get<number>(`stats:claude:${m}`),
-    redis.zrange(`stats:jobs:${m}`, 0, 9, { rev: true, withScores: true }),
+    redis.get<number>("stats:total"),
     ...days.map((day) => redis.get<number>(`stats:req:${day}`)),
+  ]);
+
+  // Redis에서 병렬 조회 (2차 — 신규 분류 통계)
+  const [langData, modeData, hourData, allJobsData] = await Promise.all([
+    redis.zrange(`stats:lang:${m}`, 0, -1, { rev: true, withScores: true }),
+    redis.zrange(`stats:mode:${m}`, 0, -1, { rev: true, withScores: true }),
+    redis.zrange(`stats:hour:${d}`, 0, -1, { withScores: true }),
+    redis.zrange(`stats:jobs:${m}`, 0, 29, { rev: true, withScores: true }),
   ]);
 
   const tReq = todayReq ?? 0;
@@ -60,14 +78,22 @@ export async function GET(request: NextRequest) {
   const tClaude = todayClaude ?? 0;
   const mReq = monthReq ?? 0;
   const mClaude = monthClaude ?? 0;
+  const total = totalAllTime ?? 0;
 
-  // 인기 직업 파싱 (zrange withScores → [name, score, name, score, ...])
-  const jobs: { name: string; count: number }[] = [];
-  if (Array.isArray(topJobs)) {
-    for (let i = 0; i < topJobs.length; i += 2) {
-      jobs.push({ name: String(topJobs[i]), count: Number(topJobs[i + 1]) });
-    }
-  }
+  // 인기 직업 Top 30 파싱
+  const topJobs30 = parseZrangeScores(allJobsData as unknown[]);
+
+  // 언어별 통계 파싱
+  const langStats = parseZrangeScores(langData as unknown[]);
+
+  // 모드별 통계 파싱
+  const modeStats = parseZrangeScores(modeData as unknown[]);
+
+  // 시간대별 통계 파싱 (hour는 오름차순으로 정렬)
+  const hourRaw = parseZrangeScores(hourData as unknown[]);
+  const hourStats = hourRaw
+    .map((h) => ({ hour: parseInt(h.name, 10), count: h.count }))
+    .sort((a, b) => a.hour - b.hour);
 
   // 일별 추이 (최근 14일)
   const daily = days.slice(0, 14).map((date, i) => ({
@@ -93,7 +119,12 @@ export async function GET(request: NextRequest) {
       estimatedCostUSD: +(mClaude * COST_PER_CLAUDE_CALL).toFixed(2),
       estimatedCostKRW: Math.round(mClaude * COST_PER_CLAUDE_CALL * 1380),
     },
-    topJobs: jobs,
+    totalAllTime: total,
+    topJobs: topJobs30.slice(0, 10),
+    topJobs30,
+    langStats,
+    modeStats,
+    hourStats,
     daily,
   });
 }
