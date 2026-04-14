@@ -400,19 +400,19 @@ export default function Home() {
                       }}>
                         {user.email}
                       </div>
-                      <button
-                        onClick={() => signOut()}
+                      <a
+                        href="/api/logout"
                         style={{
                           display: "block", width: "100%", padding: "12px 16px",
                           textAlign: "left", fontSize: "14px",
                           color: "#EF4444", fontWeight: 600,
-                          background: "none", border: "none", cursor: "pointer",
+                          textDecoration: "none",
                         }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = "#FEF2F2"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
                       >
                         로그아웃
-                      </button>
+                      </a>
                     </div>
                   )}
                 </div>
