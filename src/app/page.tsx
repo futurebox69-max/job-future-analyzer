@@ -400,19 +400,25 @@ export default function Home() {
                       }}>
                         {user.email}
                       </div>
-                      <a
-                        href="/api/logout"
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          localStorage.clear();
+                          sessionStorage.clear();
+                          window.location.reload();
+                        }}
                         style={{
                           display: "block", width: "100%", padding: "12px 16px",
                           textAlign: "left", fontSize: "14px",
                           color: "#EF4444", fontWeight: 600,
-                          textDecoration: "none",
+                          background: "none", border: "none", cursor: "pointer",
                         }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = "#FEF2F2"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
                       >
                         로그아웃
-                      </a>
+                      </button>
                     </div>
                   )}
                 </div>

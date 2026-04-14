@@ -114,14 +114,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = () => {
-    // localStorage에서 Supabase 세션 삭제 (핵심)
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith("sb-")) localStorage.removeItem(key);
-    });
-    localStorage.removeItem("supabase.auth.token");
+    // 1) 스토리지 전부 삭제
+    localStorage.clear();
     sessionStorage.clear();
-    // 페이지 리로드 (세션 없이 다시 시작)
-    window.location.href = "/";
+    // 2) supabase.auth.signOut() 절대 호출 안 함 (네트워크 hang 원인)
+    // 3) window.location.reload() = 무조건 전체 새로고침
+    //    → AuthProvider 포함 React 트리 완전 파괴 후 재시작
+    //    → 빈 localStorage → Supabase 클라이언트 세션 없음 → 로그아웃
+    window.location.reload();
   };
 
   return (
