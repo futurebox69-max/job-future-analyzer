@@ -192,6 +192,14 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 /* ===== ENHANCED SCORES ===== */
 .strength-badge { display:inline-block; background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; margin-left:8px; }
 .growth-badge { display:inline-block; background:#FFF3CD; color:#856404; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; margin-left:8px; }
+
+/* ===== SHARE ===== */
+.share-wrap { display:flex; gap:10px; justify-content:center; }
+.share-btn { display:flex; align-items:center; gap:6px; padding:12px 20px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface); font-size:13px; font-weight:600; color:var(--text); transition:all 0.2s; touch-action:manipulation; }
+.share-btn:active { transform:scale(0.97); }
+.share-btn.copied { border-color:var(--accent); background:rgba(78,205,196,0.08); color:var(--accent); }
+.share-toast { position:fixed; bottom:40px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(30,27,75,0.9); color:#fff; padding:12px 24px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; opacity:0; transition:all 0.3s; pointer-events:none; }
+.share-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -847,8 +855,7 @@ function showLoading(callback) {
 function animateGauge(score) {
   const fill = document.getElementById('gaugeFill');
   const scoreEl = document.getElementById('gaugeScore');
-  const totalLength = 251.2; // 반원 둘레
-  const targetOffset = totalLength * (1 - score / 100);
+  const totalLength = 251.2; // 반원 둘레 (Math.PI * 80)
 
   // 카운트업 애니메이션
   let current = 0;
@@ -867,14 +874,56 @@ function animateGauge(score) {
   requestAnimationFrame(tick);
 }
 
+function showToast(text) {
+  const toast = document.getElementById('shareToast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function getShareText() {
+  const r = competencyResult;
+  const arch = ARCHETYPES[r.typeKey];
+  return `AI 시대 미래역량 검사 결과: 나는 ${arch.emoji}${arch.title}! 종합 점수 ${r.avgScore}점.\n당신의 미래 역량은?\n→ ${location.href}`;
+}
+
+function setupShareButtons() {
+  document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+    const text = getShareText();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    document.getElementById('copyLinkBtn').classList.add('copied');
+    document.getElementById('copyLinkBtn').textContent = '✅ 복사됨!';
+    showToast('결과가 클립보드에 복사되었습니다!');
+    setTimeout(() => {
+      document.getElementById('copyLinkBtn').classList.remove('copied');
+      document.getElementById('copyLinkBtn').innerHTML = '📋 링크 복사';
+    }, 2000);
+  });
+
+  document.getElementById('shareXBtn').addEventListener('click', () => {
+    const text = getShareText();
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'width=550,height=420');
+  });
+}
+
 function renderResult(){
   const normScores = normalizeScores(scores);
   const typeKey = classifyType(normScores);
   const arch = ARCHETYPES[typeKey];
   const verdict = TYPE_VERDICTS[typeKey];
   const avgScore = Math.round(Object.values(normScores).reduce((a,b)=>a+b,0) / 6);
-  const sorted = Object.entries(normScores).sort((a,b)=>b[1]-a[1]);
-  const topKey = sorted[0][0];  // used by competencyResult
+  const sortedScores = Object.entries(normScores).sort((a,b)=>b[1]-a[1]);
+  const topKey = sortedScores[0][0];
   const avgTime = behaviorData.length > 0
     ? behaviorData.reduce((s,d)=>s+d.time,0)/behaviorData.length/1000 : 10;
   const qtypeMap = {scenario:'논리적 · 현실지향',game:'은유적 · 게임친화',
@@ -909,7 +958,6 @@ function renderResult(){
   // 6차원 바 차트 (강점/성장 배지 포함)
   const rowsEl = document.getElementById('scoreRows');
   rowsEl.innerHTML = '';
-  const sortedScores = Object.entries(normScores).sort((a,b) => b[1] - a[1]);
   sortedScores.forEach(([k, v], i) => {
     const s = SKILLS_INFO[k];
     const badge = i < 2 ? '<span class="strength-badge">강점</span>'
@@ -932,6 +980,17 @@ function renderResult(){
     });
   }, 300);
 
+  // 공유 영역
+  const shareCard = document.getElementById('shareCard');
+  shareCard.style.display = 'block';
+  shareCard.innerHTML = `
+    <div class="result-card-title">📤 결과 공유하기</div>
+    <div class="share-wrap">
+      <button class="share-btn" id="copyLinkBtn">📋 링크 복사</button>
+      <button class="share-btn" id="shareXBtn">𝕏 공유</button>
+    </div>
+  `;
+
   // Meta insight
   const fastRounds = behaviorData.filter(d=>d.time<5000).length;
   const style = fastRounds > behaviorData.length/2 ? '빠른 직관형 의사결정자' : '신중한 숙고형 의사결정자';
@@ -940,8 +999,11 @@ function renderResult(){
     `→ 당신은 ${selectedQType==='scenario'?'현실의 맥락에서 논리적으로 판단하는':selectedQType==='game'?'게임적 사고로 전략을 세우는':selectedQType==='image'?'직관과 감각으로 빠르게 판단하는':'체계적으로 분석하고 정리하는'} 유형입니다.<br><br>`+
     `평균 응답시간: <span class="insight-highlight">${avgTime.toFixed(1)}초</span><br>`+
     `→ ${style}`;
+
+  setupShareButtons();
 }
 
 </script>
+<div class="share-toast" id="shareToast"></div>
 </body>
 </html>
