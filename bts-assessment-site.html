@@ -991,6 +991,38 @@ function renderResult(){
     </div>
   `;
 
+  // BTS CTA
+  const btsCta = document.getElementById('btsCta');
+  btsCta.style.display = 'block';
+  btsCta.innerHTML = `
+    <h3>🔮 내 직업의 AI 대체율도 분석하기</h3>
+    <p>당신의 역량을 특정 직업과 교차 분석하면<br>더 구체적인 전환 전략이 나옵니다</p>
+    <button class="bts-btn" id="btsCTABtn">BTS에서 심층 분석 받기 →</button>
+    <div class="bts-features">
+      <span class="bts-feat">AI 대체율 분석</span>
+      <span class="bts-feat">10년 예측</span>
+      <span class="bts-feat">전환 경로</span>
+      <span class="bts-feat">스킬 로드맵</span>
+    </div>
+  `;
+
+  // Base64 토큰 생성
+  const KEY_MAP = {structural:'st',creative:'cr',emotional:'ec',adaptive:'aa',ethical:'ej',collab:'ci'};
+  const shortScores = {};
+  for (const [k,v] of Object.entries(competencyResult.scores)) {
+    shortScores[KEY_MAP[k]] = v;
+  }
+  const token = btoa(JSON.stringify({
+    s: shortScores,
+    type: competencyResult.typeKey,
+    t: Date.now()
+  }));
+  const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
+
+  document.getElementById('btsCTABtn').addEventListener('click', () => {
+    window.open(btsUrl, '_blank');
+  });
+
   // Meta insight
   const fastRounds = behaviorData.filter(d=>d.time<5000).length;
   const style = fastRounds > behaviorData.length/2 ? '빠른 직관형 의사결정자' : '신중한 숙고형 의사결정자';
