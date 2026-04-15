@@ -255,6 +255,27 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .result-hero .result-type { animation:revealBounce 0.8s ease 0.5s both; }
 .gauge-wrap { animation:revealBounce 0.8s ease 0s both; }
 @keyframes revealBounce { 0%{opacity:0;transform:scale(0)} 60%{transform:scale(1.3)} 100%{opacity:1;transform:scale(1)} }
+
+/* ===== MODE SELECT ===== */
+.mode-cards { display:flex; flex-direction:column; gap:16px; max-width:420px; margin:0 auto; padding:0 20px; }
+.mode-card { background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:24px; text-align:center; transition:all 0.2s; cursor:pointer; touch-action:manipulation; }
+.mode-card:active { transform:scale(0.97); }
+.mode-card.selected { border-color:var(--primary); background:var(--primary-light); }
+.mode-emoji { font-size:40px; margin-bottom:8px; }
+.mode-title { font-size:18px; font-weight:800; margin-bottom:4px; }
+.mode-desc { font-size:13px; color:var(--text-dim); line-height:1.5; }
+.mode-badge { display:inline-block; font-size:11px; font-weight:600; padding:3px 10px; border-radius:8px; margin-top:8px; }
+
+/* ===== NAME INPUT ===== */
+.name-screen-inner { max-width:420px; margin:0 auto; padding:60px 20px; text-align:center; }
+.name-input { width:100%; padding:16px 20px; border:2px solid var(--border); border-radius:16px; font-size:18px; font-weight:600; font-family:inherit; text-align:center; outline:none; transition:border-color 0.2s; background:var(--surface); }
+.name-input:focus { border-color:var(--primary); }
+.name-input::placeholder { color:var(--text-light); font-weight:400; }
+.name-submit { width:100%; padding:16px; border-radius:14px; background:linear-gradient(135deg,var(--primary),#8B5CF6); color:#fff; font-size:16px; font-weight:700; border:none; margin-top:16px; transition:opacity 0.2s; cursor:pointer; }
+.name-submit:disabled { opacity:0.3; cursor:not-allowed; }
+.family-count { display:flex; gap:10px; justify-content:center; margin-top:20px; }
+.family-count-btn { width:44px; height:44px; border-radius:12px; border:2px solid var(--border); background:var(--surface); font-size:18px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+.family-count-btn.selected { border-color:var(--primary); background:var(--primary-light); color:var(--primary); }
 </style>
 </head>
 <body>
@@ -423,6 +444,44 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
     <p>© 2026 LoginFuture Ministry. All rights reserved.</p>
     <p style="margin-top:4px;">AI 시대의 커리어 내비게이션 — <a href="#">BTS(Build Tomorrow Skills)</a></p>
   </footer>
+</div>
+
+<!-- ===== SCREEN: MODE SELECT ===== -->
+<div class="screen" id="modeScreen">
+  <div style="text-align:center; padding:60px 20px 30px;">
+    <div style="font-size:40px; margin-bottom:8px;">🎮</div>
+    <div class="section-title" style="font-size:24px;">어떻게 검사할까요?</div>
+    <div class="section-desc" style="font-size:14px;">혼자 해도, 가족과 함께 해도 재미있어요!</div>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card" id="modePersonal">
+      <div class="mode-emoji">🧑</div>
+      <div class="mode-title">개인 검사</div>
+      <div class="mode-desc">나만의 미래 역량을 탐색합니다</div>
+      <div class="mode-badge" style="background:var(--primary-light); color:var(--primary);">3분 · 8문항</div>
+    </div>
+    <div class="mode-card" id="modeFamily">
+      <div class="mode-emoji">👨‍👩‍👧‍👦</div>
+      <div class="mode-title">가족 검사</div>
+      <div class="mode-desc">가족이 순서대로 같은 검사를 하고<br>결과를 비교합니다</div>
+      <div class="mode-badge" style="background:rgba(78,205,196,0.15); color:#0D9488;">2~4명 · 각 3분</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: NAME INPUT ===== -->
+<div class="screen" id="nameScreen">
+  <div class="name-screen-inner">
+    <div style="font-size:40px; margin-bottom:12px;" id="nameEmoji">🧑</div>
+    <div class="section-title" style="font-size:22px;" id="nameTitle">이름을 알려주세요</div>
+    <div class="section-desc" style="font-size:13px; margin-bottom:24px;" id="nameDesc">결과에 이름이 표시됩니다</div>
+    <input class="name-input" id="playerNameInput" placeholder="이름 입력" maxlength="10" autocomplete="off">
+    <div id="familyCountSection" style="display:none;">
+      <div style="font-size:13px; color:var(--text-dim); margin-top:20px; margin-bottom:8px;">가족 몇 명이 참여하나요?</div>
+      <div class="family-count" id="familyCountBtns"></div>
+    </div>
+    <button class="name-submit" id="nameSubmitBtn" disabled>시작하기 →</button>
+  </div>
 </div>
 
 <!-- ===== SCREEN 2: QTYPE SELECT ===== -->
@@ -681,6 +740,11 @@ let timerInterval = null;
 let timeLeft = 30;
 let roundStartTime = 0;
 let competencyResult = null;
+let gameMode = 'personal'; // 'personal' | 'family'
+let familySize = 2;
+let familyMembers = []; // [{name, scores, normScores, typeKey, avgScore, ...}]
+let currentFamilyIdx = 0;
+let playerName = '';
 let comboCount = 0;
 let lastAnswerTime = 0;
 
@@ -726,10 +790,74 @@ function showScreen(id){
 }
 
 // ===== LANDING EVENTS =====
-document.getElementById('heroStartBtn').addEventListener('click',()=>showScreen('qtypeScreen'));
-document.getElementById('heroStartBtn').addEventListener('touchend',e=>{e.preventDefault();showScreen('qtypeScreen')});
-document.getElementById('ctaStartBtn').addEventListener('click',()=>showScreen('qtypeScreen'));
-document.getElementById('ctaStartBtn').addEventListener('touchend',e=>{e.preventDefault();showScreen('qtypeScreen')});
+document.getElementById('heroStartBtn').addEventListener('click',()=>showScreen('modeScreen'));
+document.getElementById('heroStartBtn').addEventListener('touchend',e=>{e.preventDefault();showScreen('modeScreen')});
+document.getElementById('ctaStartBtn').addEventListener('click',()=>showScreen('modeScreen'));
+document.getElementById('ctaStartBtn').addEventListener('touchend',e=>{e.preventDefault();showScreen('modeScreen')});
+
+// ===== MODE SCREEN =====
+document.getElementById('modePersonal').addEventListener('click', () => {
+  gameMode = 'personal';
+  familyMembers = [];
+  currentFamilyIdx = 0;
+  document.getElementById('nameEmoji').textContent = '🧑';
+  document.getElementById('nameTitle').textContent = '이름을 알려주세요';
+  document.getElementById('nameDesc').textContent = '결과에 이름이 표시됩니다';
+  document.getElementById('familyCountSection').style.display = 'none';
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('playerNameInput').placeholder = '이름 입력';
+  document.getElementById('nameSubmitBtn').disabled = true;
+  showScreen('nameScreen');
+  document.getElementById('playerNameInput').focus();
+});
+
+document.getElementById('modeFamily').addEventListener('click', () => {
+  gameMode = 'family';
+  familyMembers = [];
+  currentFamilyIdx = 0;
+  document.getElementById('nameEmoji').textContent = '👨‍👩‍👧‍👦';
+  document.getElementById('nameTitle').textContent = '가족 검사 설정';
+  document.getElementById('nameDesc').textContent = '첫 번째 가족 구성원의 이름을 입력하세요';
+  document.getElementById('familyCountSection').style.display = 'block';
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('playerNameInput').placeholder = '첫 번째 가족 이름';
+  document.getElementById('nameSubmitBtn').disabled = true;
+
+  // 가족 수 버튼 생성
+  const countContainer = document.getElementById('familyCountBtns');
+  countContainer.innerHTML = '';
+  [2,3,4].forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 'family-count-btn' + (n === 2 ? ' selected' : '');
+    btn.textContent = n;
+    btn.addEventListener('click', () => {
+      familySize = n;
+      countContainer.querySelectorAll('.family-count-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+    countContainer.appendChild(btn);
+  });
+
+  showScreen('nameScreen');
+  document.getElementById('playerNameInput').focus();
+});
+
+// 이름 입력 활성화
+document.getElementById('playerNameInput').addEventListener('input', (e) => {
+  document.getElementById('nameSubmitBtn').disabled = e.target.value.trim().length === 0;
+});
+document.getElementById('playerNameInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.value.trim().length > 0) {
+    document.getElementById('nameSubmitBtn').click();
+  }
+});
+
+// 이름 확인 → 다음 화면
+document.getElementById('nameSubmitBtn').addEventListener('click', () => {
+  playerName = document.getElementById('playerNameInput').value.trim();
+  if (!playerName) return;
+  showScreen('qtypeScreen');
+});
 
 // ===== QTYPE SCREEN =====
 const qtypeData = [
@@ -1131,6 +1259,10 @@ function renderResult(){
   // 유형
   document.getElementById('resEmoji').textContent = arch.emoji;
   document.getElementById('resType').textContent = arch.title;
+  // 이름 표시
+  if (playerName) {
+    document.getElementById('resType').textContent = `${playerName}님은 ${arch.title}`;
+  }
   document.getElementById('resSub').textContent = arch.sub;
 
   // 한 줄 판결
