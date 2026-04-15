@@ -216,6 +216,20 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 /* ===== QUESTION TRANSITION ===== */
 .assess-body { transition:opacity 0.3s ease; }
 .assess-body.fade-out { opacity:0; }
+
+/* ===== PARTICLES ===== */
+.particle-container { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:200; overflow:hidden; }
+.particle { position:absolute; font-size:24px; animation:particleFly 1s ease-out forwards; pointer-events:none; }
+@keyframes particleFly {
+  0% { opacity:1; transform:translateY(0) scale(1); }
+  100% { opacity:0; transform:translateY(-120px) scale(0.3); }
+}
+
+/* ===== COMBO ===== */
+.combo-badge { position:fixed; top:80px; right:20px; background:linear-gradient(135deg,#FF6B6B,#FF8E53); color:#fff; padding:8px 16px; border-radius:12px; font-size:14px; font-weight:800; z-index:50; opacity:0; transform:scale(0.5); transition:all 0.3s; pointer-events:none; }
+.combo-badge.show { opacity:1; transform:scale(1); }
+.combo-badge.show { animation:comboPop 0.4s ease; }
+@keyframes comboPop { 0%{transform:scale(0.5)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
 </style>
 </head>
 <body>
@@ -620,6 +634,41 @@ let timerInterval = null;
 let timeLeft = 30;
 let roundStartTime = 0;
 let competencyResult = null;
+let comboCount = 0;
+let lastAnswerTime = 0;
+
+function spawnParticles(x, y) {
+  const container = document.getElementById('particleContainer');
+  const emojis = ['✨','🌟','💫','⚡','🔥','💥','🎯','🚀'];
+  for (let i = 0; i < 6; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = (x + (Math.random() - 0.5) * 80) + 'px';
+    p.style.top = y + 'px';
+    p.style.animationDuration = (0.6 + Math.random() * 0.6) + 's';
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
+  }
+}
+
+function checkCombo() {
+  const now = Date.now();
+  if (now - lastAnswerTime < 4000 && lastAnswerTime > 0) {
+    comboCount++;
+    if (comboCount >= 2) {
+      const badge = document.getElementById('comboBadge');
+      badge.textContent = `🔥 ${comboCount}콤보!`;
+      badge.classList.remove('show');
+      void badge.offsetWidth; // reflow
+      badge.classList.add('show');
+      setTimeout(() => badge.classList.remove('show'), 1500);
+    }
+  } else {
+    comboCount = 1;
+  }
+  lastAnswerTime = now;
+}
 
 // ===== SCREEN MANAGEMENT =====
 function showScreen(id){
@@ -777,6 +826,8 @@ function submitRank(s){
     if(skillKey && scores.hasOwnProperty(skillKey)) scores[skillKey] += pts;
   });
   behaviorData.push({round,type:'rank',time:Date.now()-roundStartTime,order:items});
+  spawnParticles(window.innerWidth / 2, 400);
+  checkCombo();
   showFeedback('순위 기록 완료!');
   setTimeout(()=>{ round++; loadRound(); },800);
 }
@@ -794,6 +845,14 @@ function selectChoice(idx, s){
     if(parseInt(el.dataset.idx)===idx) el.classList.add('selected');
     el.style.pointerEvents='none';
   });
+
+  // 파티클 + 콤보
+  const choiceEl = document.querySelector('.assess-choice.selected, .assess-image-card.selected');
+  if (choiceEl) {
+    const rect = choiceEl.getBoundingClientRect();
+    spawnParticles(rect.left + rect.width / 2, rect.top);
+  }
+  checkCombo();
 
   const fb = c.fb || c.label || '선택 완료';
   showFeedback(fb);
@@ -1136,5 +1195,7 @@ function renderResult(){
 
 </script>
 <div class="share-toast" id="shareToast"></div>
+<div class="particle-container" id="particleContainer"></div>
+<div class="combo-badge" id="comboBadge"></div>
 </body>
 </html>
