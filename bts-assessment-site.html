@@ -127,7 +127,7 @@ button { font-family:inherit; cursor:pointer; touch-action:manipulation; }
 .rank-confirm:disabled { opacity:0.4; }
 
 /* Feedback flash */
-.feedback { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(30,27,75,0.9); color:#fff; padding:16px 28px; border-radius:14px; font-size:15px; font-weight:600; z-index:100; pointer-events:none; opacity:0; transition:opacity 0.3s; }
+.feedback { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(30,27,75,0.95); color:#fff; padding:20px 32px; border-radius:18px; font-size:17px; font-weight:700; z-index:100; pointer-events:none; opacity:0; transition:opacity 0.3s; text-align:center; max-width:280px; }
 .feedback.show { opacity:1; }
 
 /* Skip button */
@@ -230,6 +230,16 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .combo-badge.show { opacity:1; transform:scale(1); }
 .combo-badge.show { animation:comboPop 0.4s ease; }
 @keyframes comboPop { 0%{transform:scale(0.5)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+/* ===== CHARACTER GUIDE ===== */
+.bt-guide { display:flex; align-items:flex-start; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px 16px; margin:0 20px 16px; max-width:500px; margin-left:auto; margin-right:auto; animation:slideUp 0.4s ease; }
+.bt-avatar { font-size:28px; flex-shrink:0; }
+.bt-msg { font-size:13px; color:var(--text-dim); line-height:1.6; }
+.bt-msg strong { color:var(--text); }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ===== ENHANCED FEEDBACK ===== */
+.feedback .fb-sub { font-size:12px; font-weight:400; opacity:0.7; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -518,6 +528,28 @@ const ARCHETYPES = {
   synergist:    {emoji:'🤝', title:'시너지 메이커',   sub:'다양한 사람과 함께 함께 더 큰 것을 만드는 사람', key:'synergist'}
 };
 
+const BT_COMMENTS = {
+  0: {msg:'첫 번째 질문! 직감대로 골라보세요 🎯', emoji:'🤖'},
+  1: {msg:'흠, 흥미로운 선택이었어요. 다음은...', emoji:'🤔'},
+  2: {msg:'슬슬 패턴이 보이기 시작하네요!', emoji:'👀'},
+  3: {msg:'벌써 절반! 당신의 강점이 드러나고 있어요 💪', emoji:'🔥'},
+  4: {msg:'후반전 시작! 여기서 반전이 올 수도...', emoji:'⚡'},
+  5: {msg:'오, 이건 좀 어려운 질문이에요', emoji:'😮'},
+  6: {msg:'거의 다 왔어요! 마지막 힘내세요', emoji:'🏃'},
+  7: {msg:'마지막 질문! 이게 결과를 바꿀 수도 있어요', emoji:'🎲'}
+};
+
+const FB_SUBS = [
+  '이 선택이 당신을 정의합니다',
+  '흥미로운 관점이네요',
+  'AI는 이렇게 생각하지 못해요',
+  '당신만의 강점이 보여요',
+  '이 역량이 미래를 바꿉니다',
+  '독특한 시각이에요',
+  '이런 사람이 필요합니다',
+  '바로 이게 핵심이에요'
+];
+
 const TYPE_VERDICTS = {
   allrounder:  '당신은 올라운더형 인재입니다. 모든 역량이 고르게 높아 어떤 환경에서든 빠르게 적응할 수 있습니다.',
   balanced:    '당신은 균형 전략가입니다. 특정 역량에 치우치지 않는 안정감이 강점이며, 리더십 포지션에 적합합니다.',
@@ -753,6 +785,13 @@ function loadRound(){
       renderRankChoices(s, body);
     }
 
+    // 캐릭터 가이드
+    const comment = BT_COMMENTS[round] || BT_COMMENTS[0];
+    const guide = document.createElement('div');
+    guide.className = 'bt-guide';
+    guide.innerHTML = `<div class="bt-avatar">${comment.emoji}</div><div class="bt-msg">${comment.msg}</div>`;
+    body.insertBefore(guide, body.firstChild);
+
     body.classList.remove('fade-out');
   }, 300);
 }
@@ -861,9 +900,10 @@ function selectChoice(idx, s){
 
 function showFeedback(text){
   const el = document.getElementById('feedback');
-  el.textContent = text;
+  const sub = FB_SUBS[Math.floor(Math.random() * FB_SUBS.length)];
+  el.innerHTML = `${text}<div class="fb-sub">${sub}</div>`;
   el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),800);
+  setTimeout(()=>el.classList.remove('show'),1000);
 }
 
 document.getElementById('skipFromAssess').addEventListener('click',finishAssessment);
