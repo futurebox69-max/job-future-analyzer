@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>미래역량 검사 — AI 시대, 당신의 경쟁력을 탐색하세요</title>
+<meta property="og:title" content="AI 시대 미래역량 검사 — 3분 무료 탐색">
+<meta property="og:description" content="AI가 대체할 수 없는 6가지 핵심 역량을 탐색하세요. 3분, 8문항, 무료.">
+<meta property="og:type" content="website">
+<!-- og:url과 og:image는 배포 URL 확정 후 추가 -->
+<!-- <meta property="og:url" content="[배포URL]"> -->
+<!-- <meta property="og:image" content="[배포URL]/og-image.png"> -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+:root {
+  --bg: #F8F7FF;
+  --surface: #fff;
+  --primary: #6C63FF;
+  --primary-light: #EDE9FE;
+  --accent: #4ECDC4;
+  --coral: #FF6B6B;
+  --gold: #FFE66D;
+  --pink: #F472B6;
+  --purple: #A78BFA;
+  --green: #34D399;
+  --text: #1E1B4B;
+  --text-dim: #6B7280;
+  --text-light: #9CA3AF;
+  --border: #EDE9FE;
+  --shadow: 0 4px 24px rgba(108,99,255,0.08);
+  --radius: 20px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); -webkit-tap-highlight-color:transparent; }
+button { font-family:inherit; cursor:pointer; touch-action:manipulation; }
+
+/* ===== SECTIONS ===== */
+.section { padding:60px 20px; max-width:640px; margin:0 auto; }
+.section-tag { display:inline-block; background:var(--primary-light); color:var(--primary); font-size:12px; font-weight:700; padding:4px 12px; border-radius:100px; letter-spacing:0.5px; margin-bottom:12px; }
+.section-title { font-size:26px; font-weight:900; line-height:1.4; margin-bottom:12px; }
+.section-desc { font-size:15px; color:var(--text-dim); line-height:1.7; }
+
+/* ===== HERO ===== */
+.hero { text-align:center; padding:80px 20px 60px; background:linear-gradient(160deg, #6C63FF 0%, #8B5CF6 40%, #A78BFA 100%); color:#fff; position:relative; overflow:hidden; }
+.hero::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:60px; background:var(--bg); border-radius:50% 50% 0 0; }
+.hero-badge { display:inline-block; background:rgba(255,255,255,0.15); backdrop-filter:blur(8px); padding:6px 16px; border-radius:100px; font-size:12px; font-weight:600; margin-bottom:20px; letter-spacing:0.5px; }
+.hero h1 { font-size:32px; font-weight:900; line-height:1.3; margin-bottom:12px; }
+.hero p { font-size:15px; opacity:0.85; line-height:1.6; max-width:400px; margin:0 auto 28px; }
+.hero-stats { display:flex; justify-content:center; gap:32px; margin-bottom:24px; }
+.hero-stat { text-align:center; }
+.hero-stat-val { font-size:28px; font-weight:900; }
+.hero-stat-label { font-size:11px; opacity:0.7; }
+.hero-cta { display:inline-block; padding:16px 40px; border-radius:14px; background:#fff; color:var(--primary); font-size:16px; font-weight:700; text-decoration:none; border:none; box-shadow:0 8px 32px rgba(0,0,0,0.15); transition:transform 0.2s; position:relative; z-index:2; }
+.hero-cta:active { transform:scale(0.97); }
+
+/* ===== WHY SECTION ===== */
+.why-cards { display:flex; flex-direction:column; gap:12px; margin-top:20px; }
+.why-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; display:flex; gap:14px; align-items:flex-start; box-shadow:var(--shadow); }
+.why-icon { font-size:28px; flex-shrink:0; width:40px; text-align:center; }
+.why-text h4 { font-size:15px; font-weight:700; margin-bottom:4px; }
+.why-text p { font-size:13px; color:var(--text-dim); line-height:1.6; }
+
+/* ===== DIMENSION SECTION ===== */
+.dim-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
+.dim-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 16px; text-align:center; box-shadow:var(--shadow); transition:transform 0.2s; }
+.dim-card:active { transform:scale(0.97); }
+.dim-emoji { font-size:32px; margin-bottom:8px; }
+.dim-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+.dim-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+
+/* ===== METHOD SECTION ===== */
+.method-cards { display:flex; flex-direction:column; gap:12px; margin-top:20px; }
+.method-card { background:var(--surface); border:1.5px solid var(--border); border-radius:16px; padding:18px; display:flex; gap:14px; align-items:center; box-shadow:var(--shadow); }
+.method-card.active { border-color:var(--primary); background:var(--primary-light); }
+.method-icon { font-size:28px; flex-shrink:0; }
+.method-info h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
+.method-info p { font-size:12px; color:var(--text-dim); }
+.method-tag { font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; background:rgba(108,99,255,0.1); color:var(--primary); margin-top:4px; display:inline-block; }
+
+/* ===== CTA SECTION ===== */
+.cta-section { text-align:center; padding:60px 20px; }
+.cta-btn { display:inline-block; padding:18px 48px; border-radius:16px; background:linear-gradient(135deg,var(--primary),#8B5CF6); color:#fff; font-size:17px; font-weight:700; border:none; box-shadow:0 8px 32px rgba(108,99,255,0.35); transition:transform 0.2s; }
+.cta-btn:active { transform:scale(0.97); }
+.cta-sub { font-size:13px; color:var(--text-light); margin-top:12px; }
+
+/* ===== SCREEN SYSTEM ===== */
+.screen { display:none; min-height:100vh; }
+.screen.active { display:block; }
+
+/* ===== ASSESSMENT ===== */
+.assess-header { text-align:center; padding:20px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; }
+.assess-progress { display:flex; align-items:center; gap:12px; justify-content:center; }
+.assess-bar { flex:1; max-width:200px; height:6px; background:#EDE9FE; border-radius:3px; overflow:hidden; }
+.assess-fill { height:100%; background:var(--primary); border-radius:3px; transition:width 0.3s; }
+.assess-timer { font-size:24px; font-weight:900; color:var(--primary); font-variant-numeric:tabular-nums; }
+.assess-timer.warning { color:var(--coral); }
+.assess-count { font-size:12px; color:var(--text-dim); font-weight:600; }
+
+.assess-body { max-width:500px; margin:0 auto; padding:24px 20px; }
+.assess-context { font-size:11px; font-weight:600; color:var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+.assess-emoji { font-size:36px; margin-bottom:10px; }
+.assess-question { font-size:16px; font-weight:600; line-height:1.7; margin-bottom:20px; }
+
+.assess-choices { display:flex; flex-direction:column; gap:10px; }
+.assess-choice { background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:14px 16px; text-align:left; display:flex; align-items:center; gap:12px; transition:all 0.2s; touch-action:manipulation; }
+.assess-choice:active { transform:scale(0.98); }
+.assess-choice.selected { border-color:var(--primary); background:var(--primary-light); }
+.assess-key { width:28px; height:28px; border-radius:8px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--primary); flex-shrink:0; }
+.assess-choice-text { font-size:13px; line-height:1.5; }
+
+/* Image choices */
+.assess-image-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.assess-image-card { background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:18px; text-align:center; transition:all 0.2s; touch-action:manipulation; }
+.assess-image-card:active { transform:scale(0.97); }
+.assess-image-card.selected { border-color:var(--accent); background:rgba(78,205,196,0.08); }
+.assess-image-card .emoji { font-size:36px; margin-bottom:6px; }
+.assess-image-card .label { font-size:13px; font-weight:600; }
+.assess-image-card .desc { font-size:11px; color:var(--text-dim); margin-top:2px; }
+
+/* Rank items */
+.rank-list { display:flex; flex-direction:column; gap:8px; }
+.rank-item { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:12px; touch-action:none; user-select:none; transition:all 0.2s; }
+.rank-item.dragging { opacity:0.5; border-color:var(--primary); }
+.rank-num { width:24px; height:24px; border-radius:6px; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0; }
+.rank-text { font-size:13px; flex:1; }
+.rank-handle { color:var(--text-light); font-size:16px; }
+.rank-confirm { width:100%; padding:14px; border-radius:12px; background:linear-gradient(135deg,var(--primary),#8B5CF6); color:#fff; font-size:14px; font-weight:600; border:none; margin-top:12px; }
+.rank-confirm:disabled { opacity:0.4; }
+
+/* Feedback flash */
+.feedback { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(30,27,75,0.9); color:#fff; padding:16px 28px; border-radius:14px; font-size:15px; font-weight:600; z-index:100; pointer-events:none; opacity:0; transition:opacity 0.3s; }
+.feedback.show { opacity:1; }
+
+/* Skip button */
+.skip-btn { position:fixed; top:16px; right:16px; z-index:20; background:rgba(0,0,0,0.05); border:none; padding:8px 16px; border-radius:10px; font-size:12px; color:var(--text-dim); touch-action:manipulation; }
+
+/* ===== RESULT SCREEN ===== */
+.result-hero { text-align:center; padding:40px 20px 20px; }
+.result-emoji { font-size:56px; margin-bottom:8px; }
+.result-type { font-size:24px; font-weight:900; margin-bottom:4px; }
+.result-sub { font-size:14px; color:var(--text-dim); margin-bottom:24px; }
+
+.result-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 20px; margin:0 20px 16px; max-width:500px; margin-left:auto; margin-right:auto; box-shadow:var(--shadow); }
+.result-card-title { font-size:14px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+
+.score-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.score-icon { font-size:18px; width:24px; text-align:center; }
+.score-info { flex:1; }
+.score-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px; }
+.score-name { font-weight:500; }
+.score-val { font-weight:700; color:var(--primary); }
+.score-bar { height:6px; background:#EDE9FE; border-radius:3px; overflow:hidden; }
+.score-fill { height:100%; border-radius:3px; transition:width 1.2s ease; }
+
+.insight-text { font-size:14px; line-height:1.7; color:var(--text-dim); }
+.insight-highlight { color:var(--primary); font-weight:600; }
+
+/* Chatbot */
+.chat-area { max-width:500px; margin:0 auto; padding:0 20px 120px; }
+.chat-bubble { max-width:85%; padding:14px 18px; border-radius:18px; font-size:14px; line-height:1.6; margin-bottom:10px; animation:slideUp 0.3s ease; }
+@keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.chat-bot { background:var(--surface); border:1px solid var(--border); border-bottom-left-radius:4px; margin-right:auto; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+.chat-user { background:var(--primary); color:#fff; border-bottom-right-radius:4px; margin-left:auto; }
+.chat-options { display:flex; flex-direction:column; gap:8px; margin:8px 0 16px; max-width:85%; }
+.chat-opt { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:12px 16px; font-size:13px; text-align:left; transition:all 0.2s; touch-action:manipulation; }
+.chat-opt:active { border-color:var(--primary); background:var(--primary-light); }
+.chat-typing { display:flex; gap:4px; padding:14px 18px; }
+.chat-typing span { width:8px; height:8px; border-radius:50%; background:var(--text-light); animation:typing 1.2s infinite; }
+.chat-typing span:nth-child(2) { animation-delay:0.2s; }
+.chat-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typing { 0%,60%,100%{opacity:0.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-4px)} }
+
+/* BTS CTA */
+.bts-cta { background:linear-gradient(135deg,#1E1B4B,#312E81); border-radius:var(--radius); padding:28px 24px; text-align:center; color:#fff; margin:16px 20px; max-width:500px; margin-left:auto; margin-right:auto; }
+.bts-cta h3 { font-size:18px; font-weight:800; margin-bottom:8px; }
+.bts-cta p { font-size:13px; opacity:0.8; line-height:1.6; margin-bottom:16px; }
+.bts-btn { display:inline-block; padding:14px 32px; border-radius:12px; background:#fff; color:#1E1B4B; font-size:15px; font-weight:700; border:none; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+.bts-features { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+.bts-feat { font-size:11px; padding:3px 10px; border-radius:8px; background:rgba(255,255,255,0.12); }
+
+/* Footer */
+footer { text-align:center; padding:40px 20px; font-size:12px; color:var(--text-light); }
+footer a { color:var(--primary); text-decoration:none; font-weight:600; }
+
+@media(max-width:400px) {
+  .hero h1 { font-size:26px; }
+  .section-title { font-size:22px; }
+  .dim-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN 1: LANDING ===== -->
+<div class="screen active" id="landing">
+
+  <div class="hero">
+    <div class="hero-badge">🔬 AI 시대 역량 탐색</div>
+    <h1>AI가 당신의 일을<br>대체하기 전에,<br>먼저 확인하세요</h1>
+    <p>MBTI나 에니어그램으로는 부족합니다.<br>미래 사회에서 살아남을 6가지 핵심 역량을<br>게임처럼 재미있게 탐색합니다.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val">6</div><div class="hero-stat-label">탐색 역량</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">3분</div><div class="hero-stat-label">소요 시간</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">무료</div><div class="hero-stat-label">비용</div></div>
+    </div>
+    <button class="hero-cta" id="heroStartBtn">무료로 검사 시작하기</button>
+  </div>
+
+  <!-- WHY -->
+  <div class="section">
+    <div class="section-tag">WHY</div>
+    <div class="section-title">왜 이 검사가 필요한가요?</div>
+    <div class="section-desc">기존 검사들은 "지금의 나"를 분류합니다.<br>이 검사는 "미래의 나"가 얼마나 준비되었는지 탐색합니다.</div>
+    <div class="why-cards">
+      <div class="why-card">
+        <div class="why-icon">🤖</div>
+        <div class="why-text">
+          <h4>AI가 47%의 직업을 위협합니다</h4>
+          <p>옥스퍼드 연구(Frey & Osborne)에 따르면, 20년 내 현재 직업의 47%가 자동화될 수 있습니다. 당신의 역량은 안전한가요?</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">❌</div>
+        <div class="why-text">
+          <h4>MBTI로는 미래를 예측할 수 없습니다</h4>
+          <p>성격 유형은 변하지 않지만, 시대가 요구하는 역량은 변합니다. "나는 INTJ"라는 것과 "AI 시대에 경쟁력 있다"는 것은 전혀 다른 이야기입니다.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🎯</div>
+        <div class="why-text">
+          <h4>행동이 답입니다, 자기 보고가 아니라</h4>
+          <p>이 검사는 "당신은 창의적입니까?"라고 묻지 않습니다. 상황을 주고, 당신이 어떻게 행동하는지를 관찰합니다. 자기 인식 편향 없이, 실제 역량을 탐색합니다.</p>
+        </div>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">👨‍👩‍👧‍👦</div>
+        <div class="why-text">
+          <h4>부모와 자녀가 함께 볼 수 있습니다</h4>
+          <p>같은 검사를 가족이 함께 하면, 서로의 사고방식 차이가 드러납니다. "왜 우리 아이는 이렇게 생각하지?"에 대한 구조적 답을 얻을 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT: 6 DIMENSIONS -->
+  <div class="section" style="background:var(--surface); padding-top:40px; padding-bottom:40px; max-width:100%;">
+    <div style="max-width:640px; margin:0 auto; padding:0 20px;">
+      <div class="section-tag">WHAT</div>
+      <div class="section-title">6가지 미래 핵심 역량</div>
+      <div class="section-desc">AI가 대체할 수 없는 인간 고유의 역량을<br>6차원으로 탐색합니다.</div>
+      <div class="dim-grid">
+        <div class="dim-card">
+          <div class="dim-emoji">🧩</div>
+          <div class="dim-name">구조적 사고</div>
+          <div class="dim-desc">복잡한 문제를 분해하고<br>패턴을 찾는 능력</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-emoji">🎨</div>
+          <div class="dim-name">창의적 재설계</div>
+          <div class="dim-desc">기존 틀을 깨고<br>새로운 해법을 만드는 능력</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-emoji">💫</div>
+          <div class="dim-name">감성 연결</div>
+          <div class="dim-desc">사람의 감정을 읽고<br>공감하는 능력</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-emoji">⚡</div>
+          <div class="dim-name">적응 민첩성</div>
+          <div class="dim-desc">변화에 빠르게 대응하고<br>학습하는 능력</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-emoji">⚖️</div>
+          <div class="dim-name">윤리적 판단</div>
+          <div class="dim-desc">가치와 원칙에 기반한<br>판단 능력</div>
+        </div>
+        <div class="dim-card">
+          <div class="dim-emoji">🤝</div>
+          <div class="dim-name">협업 지능</div>
+          <div class="dim-desc">다양한 사람과<br>시너지를 만드는 능력</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW: METHODS -->
+  <div class="section">
+    <div class="section-tag">HOW</div>
+    <div class="section-title">4가지 검사 방식</div>
+    <div class="section-desc">당신이 가장 편한 방식을 선택하세요.<br>선택 자체도 당신의 인지 스타일을 드러냅니다.</div>
+    <div class="method-cards">
+      <div class="method-card">
+        <div class="method-icon">📖</div>
+        <div class="method-info">
+          <h4>시나리오형</h4>
+          <p>현실적인 상황이 주어지고, 어떻게 행동할지 선택합니다</p>
+          <div class="method-tag">논리적 · 현실지향</div>
+        </div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">🎮</div>
+        <div class="method-info">
+          <h4>게임 비유형</h4>
+          <p>롤, 포트나이트, 마크 등 게임 상황으로 질문합니다</p>
+          <div class="method-tag">은유적 · 게임친화</div>
+        </div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">🖼️</div>
+        <div class="method-info">
+          <h4>이미지 선택형</h4>
+          <p>두 가지 상징 중 끌리는 것을 직관적으로 고릅니다</p>
+          <div class="method-tag">직관적 · 감각형</div>
+        </div>
+      </div>
+      <div class="method-card">
+        <div class="method-icon">📊</div>
+        <div class="method-info">
+          <h4>순위 매기기형</h4>
+          <p>가치와 행동의 우선순위를 드래그로 배열합니다</p>
+          <div class="method-tag">분석적 · 체계형</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUST -->
+  <div class="section" style="text-align:center;">
+    <div class="section-tag">TRUST</div>
+    <div class="section-title">검증된 학술 프레임워크 기반 설계</div>
+    <div class="section-desc" style="margin-bottom:20px;">
+      Frey & Osborne(2013), O*NET Analytical Skills,<br>
+      McKinsey 자동화 분류, Autor(2015),<br>
+      EU AI Act 기준에 근거합니다.
+    </div>
+    <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+      <span style="background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:4px 12px; border-radius:8px;">Oxford Martin School</span>
+      <span style="background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:4px 12px; border-radius:8px;">O*NET</span>
+      <span style="background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:4px 12px; border-radius:8px;">McKinsey</span>
+      <span style="background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:4px 12px; border-radius:8px;">EU AI Act</span>
+    </div>
+  </div>
+
+  <!-- FINAL CTA -->
+  <div class="cta-section">
+    <div style="font-size:36px; margin-bottom:12px;">🚀</div>
+    <div class="section-title" style="text-align:center;">3분이면 됩니다</div>
+    <p style="color:var(--text-dim); font-size:14px; margin-bottom:24px;">무료 · 로그인 불필요 · 결과 즉시 확인</p>
+    <button class="cta-btn" id="ctaStartBtn">검사 시작하기</button>
+    <div class="cta-sub">이미 <strong>12,847명</strong>이 검사를 완료했습니다</div>
+  </div>
+
+  <footer>
+    <p>© 2026 LoginFuture Ministry. All rights reserved.</p>
+    <p style="margin-top:4px;">AI 시대의 커리어 내비게이션 — <a href="#">BTS(Build Tomorrow Skills)</a></p>
+  </footer>
+</div>
+
+<!-- ===== SCREEN 2: QTYPE SELECT ===== -->
+<div class="screen" id="qtypeScreen">
+  <div style="text-align:center; padding:40px 20px 20px;">
+    <div style="font-size:36px; margin-bottom:8px;">🎯</div>
+    <div class="section-title" style="font-size:22px;">검사 방식을 선택하세요</div>
+    <div class="section-desc" style="font-size:13px;">어떤 유형을 선택하느냐도 당신의 인지 스타일입니다</div>
+  </div>
+  <div style="max-width:420px; margin:0 auto; padding:12px 20px;">
+    <div class="method-cards" id="qtypeCards"></div>
+    <button class="skip-btn" id="skipFromQtype" style="position:static; margin-top:16px; width:100%; text-align:center;">건너뛰기</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3: ASSESSMENT ===== -->
+<div class="screen" id="assessScreen">
+  <div class="assess-header">
+    <div class="assess-progress">
+      <span class="assess-count" id="roundLabel">1/8</span>
+      <div class="assess-bar"><div class="assess-fill" id="progressFill" style="width:12.5%"></div></div>
+      <span class="assess-timer" id="timerDisplay">30</span>
+    </div>
+  </div>
+  <button class="skip-btn" id="skipFromAssess">검사 끝내기</button>
+  <div class="assess-body" id="assessBody"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<!-- ===== SCREEN 4: RESULT + CHATBOT ===== -->
+<div class="screen" id="resultScreen">
+  <div class="result-hero">
+    <div class="result-emoji" id="resEmoji"></div>
+    <div class="result-type" id="resType"></div>
+    <div class="result-sub" id="resSub"></div>
+  </div>
+
+  <!-- 6차원 점수 -->
+  <div class="result-card">
+    <div class="result-card-title">📊 6차원 역량 프로파일</div>
+    <div id="scoreRows"></div>
+  </div>
+
+  <!-- 메타 분석 -->
+  <div class="result-card">
+    <div class="result-card-title">💡 사고방식 메타분석</div>
+    <div id="metaInsight" class="insight-text"></div>
+  </div>
+
+  <!-- 챗봇 -->
+  <div class="result-card" style="background:transparent; border:none; box-shadow:none; padding:24px 0;">
+    <div class="result-card-title" style="padding:0 20px;">🤖 AI 커리어 코치</div>
+  </div>
+  <div class="chat-area" id="chatArea"></div>
+
+  <!-- BTS CTA -->
+  <div class="bts-cta" id="btsCta" style="display:none;">
+    <h3>🔮 Build Tomorrow Skills</h3>
+    <p>당신의 역량을 특정 직업과 교차 분석하면<br>더 구체적인 전략이 나옵니다</p>
+    <button class="bts-btn" id="btsCTABtn">BTS에서 심층 분석 받기 →</button>
+    <div class="bts-features">
+      <span class="bts-feat">AI 대체율 분석</span>
+      <span class="bts-feat">10년 예측</span>
+      <span class="bts-feat">전환 경로</span>
+      <span class="bts-feat">스킬 로드맵</span>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 LoginFuture Ministry</p>
+  </footer>
+</div>
+
+<script>
+// ===== SCENARIO DATA =====
+const SKILLS_INFO = {
+  structural:{icon:'🧩',name:'구조적 사고',color:'#6C63FF'},
+  creative:{icon:'🎨',name:'창의적 재설계',color:'#FF6B6B'},
+  emotional:{icon:'💫',name:'감성 연결',color:'#F472B6'},
+  adaptive:{icon:'⚡',name:'적응 민첩성',color:'#FFE66D'},
+  ethical:{icon:'⚖️',name:'윤리적 판단',color:'#A78BFA'},
+  collab:{icon:'🤝',name:'협업 지능',color:'#34D399'}
+};
+
+const ARCHETYPES = {
+  structural:{emoji:'🧩',title:'구조 해석자',sub:'복잡함 속에서 질서를 찾는 사람'},
+  creative:{emoji:'🎨',title:'재설계자',sub:'기존 틀을 깨고 새로운 길을 만드는 사람'},
+  emotional:{emoji:'💫',title:'감성 연결자',sub:'사람의 마음을 읽고 연결하는 사람'},
+  adaptive:{emoji:'⚡',title:'변화 서퍼',sub:'불확실성 속에서 기회를 잡는 사람'},
+  ethical:{emoji:'⚖️',title:'기술의 양심',sub:'원칙과 가치로 판단하는 사람'},
+  collab:{emoji:'🤝',title:'시너지 설계자',sub:'다양한 사람과 함께 더 큰 것을 만드는 사람'}
+};
+
+const scenarioBanks = {
+  adult:[
+    {ctx:'직장 위기',emoji:'💼',text:'팀에서 AI 도구를 도입했는데, 동료가 "일자리가 위험하다"며 불안해합니다. 어떻게 하시겠습니까?',type:'scenario',
+      choices:[
+        {text:'"AI가 대체하는 업무 vs 우리만의 강점"을 정리해서 팀 미팅을 연다',skills:{structural:3,collab:1},fb:'구조로 불안을 해소'},
+        {text:'"이걸 기회로 새 역할을 만들자"며 AI+인간 협업 모델을 제안한다',skills:{creative:3,adaptive:1},fb:'위기를 기회로'},
+        {text:'동료의 감정을 먼저 들어주고, 함께 대응 방안을 찾자고 한다',skills:{emotional:3,collab:1},fb:'사람을 먼저 보는 리더'},
+        {text:'AI 도입의 윤리적 가이드라인을 먼저 만들자고 경영진에 건의한다',skills:{ethical:3,structural:1},fb:'원칙이 있는 대응'}]},
+    {ctx:'이직 고민',emoji:'🔄',text:'연봉 30% 인상 제안을 받았지만, 그 회사는 AI 자동화를 적극 추진 중입니다.',type:'scenario',
+      choices:[
+        {text:'6개월 치 데이터로 분석. 감이 아닌 숫자로 결정한다',skills:{structural:3,adaptive:1},fb:'데이터 기반 결정'},
+        {text:'"AI를 활용하는 포지션을 만들겠다"며 역제안한다',skills:{creative:3,adaptive:1},fb:'협상의 재설계'},
+        {text:'현 직장 동료들과의 관계, 문화 적합성을 먼저 고려한다',skills:{emotional:3,ethical:1},fb:'관계 중심 판단'},
+        {text:'두 회사 모두의 3년 후 시나리오를 그려보고 판단한다',skills:{adaptive:3,structural:1},fb:'미래 시뮬레이션'}]},
+    {ctx:'부업 기회',emoji:'💡',text:'퇴근 후 AI를 활용한 부업 기회가 생겼습니다. 하지만 본업과 시간 충돌이 있습니다.',type:'scenario',
+      choices:[
+        {text:'본업과 부업의 시너지 영역을 찾아 둘을 연결한다',skills:{structural:3,creative:1},fb:'구조적 통합'},
+        {text:'과감하게 본업을 줄이고 부업에 올인한다',skills:{adaptive:3,creative:1},fb:'변화에 뛰어들기'},
+        {text:'가족과 상의하고, 생활 패턴에 미치는 영향을 먼저 고려한다',skills:{emotional:3,ethical:1},fb:'삶의 균형 우선'},
+        {text:'3개월 시범 운영 후 데이터로 판단한다',skills:{structural:2,adaptive:2},fb:'실험적 접근'}]},
+    {ctx:'팀 갈등',emoji:'🤝',text:'프로젝트에서 두 팀원이 심하게 대립합니다. 당신이 중재해야 합니다.',type:'scenario',
+      choices:[
+        {text:'"왜 실패했는지 같이 봐보자" — 리플레이 분석을 제안',skills:{structural:3,collab:1},fb:'팀의 분석가'},
+        {text:'두 사람의 아이디어를 합쳐 제3의 안을 만든다',skills:{creative:3,collab:1},fb:'창의적 중재'},
+        {text:'각자의 감정을 먼저 들어준 뒤 공감대를 형성한다',skills:{emotional:3,collab:1},fb:'감정을 먼저'},
+        {text:'팀 규칙을 세우고, 역할을 명확히 재분배한다',skills:{ethical:3,structural:1},fb:'규칙으로 신뢰를'}]}
+  ],
+  youth:[
+    {ctx:'LoL 팀 위기',emoji:'🎮',text:'랭크 게임에서 탑이 0/5가 되었습니다. 팀 분위기가 최악입니다.',type:'scenario',
+      choices:[
+        {text:'"탑은 스플릿 포기하고 팀파이트에 집중해" — 전략 수정 제안',skills:{structural:3,adaptive:1},fb:'전략적 사고'},
+        {text:'"괜찮아, 후반 가면 우리 한타 구성이 더 좋아" — 멘탈 케어',skills:{emotional:3,collab:1},fb:'팀의 정신적 지주'},
+        {text:'자신의 라인에서 초반 이득을 극대화해서 캐리를 시도한다',skills:{adaptive:3,creative:1},fb:'개인기로 돌파'},
+        {text:'"서렌 투표 올려" — 빠른 손절 후 다음 판에 집중',skills:{adaptive:2,structural:2},fb:'효율적 판단'}]},
+    {ctx:'마크 건축',emoji:'⛏️',text:'마인크래프트에서 친구들과 마을을 만들고 있습니다. 의견이 달라서 진행이 안 됩니다.',type:'scenario',
+      choices:[
+        {text:'구역을 나눠서 각자 맡은 부분을 만든 뒤 합친다',skills:{structural:3,collab:1},fb:'분업의 힘'},
+        {text:'모두의 아이디어를 합쳐서 전혀 새로운 건축 테마를 만든다',skills:{creative:3,collab:1},fb:'창의적 융합'},
+        {text:'"다 좋은데, 일단 네 아이디어부터 해보자" — 한 명씩 시도',skills:{emotional:3,adaptive:1},fb:'존중하며 전진'},
+        {text:'투표로 결정한다. 민주적이고 공정하게',skills:{ethical:3,structural:1},fb:'공정한 프로세스'}]},
+    {ctx:'포트나이트 스쿼드',emoji:'🔫',text:'포트나이트에서 스쿼드 중 한 명이 계속 혼자 돌아다니다 죽습니다.',type:'scenario',
+      choices:[
+        {text:'지형 분석 → 고지대 확보 → 하나씩 유인해서 각개격파 전략 제안',skills:{structural:3,adaptive:1},fb:'전략적 사고'},
+        {text:'그 친구 플레이 스타일에 맞는 역할을 새로 만들어준다',skills:{creative:3,emotional:1},fb:'맞춤형 해법'},
+        {text:'"같이 다니자, 네가 죽으면 우리가 슬퍼" — 감성 호소',skills:{emotional:3,collab:1},fb:'팀워크는 감정에서'},
+        {text:'역할 분담을 정하고 규칙을 만든다 (스카우트/서포트/공격)',skills:{structural:2,collab:2},fb:'시스템으로 해결'}]},
+    {ctx:'로블록스 사업',emoji:'🏗️',text:'로블록스에서 게임을 만들었는데 접속자가 점점 줄고 있습니다.',type:'scenario',
+      choices:[
+        {text:'접속 데이터를 분석해서 이탈 구간을 찾아 개선한다',skills:{structural:3,adaptive:1},fb:'데이터 기반 개선'},
+        {text:'다른 인기 게임을 분석하고, 완전히 다른 컨셉으로 리뉴얼',skills:{creative:3,structural:1},fb:'벤치마킹의 힘'},
+        {text:'플레이어들에게 직접 물어본다. "뭐가 재미없어?"',skills:{emotional:3,collab:1},fb:'유저의 목소리'},
+        {text:'수익화보다 커뮤니티를 먼저 만든다. 팬이 있으면 게임은 산다',skills:{collab:3,emotional:1},fb:'관계가 먼저'}]}
+  ],
+  image:[
+    {ctx:'상징 선택',emoji:'🔮',text:'두 가지 중 더 끌리는 것을 고르세요.',type:'image',
+      choices:[
+        {emoji:'🗺️',label:'지도',desc:'전체를 보고 길을 찾는다',skills:{structural:3,adaptive:1}},
+        {emoji:'🧭',label:'나침반',desc:'방향만 알면 길은 만든다',skills:{creative:3,adaptive:1}}]},
+    {ctx:'도구 선택',emoji:'🛠️',text:'하나만 가져갈 수 있다면?',type:'image',
+      choices:[
+        {emoji:'🔬',label:'현미경',desc:'깊이 파고들어 진실을 본다',skills:{structural:3,ethical:1}},
+        {emoji:'🔭',label:'망원경',desc:'멀리 보고 큰 그림을 그린다',skills:{creative:3,adaptive:1}}]},
+    {ctx:'길 선택',emoji:'🛤️',text:'어떤 길로 가시겠습니까?',type:'image',
+      choices:[
+        {emoji:'🏔️',label:'산길',desc:'어렵지만 정상에서 전부 보인다',skills:{adaptive:3,structural:1}},
+        {emoji:'🌊',label:'바닷길',desc:'흐름을 타면 더 멀리 간다',skills:{creative:2,emotional:2}}]},
+    {ctx:'팀 역할',emoji:'👥',text:'팀에서 당신의 자연스러운 역할은?',type:'image',
+      choices:[
+        {emoji:'🎯',label:'전략가',desc:'방향을 정하고 계획을 세운다',skills:{structural:3,ethical:1}},
+        {emoji:'🔥',label:'점화자',desc:'에너지를 불어넣고 사기를 올린다',skills:{emotional:3,collab:1}}]}
+  ],
+  rank:[
+    {ctx:'가치 순위',emoji:'⚖️',text:'AI 시대에 가장 중요한 순서로 배열하세요.',type:'rank',
+      items:['비판적 사고','감성 지능','기술 적응력','윤리적 판단','창의성','협업 능력'],
+      skillMap:['structural','emotional','adaptive','ethical','creative','collab']},
+    {ctx:'행동 순위',emoji:'🎯',text:'새 프로젝트 시작 시, 먼저 하는 순서대로.',type:'rank',
+      items:['사람들 의견 듣기','데이터 분석하기','일단 시작하기','계획 세우기','기존 사례 조사','목표 재정의'],
+      skillMap:['collab','structural','adaptive','structural','creative','ethical']}
+  ]
+};
+
+function buildScenarios(qtype){
+  const main = scenarioBanks.adult;
+  switch(qtype){
+    case 'scenario': return [...main.slice(0,4),...scenarioBanks.image.slice(0,2),...scenarioBanks.rank.slice(0,2)];
+    case 'game': return [...scenarioBanks.youth.slice(0,4),...scenarioBanks.image.slice(0,2),...scenarioBanks.rank.slice(0,1),...main.slice(0,1)];
+    case 'image': return [...scenarioBanks.image,...main.slice(0,2),...scenarioBanks.rank.slice(0,2)];
+    case 'rank': return [...scenarioBanks.rank,...scenarioBanks.image,...main.slice(0,2)];
+    default: return main;
+  }
+}
+
+// ===== STATE =====
+let currentScreen = 'landing';
+let selectedQType = 'scenario';
+let scenarios = [];
+let round = 0;
+let scores = {structural:0,creative:0,emotional:0,adaptive:0,ethical:0,collab:0};
+let behaviorData = [];
+let timerInterval = null;
+let timeLeft = 30;
+let roundStartTime = 0;
+let competencyResult = null;
+
+// ===== SCREEN MANAGEMENT =====
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  currentScreen = id;
+}
+
+// ===== LANDING EVENTS =====
+document.getElementById('heroStartBtn').addEventListener('click',()=>showScreen('qtypeScreen'));
+document.getElementById('heroStartBtn').addEventListener('touchend',e=>{e.preventDefault();showScreen('qtypeScreen')});
+document.getElementById('ctaStartBtn').addEventListener('click',()=>showScreen('qtypeScreen'));
+document.getElementById('ctaStartBtn').addEventListener('touchend',e=>{e.preventDefault();showScreen('qtypeScreen')});
+
+// ===== QTYPE SCREEN =====
+const qtypeData = [
+  {type:'scenario',icon:'📖',title:'시나리오형',desc:'현실적인 상황 선택',tag:'논리적'},
+  {type:'game',icon:'🎮',title:'게임 비유형',desc:'게임 상황으로 질문',tag:'게임친화'},
+  {type:'image',icon:'🖼️',title:'이미지 선택형',desc:'직관적으로 선택',tag:'직관적'},
+  {type:'rank',icon:'📊',title:'순위 매기기형',desc:'우선순위 배열',tag:'분석적'}
+];
+const qtypeContainer = document.getElementById('qtypeCards');
+qtypeData.forEach(q=>{
+  const card = document.createElement('div');
+  card.className = 'method-card';
+  card.innerHTML = `<div class="method-icon">${q.icon}</div><div class="method-info"><h4>${q.title}</h4><p>${q.desc}</p><div class="method-tag">${q.tag}</div></div>`;
+  card.addEventListener('click',()=>startAssessment(q.type));
+  card.addEventListener('touchend',e=>{e.preventDefault();startAssessment(q.type)});
+  qtypeContainer.appendChild(card);
+});
+document.getElementById('skipFromQtype').addEventListener('click',()=>startAssessment('scenario'));
+
+// ===== ASSESSMENT =====
+function startAssessment(qtype){
+  selectedQType = qtype;
+  scenarios = buildScenarios(qtype);
+  round = 0;
+  scores = {structural:0,creative:0,emotional:0,adaptive:0,ethical:0,collab:0};
+  behaviorData = [];
+  showScreen('assessScreen');
+  loadRound();
+}
+
+function loadRound(){
+  if(round >= scenarios.length){ finishAssessment(); return; }
+  const s = scenarios[round];
+  const total = scenarios.length;
+  document.getElementById('roundLabel').textContent = `${round+1}/${total}`;
+  document.getElementById('progressFill').style.width = `${(round+1)/total*100}%`;
+  timeLeft = 30;
+  roundStartTime = Date.now();
+  const timerEl = document.getElementById('timerDisplay');
+  timerEl.textContent = timeLeft;
+  timerEl.classList.remove('warning');
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+    if(timeLeft <= 10) timerEl.classList.add('warning');
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      behaviorData.push({round,type:s.type,time:Date.now()-roundStartTime,skipped:true});
+      showFeedback('⏰ 시간 초과');
+      setTimeout(()=>{ round++; loadRound(); },1200);
+    }
+  },1000);
+
+  const body = document.getElementById('assessBody');
+  body.innerHTML = '';
+
+  if(s.type === 'scenario'){
+    renderTextChoices(s, body);
+  } else if(s.type === 'image'){
+    renderImageChoices(s, body);
+  } else if(s.type === 'rank'){
+    renderRankChoices(s, body);
+  }
+}
+
+function renderTextChoices(s, container){
+  const keys = ['A','B','C','D'];
+  let html = `<div class="assess-context">${s.ctx}</div><div class="assess-emoji">${s.emoji}</div><div class="assess-question">${s.text}</div><div class="assess-choices">`;
+  s.choices.forEach((c,i)=>{
+    html += `<div class="assess-choice" data-idx="${i}"><div class="assess-key">${keys[i]}</div><div class="assess-choice-text">${c.text}</div></div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  container.querySelectorAll('.assess-choice').forEach(el=>{
+    el.addEventListener('click',()=>selectChoice(parseInt(el.dataset.idx),s));
+    el.addEventListener('touchend',e=>{e.preventDefault();selectChoice(parseInt(el.dataset.idx),s)});
+  });
+}
+
+function renderImageChoices(s, container){
+  let html = `<div class="assess-context">${s.ctx}</div><div class="assess-emoji">${s.emoji}</div><div class="assess-question">${s.text}</div><div class="assess-image-grid">`;
+  s.choices.forEach((c,i)=>{
+    html += `<div class="assess-image-card" data-idx="${i}"><div class="emoji">${c.emoji}</div><div class="label">${c.label}</div><div class="desc">${c.desc}</div></div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  container.querySelectorAll('.assess-image-card').forEach(el=>{
+    el.addEventListener('click',()=>selectChoice(parseInt(el.dataset.idx),s));
+    el.addEventListener('touchend',e=>{e.preventDefault();selectChoice(parseInt(el.dataset.idx),s)});
+  });
+}
+
+function renderRankChoices(s, container){
+  let html = `<div class="assess-context">${s.ctx}</div><div class="assess-emoji">${s.emoji}</div><div class="assess-question">${s.text}</div><div class="rank-list" id="rankList">`;
+  const shuffled = [...s.items].sort(()=>Math.random()-0.5);
+  shuffled.forEach((item,i)=>{
+    html += `<div class="rank-item" data-item="${item}"><div class="rank-num">${i+1}</div><div class="rank-text">${item}</div><div class="rank-handle">⠿</div></div>`;
+  });
+  html += '</div><button class="rank-confirm" id="rankConfirmBtn">이 순서로 확정</button>';
+  container.innerHTML = html;
+
+  const list = document.getElementById('rankList');
+  enableDragReorder(list);
+
+  document.getElementById('rankConfirmBtn').addEventListener('click',()=>submitRank(s));
+  document.getElementById('rankConfirmBtn').addEventListener('touchend',e=>{e.preventDefault();submitRank(s)});
+}
+
+function enableDragReorder(list){
+  let dragEl = null;
+  list.addEventListener('dragstart',e=>{dragEl=e.target.closest('.rank-item');if(dragEl)dragEl.classList.add('dragging')});
+  list.addEventListener('dragend',()=>{if(dragEl)dragEl.classList.remove('dragging');dragEl=null;updateRankNums(list)});
+  list.addEventListener('dragover',e=>{e.preventDefault();if(!dragEl)return;const after=getDragAfter(list,e.clientY);if(after){list.insertBefore(dragEl,after)}else{list.appendChild(dragEl)}});
+  let touchStartY=0;
+  list.addEventListener('touchstart',e=>{const item=e.target.closest('.rank-item');if(!item)return;dragEl=item;dragEl.classList.add('dragging');touchStartY=e.touches[0].clientY},{passive:true});
+  list.addEventListener('touchmove',e=>{if(!dragEl)return;e.preventDefault();const y=e.touches[0].clientY;const after=getDragAfter(list,y);if(after){list.insertBefore(dragEl,after)}else{list.appendChild(dragEl)}},{passive:false});
+  list.addEventListener('touchend',()=>{if(dragEl){dragEl.classList.remove('dragging');updateRankNums(list);dragEl=null}});
+}
+function getDragAfter(list,y){
+  const els=[...list.querySelectorAll('.rank-item:not(.dragging)')];
+  return els.reduce((closest,child)=>{const box=child.getBoundingClientRect();const offset=y-box.top-box.height/2;if(offset<0&&offset>closest.offset)return{offset,element:child};return closest},{offset:Number.NEGATIVE_INFINITY}).element;
+}
+function updateRankNums(list){list.querySelectorAll('.rank-num').forEach((n,i)=>n.textContent=i+1)}
+
+function submitRank(s){
+  clearInterval(timerInterval);
+  const items = [...document.querySelectorAll('#rankList .rank-item')].map(r=>r.dataset.item);
+  items.forEach((item,i)=>{
+    const idx = s.items.indexOf(item);
+    const skillKey = s.skillMap[idx];
+    const pts = Math.max(s.items.length - i, 0);
+    if(skillKey && scores.hasOwnProperty(skillKey)) scores[skillKey] += pts;
+  });
+  behaviorData.push({round,type:'rank',time:Date.now()-roundStartTime,order:items});
+  showFeedback('순위 기록 완료!');
+  setTimeout(()=>{ round++; loadRound(); },800);
+}
+
+function selectChoice(idx, s){
+  clearInterval(timerInterval);
+  const c = s.choices[idx];
+  for(const[k,v] of Object.entries(c.skills)){
+    if(scores.hasOwnProperty(k)) scores[k] += v;
+  }
+  behaviorData.push({round,type:s.type,choiceIdx:idx,time:Date.now()-roundStartTime});
+
+  // highlight
+  document.querySelectorAll('.assess-choice,.assess-image-card').forEach((el,i)=>{
+    if(parseInt(el.dataset.idx)===idx) el.classList.add('selected');
+    el.style.pointerEvents='none';
+  });
+
+  const fb = c.fb || c.label || '선택 완료';
+  showFeedback(fb);
+  setTimeout(()=>{ round++; loadRound(); },900);
+}
+
+function showFeedback(text){
+  const el = document.getElementById('feedback');
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),800);
+}
+
+document.getElementById('skipFromAssess').addEventListener('click',finishAssessment);
+
+// ===== FINISH & RESULT =====
+function finishAssessment(){
+  clearInterval(timerInterval);
+  const maxS = Math.max(...Object.values(scores))||1;
+  const topKey = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  const arch = ARCHETYPES[topKey];
+  const avgTime = behaviorData.length > 0 ? behaviorData.reduce((s,d)=>s+d.time,0)/behaviorData.length/1000 : 10;
+  const qtypeMap = {scenario:'논리적 · 현실지향',game:'은유적 · 게임친화',image:'직관적 · 감각형',rank:'분석적 · 체계형'};
+
+  competencyResult = {scores,topKey,archetype:arch.title,avgTime,qtype:selectedQType,qtypeMeaning:qtypeMap[selectedQType]};
+
+  // Show result screen
+  showScreen('resultScreen');
+  document.getElementById('resEmoji').textContent = arch.emoji;
+  document.getElementById('resType').textContent = arch.title;
+  document.getElementById('resSub').textContent = arch.sub;
+
+  // Score rows
+  const rowsEl = document.getElementById('scoreRows');
+  rowsEl.innerHTML = '';
+  Object.entries(scores).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    const s = SKILLS_INFO[k];
+    const pct = Math.round(v/maxS*100);
+    rowsEl.innerHTML += `<div class="score-row"><div class="score-icon">${s.icon}</div><div class="score-info"><div class="score-label"><span class="score-name">${s.name}</span><span class="score-val">${pct}%</span></div><div class="score-bar"><div class="score-fill" style="width:0%;background:${s.color}"></div></div></div></div>`;
+  });
+  setTimeout(()=>{
+    document.querySelectorAll('.score-fill').forEach(el=>{el.style.width=el.parentElement.previousElementSibling.querySelector('.score-val').textContent});
+  },100);
+
+  // Meta insight
+  const fastRounds = behaviorData.filter(d=>d.time<5000).length;
+  const style = fastRounds > behaviorData.length/2 ? '빠른 직관형 의사결정자' : '신중한 숙고형 의사결정자';
+  document.getElementById('metaInsight').innerHTML =
+    `선택한 검사 유형: <span class="insight-highlight">${qtypeMap[selectedQType]}</span><br>`+
+    `→ 당신은 ${selectedQType==='scenario'?'현실의 맥락에서 논리적으로 판단하는':selectedQType==='game'?'게임적 사고로 전략을 세우는':selectedQType==='image'?'직관과 감각으로 빠르게 판단하는':'체계적으로 분석하고 정리하는'} 유형입니다.<br><br>`+
+    `평균 응답시간: <span class="insight-highlight">${avgTime.toFixed(1)}초</span><br>`+
+    `→ ${style}`;
+
+  // Start chatbot
+  startChatbot();
+}
+
+// ===== CHATBOT =====
+const chatArea = document.getElementById('chatArea');
+let chatStep = 0;
+
+function addBotMsg(text, delay){
+  return new Promise(resolve=>{
+    // typing indicator
+    const typing = document.createElement('div');
+    typing.className='chat-bubble chat-bot chat-typing';
+    typing.innerHTML='<span></span><span></span><span></span>';
+    chatArea.appendChild(typing);
+    chatArea.scrollIntoView({behavior:'smooth',block:'end'});
+
+    setTimeout(()=>{
+      typing.remove();
+      const bubble = document.createElement('div');
+      bubble.className='chat-bubble chat-bot';
+      bubble.innerHTML=text;
+      chatArea.appendChild(bubble);
+      chatArea.scrollIntoView({behavior:'smooth',block:'end'});
+      resolve();
+    }, delay||1200);
+  });
+}
+
+function addUserMsg(text){
+  const bubble = document.createElement('div');
+  bubble.className='chat-bubble chat-user';
+  bubble.textContent=text;
+  chatArea.appendChild(bubble);
+}
+
+function addOptions(opts){
+  return new Promise(resolve=>{
+    const container = document.createElement('div');
+    container.className='chat-options';
+    opts.forEach(opt=>{
+      const btn = document.createElement('button');
+      btn.className='chat-opt';
+      btn.textContent=opt.text;
+      btn.addEventListener('click',()=>{
+        container.remove();
+        addUserMsg(opt.text);
+        resolve(opt.key);
+      });
+      btn.addEventListener('touchend',e=>{
+        e.preventDefault();
+        container.remove();
+        addUserMsg(opt.text);
+        resolve(opt.key);
+      });
+      container.appendChild(btn);
+    });
+    chatArea.appendChild(container);
+    chatArea.scrollIntoView({behavior:'smooth',block:'end'});
+  });
+}
+
+async function startChatbot(){
+  chatArea.innerHTML='';
+  const arch = ARCHETYPES[competencyResult.topKey];
+  const topSkill = SKILLS_INFO[competencyResult.topKey];
+  const weakKey = Object.entries(competencyResult.scores).sort((a,b)=>a[1]-b[1])[0][0];
+  const weakSkill = SKILLS_INFO[weakKey];
+
+  await addBotMsg(`안녕하세요! 검사 결과를 보니, 당신은 <strong>${arch.emoji} ${arch.title}</strong>이시네요.`,1500);
+  await addBotMsg(`<strong>${topSkill.icon} ${topSkill.name}</strong>이 가장 높고, <strong>${weakSkill.icon} ${weakSkill.name}</strong>이 상대적으로 낮아요.`,1200);
+  await addBotMsg(`궁금한 게 있으신가요?`,800);
+
+  const choice1 = await addOptions([
+    {text:'이 결과가 내 직업에 어떤 영향을 줘?', key:'job'},
+    {text:'약한 역량을 어떻게 키울 수 있어?', key:'improve'},
+    {text:'AI 시대에 내 역량으로 뭘 할 수 있어?', key:'future'}
+  ]);
+
+  if(choice1==='job'){
+    await addBotMsg(`좋은 질문이에요! 하지만 정확한 분석을 하려면 <strong>당신의 직업</strong>을 알아야 해요.`,1200);
+    await addBotMsg(`<strong>BTS(Build Tomorrow Skills)</strong>에서는 직업명을 입력하면 AI가 <strong>대체율을 분석</strong>하고, 당신의 역량 검사 결과와 <strong>교차 분석</strong>해서 맞춤 전략을 제시합니다.`,1500);
+  } else if(choice1==='improve'){
+    await addBotMsg(`${weakSkill.icon} ${weakSkill.name}을 키우는 가장 좋은 방법은 <strong>실전 경험</strong>이에요.`,1200);
+    await addBotMsg(`하지만 어떤 경험이 효과적인지는 <strong>직업과 상황</strong>에 따라 달라요. <strong>BTS</strong>에서는 직업별 맞춤 스킬 로드맵을 제공합니다.`,1400);
+  } else {
+    await addBotMsg(`${arch.emoji} ${arch.title}의 강점은 AI가 쉽게 대체할 수 없는 영역이에요!`,1200);
+    await addBotMsg(`하지만 구체적으로 어떤 직업에서 이 강점이 빛나는지, <strong>10년 후 전망</strong>은 어떤지 알려면 심층 분석이 필요해요.`,1400);
+  }
+
+  await addBotMsg(`무료로 심층 분석을 받아보시겠어요?`,1000);
+
+  const choice2 = await addOptions([
+    {text:'네, BTS에서 분석 받을래요!', key:'go'},
+    {text:'나중에 할게요', key:'later'}
+  ]);
+
+  if(choice2==='go'){
+    await addBotMsg(`좋아요! 🎉 BTS로 이동합니다. 역량 검사 결과가 자동으로 연동돼요.`,1200);
+    document.getElementById('btsCta').style.display='block';
+    document.getElementById('btsCta').scrollIntoView({behavior:'smooth',block:'center'});
+  } else {
+    await addBotMsg(`알겠어요! 언제든 다시 오세요. 아래에서 BTS 링크를 확인할 수 있어요. 😊`,1000);
+    document.getElementById('btsCta').style.display='block';
+  }
+}
+
+// BTS CTA
+document.getElementById('btsCTABtn').addEventListener('click',()=>{
+  // TODO: 실제 BTS 도메인으로 변경
+  window.open('https://job-future-analyzer.vercel.app','_blank');
+});
+document.getElementById('btsCTABtn').addEventListener('touchend',e=>{
+  e.preventDefault();
+  window.open('https://job-future-analyzer.vercel.app','_blank');
+});
+
+</script>
+</body>
+</html>
