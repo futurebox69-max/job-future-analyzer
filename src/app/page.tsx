@@ -1538,8 +1538,8 @@ export default function Home() {
         )}
       </div>
 
-      {/* 요금제 안내 섹션 */}
-      <div className="relative z-10 max-w-5xl mx-auto px-5 py-14">
+      {/* 요금제 안내 섹션 — 유료 미리보기 모드에서는 숨김 (중복 방지) */}
+      <div className="relative z-10 max-w-5xl mx-auto px-5 py-14" style={{ display: serviceMode === "paid" ? "none" : undefined }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <div style={{
             display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
