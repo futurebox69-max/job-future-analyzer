@@ -639,20 +639,34 @@ export default function Home() {
       ═══════════════════════════════════════ */}
       <div className="max-w-4xl mx-auto px-4 pb-16">
 
-        {/* 로딩: 역량검사 또는 대기 스피너 */}
-        {isLoading && !result && (
-          showAssessment && !assessmentCompleted ? (
-            <div className="py-8">
-              <CompetencyAssessment
-                mode={mode}
-                onComplete={(res) => {
-                  setCompetencyResult(res);
-                  setAssessmentCompleted(true);
-                }}
-                onSkip={() => setAssessmentCompleted(true)}
-              />
-            </div>
-          ) : (
+        {/* 역량검사: API 로딩과 무관하게 검사 완료까지 표시 */}
+        {showAssessment && !assessmentCompleted && (
+          <div className="py-8">
+            <CompetencyAssessment
+              mode={mode}
+              onComplete={(res) => {
+                setCompetencyResult(res);
+                setAssessmentCompleted(true);
+                if (result) {
+                  setTimeout(() => {
+                    document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 200);
+                }
+              }}
+              onSkip={() => {
+                setAssessmentCompleted(true);
+                if (result) {
+                  setTimeout(() => {
+                    document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 200);
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {/* 로딩 스피너: 검사 완료했지만 API 아직 대기 중 */}
+        {isLoading && !result && (assessmentCompleted || !showAssessment) && (
             <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
               <div className="relative w-20 h-20">
                 <div
@@ -759,8 +773,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* 결과 섹션 — 좌측 네비 + 우측 콘텐츠 */}
-        {result && !isLoading && (
+        {/* 결과 섹션 — 좌측 네비 + 우측 콘텐츠 (검사 완료 후에만 표시) */}
+        {result && !isLoading && (!showAssessment || assessmentCompleted) && (
           <div id="result-section" className="animate-fade-in" style={{ marginTop: "32px" }}>
 
             {/* 직업명 + 남은 횟수 헤더 */}
@@ -779,9 +793,14 @@ export default function Home() {
                     {t.instant}
                   </span>
                 )}
-                {remaining !== null && (
+                {remaining !== null && profile?.role !== "admin" && (
                   <span className="text-sm px-3 py-1 rounded-full" style={{ background: "#F5F4FF", color: "#6C63FF", border: "1px solid #EDE9FE" }}>
                     {t.remaining}: {remaining}
+                  </span>
+                )}
+                {profile?.role === "admin" && result && (
+                  <span className="text-sm px-3 py-1 rounded-full" style={{ background: "#F0FDF4", color: "#16A34A", border: "1px solid #BBF7D0" }}>
+                    무제한
                   </span>
                 )}
               </div>
@@ -950,12 +969,36 @@ export default function Home() {
                 ) : activeSection === "competency" && !competencyResult ? (
                   <div style={{ textAlign: "center", padding: "60px 20px" }}>
                     <div style={{ fontSize: "48px", marginBottom: "16px" }}>🧠</div>
-                    <p style={{ color: "#6B7280", fontSize: "15px", marginBottom: "8px" }}>
-                      역량 검사를 진행하지 않았습니다.
+                    <p style={{ color: "#1E1B4B", fontSize: "17px", fontWeight: 700, marginBottom: "8px" }}>
+                      역량 검사를 진행하지 않았습니다
                     </p>
-                    <p style={{ color: "#9CA3AF", fontSize: "13px" }}>
-                      다음 번 분석 시 역량 검사를 함께 진행하세요.
+                    <p style={{ color: "#6B7280", fontSize: "14px", lineHeight: 1.6, marginBottom: "24px" }}>
+                      검사는 약 2~3분 소요되며,<br />
+                      AI 대체율과 교차 분석하여 맞춤 전략을 제공합니다.
                     </p>
+                    <button
+                      onClick={() => {
+                        setShowAssessment(true);
+                        setAssessmentCompleted(false);
+                        setCompetencyResult(null);
+                        setTimeout(() => {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }, 100);
+                      }}
+                      style={{
+                        padding: "14px 36px",
+                        borderRadius: "14px",
+                        border: "none",
+                        background: "linear-gradient(135deg, #6C63FF, #8B5CF6)",
+                        color: "#fff",
+                        fontSize: "15px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        boxShadow: "0 8px 24px rgba(108,99,255,0.3)",
+                      }}
+                    >
+                      지금 검사하기
+                    </button>
                   </div>
                 ) : null}
                 {activeSection === "overview"    && <GaugeChart rate={result.overallRate} riskLevel={result.riskLevel} jobName={result.jobName} lang={lang} />}
@@ -1011,7 +1054,13 @@ export default function Home() {
         </div>
 
         {/* 요금제 카드 그리드 */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", alignItems: "stretch" }}>
+        <style dangerouslySetInnerHTML={{ __html: `
+          .pricing-grid { display: grid; gap: 16px; align-items: stretch; }
+          @media (max-width: 640px) { .pricing-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; } }
+          @media (min-width: 641px) and (max-width: 1024px) { .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
+          @media (min-width: 1025px) { .pricing-grid { grid-template-columns: repeat(3, 1fr); } }
+        ` }} />
+        <div className="pricing-grid">
 
           {/* FREE */}
           {(() => {
@@ -1116,8 +1165,7 @@ export default function Home() {
                       : "0 2px 12px rgba(108,99,255,0.06)",
                   position: "relative",
                   overflow: "hidden",
-                  display: "flex", flexDirection: "column",
-                  minHeight: "420px",
+                  display: "flex", flexDirection: "column" as const,
                 }}
               >
                 {/* 뱃지 */}
@@ -1141,56 +1189,4 @@ export default function Home() {
 
                 <div style={{
                   fontSize: "26px", fontWeight: 900,
-                  color: plan.dark ? "white" : "#1E1B4B",
-                  marginBottom: "2px",
-                }}>
-                  {plan.name}
-                  {plan.price && <span style={{ fontSize: "14px", fontWeight: 500, color: plan.dark ? "#A5B4FC" : "#9CA3AF" }}>{plan.price}</span>}
-                </div>
-                <div style={{ fontSize: "12px", color: plan.dark ? "#A5B4FC" : "#9CA3AF", marginBottom: "20px" }}>{plan.sub}</div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "22px", flex: 1 }}>
-                  {plan.features.map((f) => (
-                    <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: plan.dark ? "#C7D2FE" : "#374151", lineHeight: 1.4 }}>
-                      <span style={{ color: plan.dark ? "#D4AF37" : plan.tagColor, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>
-                      <span style={{ wordBreak: "keep-all" }}>{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {plan.comingSoon ? (
-                  <div style={{
-                    width: "100%", padding: "11px",
-                    borderRadius: "12px", textAlign: "center",
-                    background: plan.dark ? "rgba(255,255,255,0.08)" : "#F9FAFB",
-                    color: plan.dark ? "rgba(255,255,255,0.35)" : "#9CA3AF",
-                    fontSize: "13px", fontWeight: 600,
-                  }}>곧 출시됩니다</div>
-                ) : (
-                  <button
-                    onClick={() => { setAuthReason(undefined); setShowAuthModal(true); }}
-                    style={{
-                      width: "100%", padding: "12px",
-                      borderRadius: "12px", border: "2px solid #6C63FF",
-                      background: "white", color: "#6C63FF",
-                      fontSize: "14px", fontWeight: 700, cursor: "pointer",
-                    }}
-                  >
-                    무료로 시작하기
-                  </button>
-                )}
-              </div>
-            ));
-          })()}
-        </div>
-      </div>
-
-      <footer
-        className="relative z-10 text-center py-6 text-xs border-t"
-        style={{ color: "#9CA3AF", borderColor: "#EDE9FE" }}
-      >
-        {t.footer}
-      </footer>
-    </main>
-  );
-}
+                

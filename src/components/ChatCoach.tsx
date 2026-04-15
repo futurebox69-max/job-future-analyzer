@@ -37,11 +37,12 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading || isLimited) return;
+  const sendMessage = async (overrideText?: string) => {
+    const text = overrideText ?? input.trim();
+    if (!text || loading || isLimited) return;
     if (!user || !session?.access_token) return;
 
-    const userMsg: Message = { role: "user", content: input.trim(), ts: Date.now() };
+    const userMsg: Message = { role: "user", content: text, ts: Date.now() };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
@@ -54,7 +55,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
           "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          message: input.trim(),
+          message: text,
           conversationId,
           jobName,
           analysisContext,
@@ -189,7 +190,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
                 "AI 대체를 피하려면 어떤 역량이 필요한가요?",
                 "이 직업에서 유망한 분야는 어디인가요?",
               ].map((q) => (
-                <button key={q} onClick={() => setInput(q)} style={{
+                <button key={q} onClick={() => sendMessage(q)} style={{
                   background: "#F5F4FF", border: "1px solid #DDD6FE", borderRadius: "100px",
                   padding: "8px 16px", fontSize: "12px", color: "#6C63FF", cursor: "pointer",
                   fontWeight: 500,
