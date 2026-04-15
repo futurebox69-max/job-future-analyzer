@@ -440,12 +440,29 @@ const SKILLS_INFO = {
 };
 
 const ARCHETYPES = {
-  structural:{emoji:'🧩',title:'구조 해석자',sub:'복잡함 속에서 질서를 찾는 사람'},
-  creative:{emoji:'🎨',title:'재설계자',sub:'기존 틀을 깨고 새로운 길을 만드는 사람'},
-  emotional:{emoji:'💫',title:'감성 연결자',sub:'사람의 마음을 읽고 연결하는 사람'},
-  adaptive:{emoji:'⚡',title:'변화 서퍼',sub:'불확실성 속에서 기회를 잡는 사람'},
-  ethical:{emoji:'⚖️',title:'기술의 양심',sub:'원칙과 가치로 판단하는 사람'},
-  collab:{emoji:'🤝',title:'시너지 설계자',sub:'다양한 사람과 함께 더 큰 것을 만드는 사람'}
+  allrounder:   {emoji:'🌟', title:'올라운더',       sub:'모든 역량이 고르게 높은 만능형 인재', key:'allrounder'},
+  balanced:     {emoji:'🎯', title:'균형 전략가',    sub:'어떤 상황에서도 흔들리지 않는 안정형', key:'balanced'},
+  explosive:    {emoji:'🌋', title:'잠재력 폭발형',  sub:'극단적 강점을 가진 돌파형 인재', key:'explosive'},
+  dual_weapon:  {emoji:'⚔️', title:'이중 무기 보유자', sub:'두 가지 강점으로 시너지를 만드는 사람', key:'dual_weapon'},
+  architect:    {emoji:'🏗️', title:'미래 설계자',    sub:'복잡함 속에서 질서를 찾는 사람', key:'architect'},
+  disruptor:    {emoji:'🎨', title:'창조적 파괴자',   sub:'기존 틀을 깨고 새로운 길을 만드는 사람', key:'disruptor'},
+  empath:       {emoji:'💛', title:'공감 리더',      sub:'사람의 마음을 읽고 연결하는 사람', key:'empath'},
+  adapter:      {emoji:'⚡', title:'적응형 혁신가',   sub:'불확실성 속에서 기회를 잡는 사람', key:'adapter'},
+  guardian:     {emoji:'⚖️', title:'윤리 수호자',    sub:'원칙과 가치로 판단하는 사람', key:'guardian'},
+  synergist:    {emoji:'🤝', title:'시너지 메이커',   sub:'다양한 사람과 함께 함께 더 큰 것을 만드는 사람', key:'synergist'}
+};
+
+const TYPE_VERDICTS = {
+  allrounder:  '당신은 올라운더형 인재입니다. 모든 역량이 고르게 높아 어떤 환경에서든 빠르게 적응할 수 있습니다.',
+  balanced:    '당신은 균형 전략가입니다. 특정 역량에 치우치지 않는 안정감이 강점이며, 리더십 포지션에 적합합니다.',
+  explosive:   '당신은 잠재력 폭발형입니다. 극단적 강점이 있지만, 약한 영역을 보완하면 무서운 성장이 가능합니다.',
+  dual_weapon: '당신은 이중 무기 보유자입니다. 두 가지 핵심 역량의 조합이 독보적인 경쟁력을 만듭니다.',
+  architect:   '당신은 미래 설계자입니다. 복잡한 문제를 구조화하는 능력이 AI 시대 핵심 경쟁력입니다.',
+  disruptor:   '당신은 창조적 파괴자입니다. 기존 방식을 해체하고 재조립하는 능력은 AI가 대체하기 가장 어렵습니다.',
+  empath:      '당신은 공감 리더입니다. 사람의 감정을 읽고 신뢰를 만드는 능력은 AI 시대 최고의 무기입니다.',
+  adapter:     '당신은 적응형 혁신가입니다. 변화를 두려워하지 않고 빠르게 전환하는 능력이 강점입니다.',
+  guardian:    '당신은 윤리 수호자입니다. AI 시대에 기술의 방향을 판단하는 역할이 점점 더 중요해집니다.',
+  synergist:   '당신은 시너지 메이커입니다. 다양한 배경의 사람들과 협업해 더 큰 가치를 만드는 능력이 있습니다.'
 };
 
 const scenarioBanks = {
@@ -731,6 +748,42 @@ function showFeedback(text){
 }
 
 document.getElementById('skipFromAssess').addEventListener('click',finishAssessment);
+
+// ===== TYPE CLASSIFICATION =====
+const THEORETICAL_MAX = {
+  structural:12, creative:10, emotional:10,
+  adaptive:10, ethical:9, collab:9
+};
+
+function normalizeScores(rawScores) {
+  const normalized = {};
+  for (const [k, v] of Object.entries(rawScores)) {
+    normalized[k] = Math.min(100, Math.round(v / THEORETICAL_MAX[k] * 100));
+  }
+  return normalized;
+}
+
+function classifyType(normScores) {
+  const vals = Object.values(normScores);
+  const max = Math.max(...vals);
+  const min = Math.min(...vals);
+  const avg = Math.round(vals.reduce((a,b) => a+b, 0) / vals.length);
+  const range = max - min;
+  const sorted = Object.entries(normScores).sort((a,b) => b[1] - a[1]);
+  const topKey = sorted[0][0];
+  const top2diff = sorted[0][1] - sorted[1][1];
+
+  if (avg >= 75 && min >= 60) return 'allrounder';
+  if (range <= 10) return 'balanced';
+  if (min <= 40 && max >= 90) return 'explosive';
+  if (top2diff <= 5) return 'dual_weapon';
+
+  const dimensionMap = {
+    structural:'architect', creative:'disruptor', emotional:'empath',
+    adaptive:'adapter', ethical:'guardian', collab:'synergist'
+  };
+  return dimensionMap[topKey] || 'balanced';
+}
 
 // ===== FINISH & RESULT =====
 function finishAssessment(){
