@@ -238,6 +238,13 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .bt-msg strong { color:var(--text); }
 @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
+/* ===== INTERMISSION ===== */
+.intermission { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; padding:40px 20px; }
+.inter-emoji { font-size:48px; margin-bottom:12px; animation:loadingPulse 1.5s infinite; }
+.inter-title { font-size:22px; font-weight:800; color:var(--text); margin-bottom:8px; }
+.inter-sub { font-size:14px; color:var(--text-dim); margin-bottom:20px; line-height:1.6; }
+.inter-peek { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px 24px; display:inline-flex; align-items:center; gap:10px; font-size:15px; font-weight:600; color:var(--primary); animation:slideUp 0.5s ease 0.3s both; }
+
 /* ===== ENHANCED FEEDBACK ===== */
 .feedback .fb-sub { font-size:12px; font-weight:400; opacity:0.7; margin-top:4px; }
 </style>
@@ -739,6 +746,9 @@ function startAssessment(qtype){
   selectedQType = qtype;
   scenarios = buildScenarios(qtype);
   round = 0;
+  window._intermissionShown = false;
+  comboCount = 0;
+  lastAnswerTime = 0;
   scores = {structural:0,creative:0,emotional:0,adaptive:0,ethical:0,collab:0};
   behaviorData = [];
   showScreen('assessScreen');
@@ -747,6 +757,32 @@ function startAssessment(qtype){
 
 function loadRound(){
   if(round >= scenarios.length){ finishAssessment(); return; }
+
+  // 중간 인터미션 (4문항 후)
+  if (round === 4 && !window._intermissionShown) {
+    window._intermissionShown = true;
+    const body = document.getElementById('assessBody');
+    body.classList.remove('fade-out');
+    body.innerHTML = '';
+
+    // 중간 점수 계산
+    const midNorm = normalizeScores(scores);
+    const midSorted = Object.entries(midNorm).sort((a,b) => b[1] - a[1]);
+    const topSkill = SKILLS_INFO[midSorted[0][0]];
+
+    body.innerHTML = `<div class="intermission">
+      <div class="inter-emoji">📊</div>
+      <div class="inter-title">전반전 분석 완료!</div>
+      <div class="inter-sub">4문항 동안 당신의 선택을 분석했어요.<br>현재 가장 강한 역량은...</div>
+      <div class="inter-peek">${topSkill.icon} ${topSkill.name}</div>
+      <div class="inter-sub" style="margin-top:16px; font-size:13px;">후반전에서 뒤집힐 수 있을까요? 🤔</div>
+    </div>`;
+
+    setTimeout(() => {
+      loadRound();
+    }, 2500);
+    return;
+  }
 
   const body = document.getElementById('assessBody');
   const delay = round === 0 ? 0 : 300;
