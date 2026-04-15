@@ -848,67 +848,243 @@ export default function Home() {
               </p>
             </div>
 
-            {/* 플랜 4종 그리드 */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px", marginBottom: "28px" }}>
-              {[
-                {
-                  tag: "BASIC", color: "#0891B2", bg: "#ECFEFF",
-                  price: "₩9,900/월", icon: "🔵",
-                  features: ["기본 분석 10회", "업무별 세부 대체 분석", "AI 불안 심리 케어", "AI 협업 역량 점수"],
-                },
-                {
-                  tag: "STANDARD", color: "#7C3AED", bg: "#F5F3FF",
-                  price: "₩19,900/월", icon: "🟣", badge: "인기",
-                  features: ["기본 분석 20회", "비전 시나리오 3가지", "직업 추천 + 역량 로드맵", "AI 챗봇 월 30회", "연봉 협상 도우미"],
-                },
-                {
-                  tag: "PREMIUM", color: "#D4AF37", bg: "#FFFBEB",
-                  price: "₩39,900/월", icon: "👑",
-                  features: ["기본 분석 30회", "가족 진단 (자녀 3인)", "AI 챗봇 무제한", "HORIZON Daily Card", "월간 직업 트렌드"],
-                },
-                {
-                  tag: "EDU", color: "#059669", bg: "#ECFDF5",
-                  price: "₩1,000,000/년", icon: "🏫", badge: "기관용",
-                  features: ["학생 30명 계정", "청소년 진로 분석", "선생님 대시보드", "학급 단위 리포트", "학부모 결과 공유"],
-                },
-              ].map((plan) => (
-                <div key={plan.tag} style={{
-                  border: `1.5px solid ${plan.color}30`,
-                  borderRadius: "16px", padding: "18px 16px",
-                  background: plan.bg, position: "relative",
-                }}>
-                  {plan.badge && (
+            {/* 플랜 4종 — 세로 카드 (설명 포함) */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "28px" }}>
+
+              {/* BASIC */}
+              <div style={{
+                border: "1.5px solid #BAE6FD", borderRadius: "20px",
+                background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)",
+                padding: "22px 22px 20px", position: "relative", overflow: "hidden",
+              }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <div>
                     <div style={{
-                      position: "absolute", top: "12px", right: "12px",
-                      background: plan.tag === "EDU"
-                        ? "linear-gradient(135deg, #059669, #34D399)"
-                        : "linear-gradient(135deg, #7C3AED, #A78BFA)",
-                      borderRadius: "100px", padding: "2px 8px",
-                      fontSize: "10px", fontWeight: 700, color: "white",
-                    }}>{plan.badge}</div>
-                  )}
-                  <div style={{
-                    display: "inline-block", background: "white", borderRadius: "100px",
-                    padding: "2px 10px", fontSize: "10px", fontWeight: 700,
-                    color: plan.color, marginBottom: "8px",
-                    border: `1px solid ${plan.color}40`,
-                  }}>{plan.tag}</div>
-                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#1E1B4B", marginBottom: "12px" }}>
-                    {plan.price}
+                      display: "inline-block", background: "white", borderRadius: "100px",
+                      padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#0891B2",
+                      border: "1px solid #BAE6FD", marginBottom: "6px",
+                    }}>BASIC</div>
+                    <div style={{ fontSize: "22px", fontWeight: 900, color: "#0C4A6E" }}>₩9,900
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#0891B2" }}>/월</span>
+                    </div>
                   </div>
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                    {plan.features.map((f) => (
-                      <li key={f} style={{
-                        fontSize: "12px", color: "#374151", padding: "3px 0",
-                        display: "flex", alignItems: "flex-start", gap: "6px",
-                      }}>
-                        <span style={{ color: plan.color, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div style={{ fontSize: "36px" }}>🔍</div>
                 </div>
-              ))}
+
+                {/* 한 줄 대상 설명 */}
+                <div style={{
+                  background: "rgba(8,145,178,0.1)", borderRadius: "10px",
+                  padding: "8px 12px", marginBottom: "14px",
+                  fontSize: "13px", color: "#0C4A6E", fontWeight: 600,
+                }}>
+                  💡 직업 전환을 고민하거나 내 직업의 미래를 꼼꼼히 파악하고 싶은 분
+                </div>
+
+                {/* 왜 필요한가 */}
+                <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
+                  무료 분석은 3회로 끝납니다. 직업 하나를 제대로 분석하려면 여러 각도에서 반복 비교가 필요합니다.
+                  BASIC은 <strong>월 10회 분석</strong>으로 여러 직업을 비교하고,
+                  내 업무 중 어떤 세부 작업이 먼저 AI로 대체될지까지 알려드립니다.
+                  AI와 어떻게 협업해야 살아남는지, 점수로 제시해 드립니다.
+                </p>
+
+                {/* 제공 방식 */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {[
+                    ["🔄", "매월 10회", "다양한 직업을 자유롭게 분석"],
+                    ["⚙️", "업무별 대체 분석", "내 업무 중 AI가 먼저 대체할 세부 작업 식별"],
+                    ["🧠", "AI 협업 역량 점수", "AI와 함께 일하는 능력을 수치로 측정·가이드"],
+                    ["💆", "AI 불안 심리 케어", "직업 불안감을 실질적 행동 계획으로 전환"],
+                  ].map(([icon, title, desc]) => (
+                    <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <div>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#0C4A6E" }}>{title}</span>
+                        <span style={{ fontSize: "12px", color: "#6B7280" }}> — {desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* STANDARD */}
+              <div style={{
+                border: "2px solid #C4B5FD", borderRadius: "20px",
+                background: "linear-gradient(135deg, #FAF5FF 0%, #EDE9FE 100%)",
+                padding: "22px 22px 20px", position: "relative", overflow: "hidden",
+              }}>
+                <div style={{
+                  position: "absolute", top: "14px", right: "14px",
+                  background: "linear-gradient(135deg, #7C3AED, #A78BFA)",
+                  borderRadius: "100px", padding: "3px 10px",
+                  fontSize: "11px", fontWeight: 700, color: "white",
+                }}>가장 인기</div>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <div>
+                    <div style={{
+                      display: "inline-block", background: "white", borderRadius: "100px",
+                      padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#7C3AED",
+                      border: "1px solid #C4B5FD", marginBottom: "6px",
+                    }}>STANDARD</div>
+                    <div style={{ fontSize: "22px", fontWeight: 900, color: "#4C1D95" }}>₩19,900
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#7C3AED" }}>/월</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "36px" }}>🗺️</div>
+                </div>
+
+                <div style={{
+                  background: "rgba(124,58,237,0.1)", borderRadius: "10px",
+                  padding: "8px 12px", marginBottom: "14px",
+                  fontSize: "13px", color: "#4C1D95", fontWeight: 600,
+                }}>
+                  💡 분석에서 그치지 않고 구체적인 커리어 전략과 실행 계획을 원하는 분
+                </div>
+
+                <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
+                  분석 결과를 알아도 "그래서 나는 어떻게 해야 하지?"라는 질문이 남습니다.
+                  STANDARD는 내 직업의 미래를 <strong>3가지 시나리오</strong>로 보여주고,
+                  AI 코치와 30회 대화하며 맞춤 역량 로드맵을 함께 만들어 드립니다.
+                  연봉 협상 전략도 AI가 데이터 기반으로 조언해 드립니다.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {[
+                    ["🔄", "기본 분석 20회", "매월 20회, 다양한 직업 시나리오 탐색 가능"],
+                    ["🌐", "비전 시나리오 3가지", "현재 유지 / 부분 전환 / 완전 전환 경로를 구체적 그림으로 제시"],
+                    ["🗺️", "직업 추천 + 역량 로드맵", "나에게 맞는 다음 직업과 갖춰야 할 역량을 단계별로 안내"],
+                    ["🤖", "AI 코치 월 30회", "분석 결과 기반 맞춤 커리어 상담을 AI가 즉시 제공"],
+                    ["💰", "연봉 협상 도우미", "내 직업·역량·시장 데이터를 바탕으로 협상 전략 제안"],
+                  ].map(([icon, title, desc]) => (
+                    <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <div>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#4C1D95" }}>{title}</span>
+                        <span style={{ fontSize: "12px", color: "#6B7280" }}> — {desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PREMIUM */}
+              <div style={{
+                border: "2px solid #4F46E5",
+                borderRadius: "20px",
+                background: "linear-gradient(145deg, #1E1B4B 0%, #312E81 100%)",
+                padding: "22px 22px 20px", position: "relative", overflow: "hidden",
+              }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <div>
+                    <div style={{
+                      display: "inline-block", background: "rgba(255,255,255,0.15)", borderRadius: "100px",
+                      padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#D4AF37",
+                      marginBottom: "6px",
+                    }}>PREMIUM</div>
+                    <div style={{ fontSize: "22px", fontWeight: 900, color: "white" }}>₩39,900
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>/월</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "36px" }}>👑</div>
+                </div>
+
+                <div style={{
+                  background: "rgba(212,175,55,0.15)", borderRadius: "10px",
+                  padding: "8px 12px", marginBottom: "14px",
+                  fontSize: "13px", color: "#FDE68A", fontWeight: 600,
+                  border: "1px solid rgba(212,175,55,0.3)",
+                }}>
+                  💡 나와 자녀의 미래를 함께 준비하고, 매일 AI의 인사이트를 받고 싶은 분
+                </div>
+
+                <p style={{ fontSize: "13px", color: "#C7D2FE", lineHeight: 1.7, marginBottom: "14px" }}>
+                  직업의 미래는 나 혼자만의 문제가 아닙니다. <strong style={{ color: "white" }}>자녀 3명까지 함께</strong> 진단하고
+                  각자의 적성과 미래 직업을 분석해 드립니다. 매일 아침 HORIZON Daily Card로
+                  AI가 직업 세계의 변화를 짧고 강하게 전달합니다.
+                  월간 트렌드 리포트로 업종 전체 흐름도 놓치지 않습니다.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {[
+                    ["🔄", "기본 분석 30회", "나와 가족 모두를 위한 충분한 분석 횟수"],
+                    ["👨‍👩‍👧‍👦", "가족 진단 (자녀 3인)", "자녀의 미래 직업·적성을 AI가 청소년 눈높이로 분석"],
+                    ["🤖", "AI 코치 무제한", "언제든 커리어 고민을 AI 코치에게 상담, 횟수 제한 없음"],
+                    ["🌅", "HORIZON Daily Card", "매일 아침 AI가 보내주는 미래 직업 인사이트 카드"],
+                    ["📈", "월간 직업 트렌드 리포트", "매월 업종별 AI 대체 현황과 신흥 직업 트렌드 리포트 제공"],
+                  ].map(([icon, title, desc]) => (
+                    <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <div>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#E0E7FF" }}>{title}</span>
+                        <span style={{ fontSize: "12px", color: "#A5B4FC" }}> — {desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* EDU */}
+              <div style={{
+                border: "2px solid #6EE7B7", borderRadius: "20px",
+                background: "linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)",
+                padding: "22px 22px 20px", position: "relative", overflow: "hidden",
+              }}>
+                <div style={{
+                  position: "absolute", top: "14px", right: "14px",
+                  background: "linear-gradient(135deg, #059669, #34D399)",
+                  borderRadius: "100px", padding: "3px 10px",
+                  fontSize: "11px", fontWeight: 700, color: "white",
+                }}>기관용</div>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
+                  <div>
+                    <div style={{
+                      display: "inline-block", background: "white", borderRadius: "100px",
+                      padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#059669",
+                      border: "1px solid #6EE7B7", marginBottom: "6px",
+                    }}>EDU</div>
+                    <div style={{ fontSize: "22px", fontWeight: 900, color: "#064E3B" }}>₩1,000,000
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#059669" }}>/년</span>
+                    </div>
+                    <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "2px" }}>학교·학원 30명 기준</div>
+                  </div>
+                  <div style={{ fontSize: "36px" }}>🏫</div>
+                </div>
+
+                <div style={{
+                  background: "rgba(5,150,105,0.1)", borderRadius: "10px",
+                  padding: "8px 12px", marginBottom: "14px",
+                  fontSize: "13px", color: "#064E3B", fontWeight: 600,
+                }}>
+                  💡 학생들의 진로를 체계적으로 지도하는 학교·학원·진로상담 기관 선생님
+                </div>
+
+                <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
+                  선생님 한 분이 30명의 학생을 일일이 진로 상담하기는 현실적으로 어렵습니다.
+                  EDU 플랜은 학생 30명이 각자 자신의 직업 적성과 미래를 AI로 분석하고,
+                  선생님은 <strong>대시보드 하나</strong>에서 전체 현황을 파악합니다.
+                  AI 진로 코치가 청소년 눈높이에 맞춰 대화하고, 분석 결과는 학부모에게도 공유됩니다.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {[
+                    ["👨‍🎓", "학생 30명 계정", "학생들이 각자 계정으로 자신의 진로를 직접 탐색"],
+                    ["🧭", "청소년 전용 진로 분석", "성인 기준이 아닌 청소년 적성·학업·미래직업 맞춤 분석"],
+                    ["🖥️", "선생님 대시보드", "반 전체 진행 상황·분석 결과를 한눈에 확인 및 관리"],
+                    ["📋", "학급 단위 진로 리포트", "반 전체의 진로 경향 통계와 집단 인사이트 리포트 제공"],
+                    ["🤖", "AI 진로 코치 (청소년 모드)", "학생이 궁금한 점을 AI 코치가 쉽고 친근하게 안내"],
+                    ["👪", "학부모 결과 공유", "자녀의 분석 결과를 학부모에게 안전하게 공유"],
+                  ].map(([icon, title, desc]) => (
+                    <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <div>
+                        <span style={{ fontSize: "13px", fontWeight: 700, color: "#064E3B" }}>{title}</span>
+                        <span style={{ fontSize: "12px", color: "#6B7280" }}> — {desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
             {/* CTA */}
