@@ -30,7 +30,7 @@
   --radius: 20px;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); -webkit-tap-highlight-color:transparent; }
+body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); -webkit-tap-highlight-color:transparent; transition:background 0.8s ease; }
 button { font-family:inherit; cursor:pointer; touch-action:manipulation; }
 
 /* ===== SECTIONS ===== */
@@ -837,6 +837,9 @@ function loadRound(){
     body.insertBefore(guide, body.firstChild);
 
     body.classList.remove('fade-out');
+    // 진행 배경색 변화
+    const bgColors = ['#F8F7FF','#F5F3FF','#F0ECFF','#EBE5FF','#E6DEFF','#E0D6FF','#DBD0FF','#D5C9FF'];
+    document.body.style.background = bgColors[Math.min(round, bgColors.length - 1)];
   }, 300);
 }
 
@@ -1084,6 +1087,7 @@ function setupShareButtons() {
 }
 
 function renderResult(){
+  document.body.style.background = '';
   const normScores = normalizeScores(scores);
   const typeKey = classifyType(normScores);
   const arch = ARCHETYPES[typeKey];
