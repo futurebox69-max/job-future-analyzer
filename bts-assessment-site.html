@@ -155,21 +155,6 @@ button { font-family:inherit; cursor:pointer; touch-action:manipulation; }
 .insight-text { font-size:14px; line-height:1.7; color:var(--text-dim); }
 .insight-highlight { color:var(--primary); font-weight:600; }
 
-/* Chatbot */
-.chat-area { max-width:500px; margin:0 auto; padding:0 20px 120px; }
-.chat-bubble { max-width:85%; padding:14px 18px; border-radius:18px; font-size:14px; line-height:1.6; margin-bottom:10px; animation:slideUp 0.3s ease; }
-@keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-.chat-bot { background:var(--surface); border:1px solid var(--border); border-bottom-left-radius:4px; margin-right:auto; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
-.chat-user { background:var(--primary); color:#fff; border-bottom-right-radius:4px; margin-left:auto; }
-.chat-options { display:flex; flex-direction:column; gap:8px; margin:8px 0 16px; max-width:85%; }
-.chat-opt { background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:12px 16px; font-size:13px; text-align:left; transition:all 0.2s; touch-action:manipulation; }
-.chat-opt:active { border-color:var(--primary); background:var(--primary-light); }
-.chat-typing { display:flex; gap:4px; padding:14px 18px; }
-.chat-typing span { width:8px; height:8px; border-radius:50%; background:var(--text-light); animation:typing 1.2s infinite; }
-.chat-typing span:nth-child(2) { animation-delay:0.2s; }
-.chat-typing span:nth-child(3) { animation-delay:0.4s; }
-@keyframes typing { 0%,60%,100%{opacity:0.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-4px)} }
-
 /* BTS CTA */
 .bts-cta { background:linear-gradient(135deg,#1E1B4B,#312E81); border-radius:var(--radius); padding:28px 24px; text-align:center; color:#fff; margin:16px 20px; max-width:500px; margin-left:auto; margin-right:auto; }
 .bts-cta h3 { font-size:18px; font-weight:800; margin-bottom:8px; }
@@ -195,6 +180,18 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .loading-bar-wrap { width:200px; height:6px; background:#EDE9FE; border-radius:3px; overflow:hidden; margin-bottom:16px; }
 .loading-bar-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:3px; transition:width 0.3s; }
 .loading-status { font-size:13px; color:var(--text-dim); min-height:20px; }
+
+/* ===== GAUGE ===== */
+.gauge-wrap { position:relative; width:200px; height:110px; margin:0 auto 8px; }
+.gauge-svg { width:200px; height:110px; }
+.gauge-bg { fill:none; stroke:#EDE9FE; stroke-width:12; stroke-linecap:round; }
+.gauge-fill { fill:none; stroke:var(--primary); stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset 1.5s ease-out; }
+.gauge-score { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); font-size:36px; font-weight:900; color:var(--text); }
+.gauge-label { text-align:center; font-size:12px; color:var(--text-dim); margin-bottom:16px; }
+
+/* ===== ENHANCED SCORES ===== */
+.strength-badge { display:inline-block; background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; margin-left:8px; }
+.growth-badge { display:inline-block; background:#FFF3CD; color:#856404; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; margin-left:8px; }
 </style>
 </head>
 <body>
@@ -404,26 +401,58 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 
 <!-- ===== SCREEN 4: RESULT ===== -->
 <div class="screen" id="resultScreen">
+  <!-- ① 종합 게이지 + 유형 -->
   <div class="result-hero">
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 200 110">
+        <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"/>
+        <path class="gauge-fill" id="gaugeFill" d="M 20 100 A 80 80 0 0 1 180 100"
+              stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+      </svg>
+      <div class="gauge-score" id="gaugeScore">0</div>
+    </div>
+    <div class="gauge-label">종합 미래역량 점수</div>
     <div class="result-emoji" id="resEmoji"></div>
     <div class="result-type" id="resType"></div>
     <div class="result-sub" id="resSub"></div>
   </div>
 
-  <!-- 6차원 점수 -->
+  <!-- ① 한 줄 판결 -->
+  <div class="result-card">
+    <div class="result-card-title">📋 한 줄 판결</div>
+    <div id="verdictText" class="insight-text" style="font-weight:500; color:var(--text);"></div>
+  </div>
+
+  <!-- ② 6차원 바 차트 -->
   <div class="result-card">
     <div class="result-card-title">📊 6차원 역량 프로파일</div>
     <div id="scoreRows"></div>
   </div>
 
-  <!-- 메타 분석 -->
+  <!-- ③ 메타분석 -->
   <div class="result-card">
     <div class="result-card-title">💡 사고방식 메타분석</div>
     <div id="metaInsight" class="insight-text"></div>
   </div>
 
+  <!-- ④ 공유 (Task 5에서 구현) -->
+  <div class="result-card" id="shareCard" style="display:none;"></div>
+
+  <!-- ⑤ BTS CTA (Task 6에서 구현) -->
+  <div class="bts-cta" id="btsCta" style="display:none;"></div>
+
+  <!-- ⑥ 블러 미리보기 (Task 7에서 구현) -->
+  <div class="result-card" id="blurCard" style="display:none;"></div>
+
+  <!-- ⑦ 면책 조항 -->
   <footer>
-    <p>© 2026 LoginFuture Ministry</p>
+    <p class="disclaimer" style="font-size:11px; color:var(--text-light); line-height:1.6; max-width:500px; margin:0 auto 12px; padding:0 20px;">
+      본 검사는 자기인식 탐색 도구이며, 임상적 진단이나 채용 평가의 목적으로 사용될 수 없습니다.
+      결과는 참고 자료이며, 전문적 진로 상담을 대체하지 않습니다.
+      검증된 학술 프레임워크(Frey &amp; Osborne, O*NET, McKinsey, Autor, EU AI Act) 기반 설계.
+    </p>
+    <p style="font-size:12px; color:var(--text-light);">© 2026 LoginFuture Ministry. All rights reserved.</p>
+    <p style="font-size:12px; color:var(--text-light); margin-top:4px;">AI 시대의 커리어 내비게이션 — <a href="https://job-future-analyzer.vercel.app" style="color:var(--primary); text-decoration:none; font-weight:600;">BTS(Build Tomorrow Skills)</a></p>
   </footer>
 </div>
 
@@ -815,6 +844,29 @@ function showLoading(callback) {
   }, 2000);
 }
 
+function animateGauge(score) {
+  const fill = document.getElementById('gaugeFill');
+  const scoreEl = document.getElementById('gaugeScore');
+  const totalLength = 251.2; // 반원 둘레
+  const targetOffset = totalLength * (1 - score / 100);
+
+  // 카운트업 애니메이션
+  let current = 0;
+  const duration = 1500;
+  const start = performance.now();
+
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    current = Math.round(score * eased);
+    scoreEl.textContent = current;
+    fill.style.strokeDashoffset = totalLength * (1 - (score * eased) / 100);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 function renderResult(){
   const normScores = normalizeScores(scores);
   const typeKey = classifyType(normScores);
@@ -822,7 +874,7 @@ function renderResult(){
   const verdict = TYPE_VERDICTS[typeKey];
   const avgScore = Math.round(Object.values(normScores).reduce((a,b)=>a+b,0) / 6);
   const sorted = Object.entries(normScores).sort((a,b)=>b[1]-a[1]);
-  const topKey = sorted[0][0];
+  const topKey = sorted[0][0];  // used by competencyResult
   const avgTime = behaviorData.length > 0
     ? behaviorData.reduce((s,d)=>s+d.time,0)/behaviorData.length/1000 : 10;
   const qtypeMap = {scenario:'논리적 · 현실지향',game:'은유적 · 게임친화',
@@ -842,23 +894,43 @@ function renderResult(){
   };
 
   showScreen('resultScreen');
+
+  // 게이지
+  animateGauge(competencyResult.avgScore);
+
+  // 유형
   document.getElementById('resEmoji').textContent = arch.emoji;
   document.getElementById('resType').textContent = arch.title;
   document.getElementById('resSub').textContent = arch.sub;
 
-  // Score rows
+  // 한 줄 판결
+  document.getElementById('verdictText').textContent = verdict;
+
+  // 6차원 바 차트 (강점/성장 배지 포함)
   const rowsEl = document.getElementById('scoreRows');
   rowsEl.innerHTML = '';
-  sorted.forEach(([k,v])=>{
+  const sortedScores = Object.entries(normScores).sort((a,b) => b[1] - a[1]);
+  sortedScores.forEach(([k, v], i) => {
     const s = SKILLS_INFO[k];
-    const pct = v;
-    rowsEl.innerHTML += `<div class="score-row"><div class="score-icon">${s.icon}</div><div class="score-info"><div class="score-label"><span class="score-name">${s.name}</span><span class="score-val">${pct}%</span></div><div class="score-bar"><div class="score-fill" style="width:0%;background:${s.color}"></div></div></div></div>`;
+    const badge = i < 2 ? '<span class="strength-badge">강점</span>'
+      : (i === sortedScores.length - 1 ? '<span class="growth-badge">성장 포인트</span>' : '');
+    rowsEl.innerHTML += `<div class="score-row">
+      <div class="score-icon">${s.icon}</div>
+      <div class="score-info">
+        <div class="score-label"><span class="score-name">${s.name}${badge}</span><span class="score-val">${v}%</span></div>
+        <div class="score-bar"><div class="score-fill" style="width:0%;background:${s.color}"></div></div>
+      </div>
+    </div>`;
   });
-  setTimeout(()=>{
-    document.querySelectorAll('.score-fill').forEach(el=>{
-      el.style.width=el.parentElement.previousElementSibling.querySelector('.score-val').textContent;
+
+  // 바 차트 순차 애니메이션 (0.2초 stagger)
+  setTimeout(() => {
+    document.querySelectorAll('.score-fill').forEach((el, i) => {
+      setTimeout(() => {
+        el.style.width = el.closest('.score-row').querySelector('.score-val').textContent;
+      }, i * 200);
     });
-  },100);
+  }, 300);
 
   // Meta insight
   const fastRounds = behaviorData.filter(d=>d.time<5000).length;
