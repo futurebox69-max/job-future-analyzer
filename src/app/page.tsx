@@ -359,14 +359,27 @@ export default function Home() {
           className="max-w-4xl mx-auto px-5 pt-5 flex items-center justify-between"
           style={{ gap: "12px" }}
         >
-          <div style={{
-            color: "rgba(255,255,255,0.88)",
-            fontSize: "15px",
-            fontWeight: 700,
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-          }}>
-            FUTURE BOX
+          {/* BTS 브랜드 로고 */}
+          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+            <div style={{
+              color: "white",
+              fontSize: "28px",
+              fontWeight: 900,
+              letterSpacing: "-0.02em",
+              textShadow: "0 2px 12px rgba(0,0,0,0.18)",
+            }}>
+              BTS
+            </div>
+            <div style={{
+              color: "rgba(255,255,255,0.65)",
+              fontSize: "8px",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              marginTop: "2px",
+            }}>
+              BUILD TOMORROW SKILLS
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <ModeToggle
@@ -454,6 +467,40 @@ export default function Home() {
 
         {/* Hero copy */}
         <div className="max-w-3xl mx-auto px-5 pt-10 pb-2 text-center">
+
+          {/* BTS 앱 이름 — 히어로 상단에 크게 표시 */}
+          <div style={{ marginBottom: "20px" }}>
+            <div style={{
+              display: "inline-flex", flexDirection: "column", alignItems: "center",
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              borderRadius: "20px",
+              padding: "14px 32px 12px",
+            }}>
+              <div style={{
+                fontSize: "clamp(42px, 8vw, 72px)",
+                fontWeight: 900,
+                color: "white",
+                letterSpacing: "-0.03em",
+                lineHeight: 1,
+                textShadow: "0 4px 24px rgba(0,0,0,0.2)",
+              }}>
+                BTS
+              </div>
+              <div style={{
+                fontSize: "clamp(9px, 1.5vw, 11px)",
+                fontWeight: 700,
+                color: "rgba(255,255,255,0.75)",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                marginTop: "4px",
+              }}>
+                BUILD TOMORROW SKILLS
+              </div>
+            </div>
+          </div>
+
           {/* Social proof badge */}
           {totalCount !== null && totalCount > 0 && (
             <div

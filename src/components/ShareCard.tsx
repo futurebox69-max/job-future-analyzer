@@ -138,7 +138,13 @@ const LABELS = {
 export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 2500);
+  };
   const t = LABELS[lang] ?? LABELS.ko;
   const _ = getLang(lang); // keep for potential future use
 
@@ -174,6 +180,38 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
     } else {
       handleCopyText();
     }
+  };
+
+  const handleShareKakao = async () => {
+    try { await navigator.clipboard.writeText(shareText); } catch { /* ignore */ }
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    if (isMobile) {
+      // Try KakaoTalk URL scheme on mobile
+      const kakaoUrl = `kakaotalk://msg/send?msg=${encodeURIComponent(shareText.slice(0, 300))}`;
+      const timer = setTimeout(() => {
+        showToast(lang === "ko" ? "텍스트 복사됨 — 카카오톡에서 붙여넣기 하세요" : "Copied — paste in KakaoTalk");
+      }, 800);
+      window.location.href = kakaoUrl;
+      clearTimeout(timer);
+    } else {
+      showToast(lang === "ko" ? "텍스트 복사됨 — 카카오톡에서 붙여넣기 하세요" : "Copied — paste in KakaoTalk");
+    }
+  };
+
+  const handleShareFacebook = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}&quote=${encodeURIComponent(shareText.slice(0, 500))}`,
+      "_blank"
+    );
+  };
+
+  const handleShareInstagram = async () => {
+    try { await navigator.clipboard.writeText(shareText); } catch { /* ignore */ }
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    if (isMobile) {
+      window.location.href = "instagram://";
+    }
+    showToast(lang === "ko" ? "텍스트 복사됨 — 인스타그램에서 붙여넣기 하세요" : "Copied — paste in Instagram");
   };
 
   const handleSaveImage = async () => {
@@ -357,6 +395,18 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
 
             {/* 공유 버튼들 */}
             <div className="px-4 pb-6 space-y-2">
+
+              {/* 토스트 메시지 */}
+              {toastMsg && (
+                <div style={{
+                  background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)",
+                  borderRadius: 10, padding: "8px 14px",
+                  fontSize: 12, color: "#6EE7B7", textAlign: "center",
+                }}>
+                  ✅ {toastMsg}
+                </div>
+              )}
+
               {/* 이미지 저장 */}
               <button
                 onClick={handleSaveImage}
@@ -364,6 +414,15 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                 style={{ background: "linear-gradient(135deg, #6C63FF, #A78BFA)", color: "#fff" }}
               >
                 {t.save_image}
+              </button>
+
+              {/* 카카오톡 */}
+              <button
+                onClick={handleShareKakao}
+                className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                style={{ background: "#FEE500", color: "#3A1D1D" }}
+              >
+                <span style={{ fontSize: 16 }}>💬</span> {lang === "ko" ? "카카오톡 공유" : "KakaoTalk"}
               </button>
 
               {/* X + Threads */}
@@ -380,7 +439,28 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                   className="py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
                   style={{ background: "#000", color: "#fff" }}
                 >
-                  <span>@</span> {t.share_threads}
+                  <span style={{ fontWeight: 700 }}>@</span> Threads
+                </button>
+              </div>
+
+              {/* Facebook + Instagram */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={handleShareFacebook}
+                  className="py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                  style={{ background: "#1877F2", color: "#fff" }}
+                >
+                  <span style={{ fontSize: 15 }}>f</span> Facebook
+                </button>
+                <button
+                  onClick={handleShareInstagram}
+                  className="py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
+                  style={{
+                    background: "linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
+                    color: "#fff",
+                  }}
+                >
+                  <span style={{ fontSize: 14 }}>📸</span> Instagram
                 </button>
               </div>
 
