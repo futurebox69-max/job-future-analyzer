@@ -505,13 +505,23 @@ export default function Home() {
           </h1>
 
           <p style={{
-            color: "rgba(255,255,255,0.80)",
-            fontSize: "clamp(16px, 2.2vw, 20px)",
+            color: "rgba(255,255,255,0.88)",
+            fontSize: "clamp(15px, 2vw, 19px)",
             fontWeight: 400,
-            letterSpacing: "0.02em",
-            marginBottom: "20px",
+            letterSpacing: "0.01em",
+            lineHeight: 1.75,
+            marginBottom: "8px",
           }}>
             {t.hero_tagline}
+          </p>
+          <p style={{
+            color: "rgba(255,255,255,0.65)",
+            fontSize: "clamp(13px, 1.6vw, 16px)",
+            fontWeight: 400,
+            marginBottom: "20px",
+            letterSpacing: "0.01em",
+          }}>
+            막연한 공포가 아니라, 지금 무엇을 준비해야 하는지 보여드립니다
           </p>
 
           {/* 매월 1일 업데이트 배지 */}
@@ -595,8 +605,8 @@ export default function Home() {
               <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>
                 무료 분석
               </h3>
-              <p style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.6, marginBottom: "20px" }}>
-                로그인 후 바로 시작<br />기본 3회 무료 제공
+              <p style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.7, marginBottom: "20px" }}>
+                로그인 후 무료로 시작합니다<br />결과는 내 계정에 저장됩니다
               </p>
               <ul style={{ flex: 1, listStyle: "none", padding: 0, margin: "0 0 20px" }}>
                 {[
@@ -622,7 +632,7 @@ export default function Home() {
                   color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
                 }}
               >
-                지금 무료로 시작하기 →
+                무료 분석 시작하기
               </button>
             </div>
 
@@ -709,6 +719,136 @@ export default function Home() {
               .service-selector-grid { grid-template-columns: 1fr !important; }
             }
           ` }} />
+
+          {/* ── 문제 공감 섹션 ── */}
+          <div style={{ marginTop: "64px", textAlign: "center", padding: "0 8px" }}>
+            <div style={{
+              display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#6C63FF", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "16px",
+            }}>WHY BTS</div>
+            <h2 style={{
+              fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 900, color: "#1E1B4B",
+              lineHeight: 1.3, marginBottom: "24px", wordBreak: "keep-all",
+            }}>
+              직업만 보면 절반만 보는 것입니다
+            </h2>
+            <div style={{
+              maxWidth: "540px", margin: "0 auto",
+              background: "white", borderRadius: "24px",
+              padding: "28px 32px",
+              boxShadow: "0 8px 32px rgba(65,88,208,0.1)",
+              border: "1px solid #EDE9FE",
+              textAlign: "left",
+            }}>
+              <p style={{ fontSize: "15px", color: "#374151", lineHeight: 1.9, marginBottom: "16px" }}>
+                같은 직업이어도<br />
+                <strong style={{ color: "#1E1B4B" }}>누구는 버티고, 누구는 흔들립니다.</strong>
+              </p>
+              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.8, marginBottom: "16px" }}>
+                차이는 단순히 직업 이름이 아니라<br />
+                준비 상태와 역량 구조에 있습니다.
+              </p>
+              <div style={{
+                background: "#F5F4FF", borderRadius: "14px",
+                padding: "14px 18px",
+                borderLeft: "4px solid #6C63FF",
+              }}>
+                <p style={{ fontSize: "14px", color: "#4C1D95", lineHeight: 1.7, margin: 0, fontWeight: 600 }}>
+                  BTS는 직업의 변화 가능성만 보지 않습니다.<br />
+                  당신도 함께 봅니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 이 앱이 다른 이유 섹션 ── */}
+          <div style={{ marginTop: "64px", textAlign: "center", padding: "0 8px" }}>
+            <div style={{
+              display: "inline-block", background: "#FEF3C7", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "16px",
+            }}>DIFFERENCE</div>
+            <h2 style={{
+              fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 900, color: "#1E1B4B",
+              lineHeight: 1.3, marginBottom: "32px",
+            }}>
+              이 앱이 다른 이유
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              {[
+                { icon: "🔍", title: "직업 분석", desc: "당신의 직업이 앞으로 어떤 방향으로 움직일지 분석합니다" },
+                { icon: "🔗", title: "역량 연결", desc: "직업 변화와 나의 현재 역량을 함께 봅니다" },
+                { icon: "🎯", title: "행동 제안", desc: "결과만 던지고 끝내지 않습니다. 지금 줄일 것, 키울 것, 시작할 것을 제안합니다" },
+                { icon: "📈", title: "지속 추적", desc: "한 번 보고 끝나는 분석이 아니라 계속 변하는 미래를 따라갈 수 있게 돕습니다" },
+              ].map(({ icon, title, desc }) => (
+                <div key={title} style={{
+                  background: "white", borderRadius: "20px",
+                  padding: "24px 20px",
+                  boxShadow: "0 4px 20px rgba(65,88,208,0.08)",
+                  border: "1px solid #EDE9FE",
+                  textAlign: "left",
+                }}>
+                  <div style={{ fontSize: "28px", marginBottom: "10px" }}>{icon}</div>
+                  <div style={{ fontSize: "15px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>{title}</div>
+                  <div style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.7 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 대상자 섹션 ── */}
+          <div style={{ marginTop: "64px", marginBottom: "24px", textAlign: "center", padding: "0 8px" }}>
+            <div style={{
+              display: "inline-block", background: "#F0FDF4", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#059669", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "16px",
+            }}>WHO NEEDS THIS</div>
+            <h2 style={{
+              fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 900, color: "#1E1B4B",
+              lineHeight: 1.3, marginBottom: "24px",
+            }}>
+              이런 분께 필요합니다
+            </h2>
+            <div style={{
+              maxWidth: "480px", margin: "0 auto",
+              background: "white", borderRadius: "24px",
+              padding: "28px 32px",
+              boxShadow: "0 8px 32px rgba(65,88,208,0.1)",
+              border: "1px solid #EDE9FE",
+              textAlign: "left",
+            }}>
+              {[
+                { icon: "💼", text: "내 직업의 미래가 걱정되는 직장인" },
+                { icon: "🔄", text: "이직과 전환을 고민하는 분" },
+                { icon: "👨‍👩‍👧", text: "자녀 진로를 준비하는 부모" },
+                { icon: "📚", text: "학생을 지도하는 교사와 상담자" },
+                { icon: "⛪", text: "청소년과 청년의 길을 돕는 교회와 기관" },
+              ].map(({ icon, text }) => (
+                <div key={text} style={{
+                  display: "flex", alignItems: "center", gap: "14px",
+                  padding: "12px 0",
+                  borderBottom: "1px solid #F3F4F6",
+                }}>
+                  <span style={{ fontSize: "20px", flexShrink: 0 }}>{icon}</span>
+                  <span style={{ fontSize: "14px", color: "#374151", fontWeight: 500 }}>{text}</span>
+                </div>
+              ))}
+              <div style={{ marginTop: "20px" }}>
+                <button
+                  onClick={() => setServiceMode("free")}
+                  style={{
+                    width: "100%", padding: "14px", borderRadius: "14px", border: "none",
+                    background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+                    color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
+                  }}
+                >
+                  무료 분석 시작하기
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -877,7 +1017,7 @@ export default function Home() {
                       display: "inline-block", background: "white", borderRadius: "100px",
                       padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#0891B2",
                       border: "1px solid #BAE6FD", marginBottom: "6px",
-                    }}>BASIC</div>
+                    }}>Starter</div>
                     <div style={{ fontSize: "22px", fontWeight: 900, color: "#0C4A6E" }}>₩9,900
                       <span style={{ fontSize: "13px", fontWeight: 500, color: "#0891B2" }}>/월</span>
                     </div>
@@ -891,15 +1031,14 @@ export default function Home() {
                   padding: "8px 12px", marginBottom: "14px",
                   fontSize: "13px", color: "#0C4A6E", fontWeight: 600,
                 }}>
-                  💡 직업 전환을 고민하거나 내 직업의 미래를 꼼꼼히 파악하고 싶은 분
+                  💡 가볍게 시작하는 분께
                 </div>
 
                 {/* 왜 필요한가 */}
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
-                  무료 분석은 3회로 끝납니다. 직업 하나를 제대로 분석하려면 여러 각도에서 반복 비교가 필요합니다.
-                  BASIC은 <strong>월 10회 분석</strong>으로 여러 직업을 비교하고,
-                  내 업무 중 어떤 세부 작업이 먼저 AI로 대체될지까지 알려드립니다.
-                  AI와 어떻게 협업해야 살아남는지, 점수로 제시해 드립니다.
+                  기본 분석과 월간 요약으로 내 직업의 흐름을 꾸준히 확인합니다.
+                  무료 분석은 3회로 끝나지만, Starter는 <strong>월 10회 분석</strong>으로
+                  여러 직업을 비교하고 내 업무 중 어떤 세부 작업이 먼저 AI로 대체될지까지 알려드립니다.
                 </p>
 
                 {/* 제공 방식 */}
@@ -939,7 +1078,7 @@ export default function Home() {
                       display: "inline-block", background: "white", borderRadius: "100px",
                       padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#7C3AED",
                       border: "1px solid #C4B5FD", marginBottom: "6px",
-                    }}>STANDARD</div>
+                    }}>Builder</div>
                     <div style={{ fontSize: "22px", fontWeight: 900, color: "#4C1D95" }}>₩19,900
                       <span style={{ fontSize: "13px", fontWeight: 500, color: "#7C3AED" }}>/월</span>
                     </div>
@@ -952,14 +1091,14 @@ export default function Home() {
                   padding: "8px 12px", marginBottom: "14px",
                   fontSize: "13px", color: "#4C1D95", fontWeight: 600,
                 }}>
-                  💡 분석에서 그치지 않고 구체적인 커리어 전략과 실행 계획을 원하는 분
+                  💡 가장 추천하는 플랜
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
+                  심층 분석과 90일 행동계획까지, 실제로 준비를 시작하고 싶은 분께 적합합니다.
                   분석 결과를 알아도 "그래서 나는 어떻게 해야 하지?"라는 질문이 남습니다.
-                  STANDARD는 내 직업의 미래를 <strong>3가지 시나리오</strong>로 보여주고,
-                  AI 코치와 30회 대화하며 맞춤 역량 로드맵을 함께 만들어 드립니다.
-                  연봉 협상 전략도 AI가 데이터 기반으로 조언해 드립니다.
+                  Builder는 내 직업의 미래를 <strong>3가지 시나리오</strong>로 보여주고,
+                  AI 코치와 함께 맞춤 역량 로드맵을 만들어 드립니다.
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -994,7 +1133,7 @@ export default function Home() {
                       display: "inline-block", background: "rgba(255,255,255,0.15)", borderRadius: "100px",
                       padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#D4AF37",
                       marginBottom: "6px",
-                    }}>PREMIUM</div>
+                    }}>Family</div>
                     <div style={{ fontSize: "22px", fontWeight: 900, color: "white" }}>₩39,900
                       <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>/월</span>
                     </div>
@@ -1008,14 +1147,14 @@ export default function Home() {
                   fontSize: "13px", color: "#FDE68A", fontWeight: 600,
                   border: "1px solid rgba(212,175,55,0.3)",
                 }}>
-                  💡 나와 자녀의 미래를 함께 준비하고, 매일 AI의 인사이트를 받고 싶은 분
+                  💡 부모와 자녀를 함께 보고 싶은 가정용 플랜
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#C7D2FE", lineHeight: 1.7, marginBottom: "14px" }}>
-                  직업의 미래는 나 혼자만의 문제가 아닙니다. <strong style={{ color: "white" }}>자녀 3명까지 함께</strong> 진단하고
+                  가족의 결과를 함께 관리하고 대화와 진로 준비에 활용할 수 있습니다.
+                  <strong style={{ color: "white" }}>자녀 3명까지 함께</strong> 진단하고
                   각자의 적성과 미래 직업을 분석해 드립니다. 매일 아침 AI가
                   직업 세계의 변화를 카드 한 장으로 짧고 강하게 전달합니다.
-                  월간 트렌드 리포트로 업종 전체 흐름도 놓치지 않습니다.
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
