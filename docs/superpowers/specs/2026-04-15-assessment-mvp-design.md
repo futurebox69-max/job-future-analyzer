@@ -19,13 +19,37 @@
 
 ### 접근 방식
 
-기존 파일 직접 개선 (A 방식). 단일 HTML 파일 유지. 886줄 → ~1,500줄 예상.
+기존 파일 직접 개선 (A 방식). 단일 HTML 파일 유지. 886줄 → ~1,500~1,800줄 예상.
+
+### 개선사항 체크리스트 (브리핑 문서 대응)
+
+| # | 개선사항 | 설계 섹션 |
+|---|---------|-----------|
+| 1 | 반원형 게이지 + 6차원 바 차트 시각화 강화 | 섹션 1 |
+| 2 | 역량 유형 분류 (10개 유형) | 섹션 2 |
+| 3 | 공유 기능 (링크복사/X) | 섹션 3 |
+| 4 | BTS 연결 CTA (URL 토큰 포함) | 섹션 3 |
+| 5 | 결정 리포트 블러 미리보기 + 이메일 수집 | 섹션 3 |
+| 6 | 면책 조항 | 섹션 4 |
+| 7 | UX 폴리시 (애니메이션, 피드백, 모바일 터치) | 섹션 4 |
+
+### 화면(Screen) 구조
+
+프로토타입에는 4개 screen div가 존재한다. 이 구조를 유지한다:
+
+| Screen | ID | 내용 | 비고 |
+|--------|----|------|------|
+| 1 | `landing` | 랜딩 페이지 | 기존 유지 |
+| 2 | `qtypeScreen` | 검사 방식 선택 | 기존 유지 |
+| 3 | `assessScreen` | 검사 진행 (8문항) | 기존 유지 |
+| 3.5 | `loadingScreen` | 분석 중 로딩 (2초) | **신규 추가** |
+| 4 | `resultScreen` | 결과 + 공유 + CTA | **대폭 개선** |
 
 ---
 
 ## 1. 결과 화면 재설계
 
-기존 결과 화면(Screen 4)의 챗봇을 제거하고, 전환 퍼널 최적화 순서로 재구성한다.
+프로토타입 Screen 4 (`resultScreen`)의 챗봇을 제거하고, 전환 퍼널 최적화 순서로 재구성한다.
 
 ### 화면 구조 (위→아래)
 
@@ -83,7 +107,35 @@
 
 - 기존: max 기준 상대 % → 변경: 절대 0~100 정규화
 - 정규화 = (raw 점수 / 이론적 최대) × 100
-- 이론적 최대: 8문항 × 평균 최대 가중치 기반 산출
+
+이론적 최대 산출:
+
+```
+8문항 구성 (시나리오 기본):
+- 문항 1~4: 시나리오형, 해당 차원 최대 +3점
+- 문항 5~6: 이미지형, 해당 차원 최대 +3점
+- 문항 7~8: 순위형, 최대 6항목 = 1위에 6점, 해당 차원에 최대 +6점
+
+각 차원에 직접 기여하는 문항은 평균 2~3개.
+이론적 최대 = 직접 기여 문항 수 × 최대 가중치.
+
+실용적 계산: 각 차원의 이론적 최대를 문항 구성 시 미리 계산해
+THEORETICAL_MAX 상수 객체로 정의한다.
+```
+
+```javascript
+// 예시: 시나리오형 기본 구성 기준
+const THEORETICAL_MAX = {
+  structural: 12,  // 문항1(3) + 문항4(3) + 순위(6)
+  creative: 10,    // 문항2(3) + 문항3(1) + 순위(5)
+  emotional: 10,   // 문항3(3) + 문항4(1) + 순위(4) + 이미지(2)
+  adaptive: 10,    // 문항2(1) + 이미지(3) + 순위(6)
+  ethical: 9,      // 문항1(1) + 문항4(3) + 이미지(1) + 순위(4)
+  collab: 9        // 문항1(1) + 문항3(1) + 문항4(1) + 순위(6)
+};
+// 실제 값은 buildScenarios() 결과에 따라 정확히 산출
+const normalize = (raw, key) => Math.min(100, Math.round(raw / THEORETICAL_MAX[key] * 100));
+```
 
 ---
 
@@ -91,11 +143,39 @@
 
 ### BTS 연결
 
+#### 차원 키 매핑
+
+| 내부 키 (long) | 토큰 키 (short) |
+|---------------|----------------|
+| structural | st |
+| creative | cr |
+| emotional | ec |
+| adaptive | aa |
+| ethical | ej |
+| collab | ci |
+
+#### 유형 키 enum
+
+| 유형명 (한국어) | 토큰 키 (영문) |
+|---------------|---------------|
+| 올라운더 | allrounder |
+| 균형 전략가 | balanced |
+| 잠재력 폭발형 | explosive |
+| 이중 무기 보유자 | dual_weapon |
+| 미래 설계자 | architect |
+| 창조적 파괴자 | disruptor |
+| 공감 리더 | empath |
+| 적응형 혁신가 | adapter |
+| 윤리 수호자 | guardian |
+| 시너지 메이커 | synergist |
+
+#### 토큰 구조
+
 ```javascript
 const token = btoa(JSON.stringify({
-  s: { st:85, cr:72, ec:68, aa:91, ej:56, ci:78 },
-  type: 'adaptive_innovator',
-  t: Date.now()
+  s: { st:85, cr:72, ec:68, aa:91, ej:56, ci:78 },  // 정규화된 6차원 점수
+  type: 'adapter',  // 유형 키 enum
+  t: Date.now()     // 타임스탬프
 }));
 const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 ```
@@ -107,7 +187,7 @@ const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 
 | 버튼 | 동작 |
 |------|------|
-| 링크 복사 | `navigator.clipboard.writeText()` → 토스트 알림 |
+| 링크 복사 | `navigator.clipboard.writeText()` → 토스트 알림. HTTPS 필수. 폴백: `document.execCommand('copy')` |
 | X(트위터) | `window.open()` 트윗 인텐트 URL |
 
 - 카카오톡: MVP에서는 제외 (앱키 등록/심사가 속도를 늦춤), 추후 추가
@@ -139,6 +219,15 @@ const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 - 이메일 수집: Google Forms 숨김 제출 (hidden iframe POST)
 - 마케팅 동의 체크박스 미체크 시 버튼 비활성화
 
+#### 이메일 수집 구현 상세
+
+- Google Form URL은 스크립트 상단에 `GOOGLE_FORM_URL` 상수로 정의
+- 필드: 이메일(entry.XXXXX), 유형명(entry.XXXXX) — Form 생성 후 실제 entry ID로 교체
+- 제출 방식: hidden iframe에 form POST → 새 페이지 이동 없음
+- 성공 시: 토스트 "신청 완료! 출시되면 알려드릴게요"
+- 실패 시: silent fail (CORS 제한으로 응답 확인 불가, iframe onload로 제출 완료 간주)
+- "서버 미저장 원칙"과의 관계: 검사 응답 데이터는 서버에 보내지 않음. 이메일은 사용자가 자발적으로 입력하는 별도 행위이며 검사 데이터와 무관
+
 ---
 
 ## 4. UX 폴리시 + 면책 조항
@@ -153,9 +242,11 @@ const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 | 바 차트 | width 0→100% | 순차 등장 (0.2초 간격 stagger) |
 | 공유 버튼 | 없음 | 결과 렌더 후 0.5초 뒤 slide-up |
 
-### 분석 중 로딩 화면
+### 분석 중 로딩 화면 (Screen 3.5: `loadingScreen`)
 
-문항 완료 → 결과 사이 2초간 가짜 로딩 표시:
+문항 완료 → 결과 사이 2초간 가짜 로딩 표시. 별도 screen div로 구현 (`<div class="screen" id="loadingScreen">`):
+
+화면 흐름: `assessScreen` → `loadingScreen` (2초) → `resultScreen`
 
 - 가짜 진행 바 (0→100%)
 - 텍스트 롤링: "6차원 역량 교차 분석 중" → "유형 패턴 매칭 중" → "맞춤 인사이트 생성 중"
@@ -172,7 +263,11 @@ const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 <meta property="og:title" content="AI 시대 미래역량 검사">
 <meta property="og:description" content="3분 만에 AI 시대 6가지 핵심 역량을 탐색하세요. 무료.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="[배포 URL]">
+<meta property="og:image" content="[배포 URL]/og-image.png">
 ```
+
+- `og:image`: 1200x630px 정적 이미지. MVP에서는 간단한 텍스트+로고 이미지를 별도 생성해 같은 호스팅에 배치. 없으면 생략 가능하나 공유 시 미리보기 품질 저하.
 
 ### 면책 조항
 
@@ -183,7 +278,7 @@ const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 ### 기타
 
 - 연도 업데이트: 2025 → 2026
-- 용어 통일: "측정" → "탐색" (기획서 과학적 타당성 섹션 반영)
+- 용어 통일: 사용자에게 보이는 모든 "측정" 텍스트를 "탐색"으로 변경 (기획서 과학적 타당성 섹션 반영). 대상 위치: 타이틀 태그, hero 배지, hero 설명, 차원 소개 섹션 등
 
 ---
 
