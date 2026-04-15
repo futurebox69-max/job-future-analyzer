@@ -606,7 +606,7 @@ function buildScenarios(qtype){
     case 'game': return [...scenarioBanks.youth.slice(0,4),...scenarioBanks.image.slice(0,2),...scenarioBanks.rank.slice(0,1),...main.slice(0,1)];
     case 'image': return [...scenarioBanks.image,...main.slice(0,2),...scenarioBanks.rank.slice(0,2)];
     case 'rank': return [...scenarioBanks.rank,...scenarioBanks.image,...main.slice(0,2)];
-    default: return main;
+    default: return [...main.slice(0,4),...scenarioBanks.image.slice(0,2),...scenarioBanks.rank.slice(0,2)];
   }
 }
 
@@ -669,7 +669,8 @@ function loadRound(){
   if(round >= scenarios.length){ finishAssessment(); return; }
 
   const body = document.getElementById('assessBody');
-  body.classList.add('fade-out');
+  const delay = round === 0 ? 0 : 300;
+  if (delay > 0) body.classList.add('fade-out');
 
   setTimeout(() => {
     const s = scenarios[round];
@@ -739,7 +740,7 @@ function renderRankChoices(s, container){
   let html = `<div class="assess-context">${s.ctx}</div><div class="assess-emoji">${s.emoji}</div><div class="assess-question">${s.text}</div><div class="rank-list" id="rankList">`;
   const shuffled = [...s.items].sort(()=>Math.random()-0.5);
   shuffled.forEach((item,i)=>{
-    html += `<div class="rank-item" data-item="${item}"><div class="rank-num">${i+1}</div><div class="rank-text">${item}</div><div class="rank-handle">⠿</div></div>`;
+    html += `<div class="rank-item" draggable="true" data-item="${item}"><div class="rank-num">${i+1}</div><div class="rank-text">${item}</div><div class="rank-handle">⠿</div></div>`;
   });
   html += '</div><button class="rank-confirm" id="rankConfirmBtn">이 순서로 확정</button>';
   container.innerHTML = html;
