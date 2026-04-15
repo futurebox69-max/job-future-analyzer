@@ -159,7 +159,7 @@ button { font-family:inherit; cursor:pointer; touch-action:manipulation; }
 .bts-cta { background:linear-gradient(135deg,#1E1B4B,#312E81); border-radius:var(--radius); padding:28px 24px; text-align:center; color:#fff; margin:16px 20px; max-width:500px; margin-left:auto; margin-right:auto; }
 .bts-cta h3 { font-size:18px; font-weight:800; margin-bottom:8px; }
 .bts-cta p { font-size:13px; opacity:0.8; line-height:1.6; margin-bottom:16px; }
-.bts-btn { display:inline-block; padding:14px 32px; border-radius:12px; background:#fff; color:#1E1B4B; font-size:15px; font-weight:700; border:none; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+.bts-btn { display:inline-block; padding:14px 32px; border-radius:12px; background:#fff; color:#1E1B4B; font-size:15px; font-weight:700; border:none; box-shadow:0 4px 16px rgba(0,0,0,0.2); cursor:pointer; }
 .bts-features { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
 .bts-feat { font-size:11px; padding:3px 10px; border-radius:8px; background:rgba(255,255,255,0.12); }
 
@@ -200,6 +200,19 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .share-btn.copied { border-color:var(--accent); background:rgba(78,205,196,0.08); color:var(--accent); }
 .share-toast { position:fixed; bottom:40px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(30,27,75,0.9); color:#fff; padding:12px 24px; border-radius:12px; font-size:13px; font-weight:600; z-index:100; opacity:0; transition:all 0.3s; pointer-events:none; }
 .share-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ===== BLUR PREVIEW ===== */
+.blur-preview { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:12px; filter:blur(6px); user-select:none; pointer-events:none; }
+.blur-preview p { font-size:13px; line-height:1.8; color:var(--text-dim); }
+.email-form { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+.email-input { width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; font-family:inherit; outline:none; transition:border-color 0.2s; }
+.email-input:focus { border-color:var(--primary); }
+.consent-row { display:flex; align-items:flex-start; gap:8px; }
+.consent-row input[type="checkbox"] { margin-top:3px; accent-color:var(--primary); }
+.consent-row label { font-size:12px; color:var(--text-dim); line-height:1.5; }
+.email-submit { width:100%; padding:14px; border-radius:12px; background:linear-gradient(135deg,var(--primary),#8B5CF6); color:#fff; font-size:14px; font-weight:600; border:none; transition:opacity 0.2s; }
+.email-submit:disabled { opacity:0.4; cursor:not-allowed; }
+.email-note { font-size:11px; color:var(--text-light); text-align:center; margin-top:4px; }
 </style>
 </head>
 <body>
@@ -1021,6 +1034,81 @@ function renderResult(){
 
   document.getElementById('btsCTABtn').addEventListener('click', () => {
     window.open(btsUrl, '_blank');
+  });
+
+  // 블러 미리보기 + 이메일
+  const GOOGLE_FORM_URL = ''; // Google Form 생성 후 URL 입력
+  const GOOGLE_FORM_EMAIL_FIELD = 'entry.0000000'; // 실제 entry ID로 교체
+  const GOOGLE_FORM_TYPE_FIELD = 'entry.0000001';  // 실제 entry ID로 교체
+
+  const blurCard = document.getElementById('blurCard');
+  blurCard.style.display = 'block';
+  blurCard.innerHTML = `
+    <div class="result-card-title">🔒 결정 리포트 미리보기</div>
+    <div class="blur-preview">
+      <p>📌 전환 경로 Top 3<br>1. 데이터 분석 전문가 (적합도 92%)<br>2. UX 리서처 (적합도 87%)<br>3. AI 트레이너 (적합도 83%)</p>
+      <p>📋 90일 실행 계획<br>1~30일: 기초 역량 강화 프로그램<br>31~60일: 실전 프로젝트 참여<br>61~90일: 포트폴리오 완성 + 네트워킹</p>
+    </div>
+    <div style="text-align:center; margin-bottom:12px;">
+      <span style="font-size:14px; font-weight:600; color:var(--text);">📩 출시되면 알려드릴게요</span>
+    </div>
+    <div class="email-form">
+      <input type="email" class="email-input" id="emailInput" placeholder="이메일을 입력하세요">
+      <div class="consent-row">
+        <input type="checkbox" id="consentCheck">
+        <label for="consentCheck">마케팅 정보 수신에 동의합니다</label>
+      </div>
+      <button class="email-submit" id="emailSubmitBtn" disabled>알림 신청하기</button>
+      <div class="email-note">※ 이메일은 출시 알림 목적으로만 사용되며, 언제든 해지 가능합니다</div>
+    </div>
+  `;
+
+  // 동의 체크 시 버튼 활성화
+  document.getElementById('consentCheck').addEventListener('change', (e) => {
+    document.getElementById('emailSubmitBtn').disabled = !e.target.checked;
+  });
+
+  // 이메일 제출
+  document.getElementById('emailSubmitBtn').addEventListener('click', () => {
+    const email = document.getElementById('emailInput').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('올바른 이메일을 입력해주세요');
+      return;
+    }
+
+    if (GOOGLE_FORM_URL) {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.name = 'emailFrame';
+      document.body.appendChild(iframe);
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = GOOGLE_FORM_URL;
+      form.target = 'emailFrame';
+
+      const emailField = document.createElement('input');
+      emailField.name = GOOGLE_FORM_EMAIL_FIELD;
+      emailField.value = email;
+      form.appendChild(emailField);
+
+      const typeField = document.createElement('input');
+      typeField.name = GOOGLE_FORM_TYPE_FIELD;
+      typeField.value = competencyResult.archetype;
+      form.appendChild(typeField);
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+      setTimeout(() => document.body.removeChild(iframe), 3000);
+    }
+
+    // UI 피드백
+    document.getElementById('emailSubmitBtn').textContent = '✅ 신청 완료!';
+    document.getElementById('emailSubmitBtn').disabled = true;
+    document.getElementById('emailInput').disabled = true;
+    document.getElementById('consentCheck').disabled = true;
+    showToast('신청 완료! 출시되면 알려드릴게요 📩');
   });
 
   // Meta insight
