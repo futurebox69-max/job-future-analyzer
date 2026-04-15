@@ -468,39 +468,6 @@ export default function Home() {
         {/* Hero copy */}
         <div className="max-w-3xl mx-auto px-5 pt-10 pb-2 text-center">
 
-          {/* BTS 앱 이름 — 히어로 상단에 크게 표시 */}
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{
-              display: "inline-flex", flexDirection: "column", alignItems: "center",
-              background: "rgba(255,255,255,0.12)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255,255,255,0.25)",
-              borderRadius: "20px",
-              padding: "14px 32px 12px",
-            }}>
-              <div style={{
-                fontSize: "clamp(42px, 8vw, 72px)",
-                fontWeight: 900,
-                color: "white",
-                letterSpacing: "-0.03em",
-                lineHeight: 1,
-                textShadow: "0 4px 24px rgba(0,0,0,0.2)",
-              }}>
-                BTS
-              </div>
-              <div style={{
-                fontSize: "clamp(9px, 1.5vw, 11px)",
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.75)",
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                marginTop: "4px",
-              }}>
-                BUILD TOMORROW SKILLS
-              </div>
-            </div>
-          </div>
-
           {/* Social proof badge */}
           {totalCount !== null && totalCount > 0 && (
             <div
