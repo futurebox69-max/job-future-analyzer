@@ -123,6 +123,8 @@ export default function Home() {
   const [competencyResult, setCompetencyResult] = useState<CompetencyResultType | null>(null);
   const [showAssessment, setShowAssessment] = useState(false);
   const [assessmentCompleted, setAssessmentCompleted] = useState(false);
+  // 첫 화면 서비스 선택: null=선택 전, "free"=무료, "paid"=유료(출시예정)
+  const [serviceMode, setServiceMode] = useState<"free" | "paid" | null>(null);
 
   const popularJobs =
     lang === "ko" ? POPULAR_JOBS_KO :
@@ -531,108 +533,431 @@ export default function Home() {
       </div>
 
       {/* ═══════════════════════════════════════
-          FLOATING SEARCH CARD — overlaps hero
+          SERVICE SELECTOR (첫 화면 서비스 선택)
+          serviceMode===null → 두 카드 보여줌
+          serviceMode==="free" → 검색 카드
+          serviceMode==="paid" → 출시예정 안내
       ═══════════════════════════════════════ */}
-      <div
-        id="search-card"
-        className="max-w-2xl mx-auto px-4"
-        style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
-      >
+
+      {/* ── 서비스 선택 카드 ── */}
+      {serviceMode === null && (
         <div
-          style={{
-            background: "white",
-            borderRadius: "28px",
-            padding: "28px 28px 22px",
-            boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
-          }}
+          className="max-w-3xl mx-auto px-4"
+          style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
         >
-          {/* 사용량 카운터 + 경고 */}
-          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <UsageCounter onUpgradeClick={() => setShowUpgradePopup(true)} />
-            {!user && !authLoading && (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "16px",
+          }}>
+            {/* 무료 서비스 카드 */}
+            <div
+              style={{
+                background: "white",
+                borderRadius: "28px",
+                padding: "32px 24px 28px",
+                boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
+                display: "flex", flexDirection: "column",
+                cursor: "pointer",
+                border: "2px solid transparent",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#6C63FF";
+                e.currentTarget.style.transform = "translateY(-4px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "transparent";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+              onClick={() => setServiceMode("free")}
+            >
+              <div style={{
+                display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
+                padding: "4px 14px", fontSize: "12px", color: "#6C63FF",
+                fontWeight: 700, letterSpacing: "0.06em", marginBottom: "16px", width: "fit-content",
+              }}>FREE</div>
+              <div style={{ fontSize: "28px", marginBottom: "8px" }}>🆓</div>
+              <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>
+                무료 분석
+              </h3>
+              <p style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.6, marginBottom: "20px" }}>
+                로그인 후 바로 시작<br />기본 3회 무료 제공
+              </p>
+              <ul style={{ flex: 1, listStyle: "none", padding: 0, margin: "0 0 20px" }}>
+                {[
+                  "8차원 AI 대체율 심층 분석",
+                  "10년 직업 미래 예측",
+                  "스킬 갭 분석",
+                  "미래역량 검사",
+                  "5개 언어 지원",
+                  "즉시 결과 확인",
+                ].map((f) => (
+                  <li key={f} style={{
+                    fontSize: "13px", color: "#374151",
+                    padding: "5px 0", display: "flex", alignItems: "center", gap: "8px",
+                  }}>
+                    <span style={{ color: "#6C63FF", fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                  </li>
+                ))}
+              </ul>
               <button
-                onClick={() => { setAuthReason("로그인하면 무료로 3회 분석할 수 있습니다."); setShowAuthModal(true); }}
                 style={{
-                  fontSize: "12px", color: "#9CA3AF", background: "none",
-                  border: "none", cursor: "pointer", textDecoration: "underline",
+                  width: "100%", padding: "14px", borderRadius: "14px", border: "none",
+                  background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+                  color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
                 }}
               >
-                로그인하면 3회 무료 분석
+                지금 무료로 시작하기 →
               </button>
-            )}
+            </div>
+
+            {/* 유료 서비스 카드 */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, #1E1B4B 0%, #312E81 100%)",
+                borderRadius: "28px",
+                padding: "32px 24px 28px",
+                boxShadow: "0 24px 64px rgba(79,70,229,0.25), 0 4px 20px rgba(0,0,0,0.15)",
+                display: "flex", flexDirection: "column",
+                cursor: "pointer",
+                border: "2px solid transparent",
+                transition: "all 0.2s ease",
+                position: "relative",
+                overflow: "hidden",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#A78BFA";
+                e.currentTarget.style.transform = "translateY(-4px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "transparent";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+              onClick={() => setServiceMode("paid")}
+            >
+              {/* 곧 출시 뱃지 */}
+              <div style={{
+                position: "absolute", top: "16px", right: "16px",
+                background: "linear-gradient(135deg, #F59E0B, #FCD34D)",
+                borderRadius: "100px", padding: "4px 12px",
+                fontSize: "11px", fontWeight: 700, color: "#78350F",
+              }}>곧 출시</div>
+
+              <div style={{
+                display: "inline-block",
+                background: "rgba(255,255,255,0.12)",
+                borderRadius: "100px",
+                padding: "4px 14px", fontSize: "12px", color: "#C4B5FD",
+                fontWeight: 700, letterSpacing: "0.06em", marginBottom: "16px", width: "fit-content",
+              }}>PREMIUM</div>
+              <div style={{ fontSize: "28px", marginBottom: "8px" }}>💎</div>
+              <h3 style={{ fontSize: "20px", fontWeight: 800, color: "white", marginBottom: "6px" }}>
+                유료 서비스
+              </h3>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.65)", lineHeight: 1.6, marginBottom: "20px" }}>
+                무제한 분석 + 심화 기능<br />₩9,900부터 · 곧 출시 예정
+              </p>
+              <ul style={{ flex: 1, listStyle: "none", padding: 0, margin: "0 0 20px" }}>
+                {[
+                  "무제한 분석 횟수",
+                  "AI 커리어 코치 (무제한)",
+                  "비전 시나리오 3가지",
+                  "직업 추천 + 역량 로드맵",
+                  "가족 진단 (자녀 3인)",
+                  "학교·학원 기관용 플랜",
+                ].map((f) => (
+                  <li key={f} style={{
+                    fontSize: "13px", color: "rgba(255,255,255,0.85)",
+                    padding: "5px 0", display: "flex", alignItems: "center", gap: "8px",
+                  }}>
+                    <span style={{ color: "#A78BFA", fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                style={{
+                  width: "100%", padding: "14px", borderRadius: "14px",
+                  background: "rgba(255,255,255,0.15)",
+                  backdropFilter: "blur(10px)",
+                  color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
+                  outline: "1px solid rgba(255,255,255,0.25)",
+                }}
+              >
+                서비스 내용 보기 →
+              </button>
+            </div>
           </div>
 
-          {/* 8회 경고 배너 */}
-          {showUsageWarning && (
-            <div style={{
-              background: "#FEF3C7", border: "1px solid #FDE68A",
-              borderRadius: "12px", padding: "10px 14px", marginBottom: "12px",
-              fontSize: "13px", color: "#92400E", fontWeight: 500,
-            }}>
-              ⚠️ 이번 달 {FREE_LIMIT - (profile?.monthly_usage ?? 0)}회 남았습니다.
-              프리미엄으로 업그레이드하면 무제한 분석이 가능합니다.
+          {/* 모바일용: 세로 스택 */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            @media (max-width: 600px) {
+              .service-selector-grid { grid-template-columns: 1fr !important; }
+            }
+          ` }} />
+        </div>
+      )}
+
+      {/* ── 무료: 기존 검색 카드 ── */}
+      {serviceMode === "free" && (
+        <div
+          id="search-card"
+          className="max-w-2xl mx-auto px-4"
+          style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
+        >
+          {/* 뒤로 버튼 */}
+          <button
+            onClick={() => { setServiceMode(null); setResult(null); setError(null); }}
+            style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)",
+              border: "1px solid rgba(108,99,255,0.2)", borderRadius: "100px",
+              padding: "6px 14px", fontSize: "13px", color: "#6C63FF",
+              fontWeight: 600, cursor: "pointer", marginBottom: "12px",
+            }}
+          >
+            ← 처음으로
+          </button>
+
+          <div
+            style={{
+              background: "white",
+              borderRadius: "28px",
+              padding: "28px 28px 22px",
+              boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
+            }}
+          >
+            {/* 사용량 카운터 + 경고 */}
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <UsageCounter onUpgradeClick={() => setShowUpgradePopup(true)} />
+              {!user && !authLoading && (
+                <button
+                  onClick={() => { setAuthReason("로그인하면 무료로 3회 분석할 수 있습니다."); setShowAuthModal(true); }}
+                  style={{
+                    fontSize: "12px", color: "#9CA3AF", background: "none",
+                    border: "none", cursor: "pointer", textDecoration: "underline",
+                  }}
+                >
+                  로그인하면 3회 무료 분석
+                </button>
+              )}
             </div>
-          )}
 
-          <JobInput onAnalyze={handleAnalyze} isLoading={isLoading} mode={mode} lang={lang} />
-
-          {/* Popular job chips — D style discovery */}
-          {!isLoading && !result && (
-            <div style={{ marginTop: "18px" }}>
-              <p style={{
-                fontSize: "14px",
-                color: "#9CA3AF",
-                marginBottom: "10px",
-                fontWeight: 600,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
+            {/* 경고 배너 */}
+            {showUsageWarning && (
+              <div style={{
+                background: "#FEF3C7", border: "1px solid #FDE68A",
+                borderRadius: "12px", padding: "10px 14px", marginBottom: "12px",
+                fontSize: "13px", color: "#92400E", fontWeight: 500,
               }}>
-                {t.popular_jobs_title}
+                ⚠️ 이번 달 {FREE_LIMIT - (profile?.monthly_usage ?? 0)}회 남았습니다.
+                프리미엄으로 업그레이드하면 무제한 분석이 가능합니다.
+              </div>
+            )}
+
+            <JobInput onAnalyze={handleAnalyze} isLoading={isLoading} mode={mode} lang={lang} />
+
+            {/* Popular job chips */}
+            {!isLoading && !result && (
+              <div style={{ marginTop: "18px" }}>
+                <p style={{
+                  fontSize: "14px", color: "#9CA3AF", marginBottom: "10px",
+                  fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase",
+                }}>
+                  {t.popular_jobs_title}
+                </p>
+                <div className="grid grid-cols-5" style={{ gap: "8px" }}>
+                  {popularJobs.map(({ icon, name, job }) => (
+                    <button
+                      key={job}
+                      onClick={() => handleAnalyze(job)}
+                      style={{
+                        background: "#F5F4FF", border: "1.5px solid #EDE9FE",
+                        borderRadius: "16px", padding: "12px 6px", color: "#5B52D6",
+                        fontWeight: 600, cursor: "pointer", transition: "all 0.15s ease",
+                        textAlign: "center", display: "flex", flexDirection: "column",
+                        alignItems: "center", gap: "6px",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "#6C63FF";
+                        e.currentTarget.style.color = "white";
+                        e.currentTarget.style.borderColor = "#6C63FF";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(108,99,255,0.3)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "#F5F4FF";
+                        e.currentTarget.style.color = "#5B52D6";
+                        e.currentTarget.style.borderColor = "#EDE9FE";
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      <span style={{ fontSize: "24px", lineHeight: 1 }}>{icon}</span>
+                      <span style={{ fontSize: "13px", lineHeight: 1.3, wordBreak: "keep-all" }}>{name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── 유료: 출시 예정 안내 ── */}
+      {serviceMode === "paid" && (
+        <div
+          className="max-w-3xl mx-auto px-4"
+          style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
+        >
+          {/* 뒤로 버튼 */}
+          <button
+            onClick={() => setServiceMode(null)}
+            style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)",
+              border: "1px solid rgba(108,99,255,0.2)", borderRadius: "100px",
+              padding: "6px 14px", fontSize: "13px", color: "#6C63FF",
+              fontWeight: 600, cursor: "pointer", marginBottom: "12px",
+            }}
+          >
+            ← 처음으로
+          </button>
+
+          {/* 메인 카드 */}
+          <div style={{
+            background: "white", borderRadius: "28px",
+            padding: "36px 32px 32px",
+            boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
+          }}>
+            {/* 헤더 */}
+            <div style={{ textAlign: "center", marginBottom: "32px" }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: "8px",
+                background: "linear-gradient(135deg, #FEF3C7, #FDE68A)",
+                borderRadius: "100px", padding: "6px 18px",
+                fontSize: "13px", fontWeight: 700, color: "#92400E", marginBottom: "16px",
+              }}>
+                ⏳ 곧 출시됩니다
+              </div>
+              <h2 style={{ fontSize: "26px", fontWeight: 900, color: "#1E1B4B", marginBottom: "8px" }}>
+                유료 서비스 미리보기
+              </h2>
+              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.7 }}>
+                출시 전 사전 등록하시면 <strong style={{ color: "#6C63FF" }}>얼리버드 특별 할인</strong>을 받으실 수 있습니다
               </p>
-              <div className="grid grid-cols-5" style={{ gap: "8px" }}>
-                {popularJobs.map(({ icon, name, job }) => (
-                  <button
-                    key={job}
-                    onClick={() => handleAnalyze(job)}
-                    style={{
-                      background: "#F5F4FF",
-                      border: "1.5px solid #EDE9FE",
-                      borderRadius: "16px",
-                      padding: "12px 6px",
-                      color: "#5B52D6",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                      textAlign: "center",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#6C63FF";
-                      e.currentTarget.style.color = "white";
-                      e.currentTarget.style.borderColor = "#6C63FF";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(108,99,255,0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#F5F4FF";
-                      e.currentTarget.style.color = "#5B52D6";
-                      e.currentTarget.style.borderColor = "#EDE9FE";
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <span style={{ fontSize: "24px", lineHeight: 1 }}>{icon}</span>
-                    <span style={{ fontSize: "13px", lineHeight: 1.3, wordBreak: "keep-all" }}>{name}</span>
-                  </button>
-                ))}
+            </div>
+
+            {/* 플랜 4종 그리드 */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "14px", marginBottom: "28px" }}>
+              {[
+                {
+                  tag: "BASIC", color: "#0891B2", bg: "#ECFEFF",
+                  price: "₩9,900/월", icon: "🔵",
+                  features: ["기본 분석 10회", "업무별 세부 대체 분석", "AI 불안 심리 케어", "AI 협업 역량 점수"],
+                },
+                {
+                  tag: "STANDARD", color: "#7C3AED", bg: "#F5F3FF",
+                  price: "₩19,900/월", icon: "🟣", badge: "인기",
+                  features: ["기본 분석 20회", "비전 시나리오 3가지", "직업 추천 + 역량 로드맵", "AI 챗봇 월 30회", "연봉 협상 도우미"],
+                },
+                {
+                  tag: "PREMIUM", color: "#D4AF37", bg: "#FFFBEB",
+                  price: "₩39,900/월", icon: "👑",
+                  features: ["기본 분석 30회", "가족 진단 (자녀 3인)", "AI 챗봇 무제한", "HORIZON Daily Card", "월간 직업 트렌드"],
+                },
+                {
+                  tag: "EDU", color: "#059669", bg: "#ECFDF5",
+                  price: "₩1,000,000/년", icon: "🏫", badge: "기관용",
+                  features: ["학생 30명 계정", "청소년 진로 분석", "선생님 대시보드", "학급 단위 리포트", "학부모 결과 공유"],
+                },
+              ].map((plan) => (
+                <div key={plan.tag} style={{
+                  border: `1.5px solid ${plan.color}30`,
+                  borderRadius: "16px", padding: "18px 16px",
+                  background: plan.bg, position: "relative",
+                }}>
+                  {plan.badge && (
+                    <div style={{
+                      position: "absolute", top: "12px", right: "12px",
+                      background: plan.tag === "EDU"
+                        ? "linear-gradient(135deg, #059669, #34D399)"
+                        : "linear-gradient(135deg, #7C3AED, #A78BFA)",
+                      borderRadius: "100px", padding: "2px 8px",
+                      fontSize: "10px", fontWeight: 700, color: "white",
+                    }}>{plan.badge}</div>
+                  )}
+                  <div style={{
+                    display: "inline-block", background: "white", borderRadius: "100px",
+                    padding: "2px 10px", fontSize: "10px", fontWeight: 700,
+                    color: plan.color, marginBottom: "8px",
+                    border: `1px solid ${plan.color}40`,
+                  }}>{plan.tag}</div>
+                  <div style={{ fontSize: "16px", fontWeight: 800, color: "#1E1B4B", marginBottom: "12px" }}>
+                    {plan.price}
+                  </div>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                    {plan.features.map((f) => (
+                      <li key={f} style={{
+                        fontSize: "12px", color: "#374151", padding: "3px 0",
+                        display: "flex", alignItems: "flex-start", gap: "6px",
+                      }}>
+                        <span style={{ color: plan.color, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div style={{
+              background: "linear-gradient(135deg, #F0EEFF, #EDE9FE)",
+              borderRadius: "18px", padding: "24px 20px", textAlign: "center",
+              border: "1px solid #DDD6FE",
+            }}>
+              <div style={{ fontSize: "22px", marginBottom: "8px" }}>🔔</div>
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>
+                출시 알림 신청
+              </div>
+              <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "16px", lineHeight: 1.6 }}>
+                유료 서비스 출시 시 이메일로 가장 먼저 알려드립니다<br />
+                <strong style={{ color: "#6C63FF" }}>사전 등록자 30% 얼리버드 할인</strong> 혜택 제공
+              </div>
+              <a
+                href="mailto:futurebox69@gmail.com?subject=유료서비스 출시 알림 신청&body=안녕하세요, 내 직업의 미래 유료 서비스 출시 알림을 신청합니다."
+                style={{
+                  display: "inline-block",
+                  padding: "13px 28px", borderRadius: "14px",
+                  background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+                  color: "white", fontSize: "15px", fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                출시 알림 신청하기 →
+              </a>
+              <div style={{ marginTop: "12px", fontSize: "12px", color: "#9CA3AF" }}>
+                스팸 없음 · 언제든 취소 가능 · 출시 후 30일 환불 보장
               </div>
             </div>
-          )}
+
+            {/* 무료 서비스로 이동 */}
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+              <button
+                onClick={() => setServiceMode("free")}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "#6C63FF", fontSize: "14px", fontWeight: 600,
+                  textDecoration: "underline",
+                }}
+              >
+                지금은 무료로 먼저 체험해보기
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ═══════════════════════════════════════
           MAIN CONTENT AREA
@@ -666,44 +991,43 @@ export default function Home() {
         )}
 
         {/* 로딩 스피너: 검사 완료했지만 API 아직 대기 중 */}
-        {isLoading && !result && (assessmentCompleted || !showAssessment) && (
-            <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
-              <div className="relative w-20 h-20">
-                <div
-                  className="absolute inset-0 rounded-full border-4 animate-spin"
-                  style={{ borderColor: "rgba(108,99,255,0.15)", borderTopColor: "#6C63FF" }}
-                />
-                <div
-                  className="absolute inset-3 rounded-full border-4 animate-spin"
-                  style={{
-                    borderColor: "rgba(167,139,250,0.15)",
-                    borderBottomColor: "#A78BFA",
-                    animationDirection: "reverse",
-                    animationDuration: "1.5s",
-                  }}
-                />
-              </div>
-              <p className="text-sm font-medium" style={{ color: "#4B5563" }}>
-                {loadingMsg || t.loading[0]}
-              </p>
-              {assessmentCompleted && competencyResult && (
-                <p style={{ color: "#6C63FF", fontSize: "13px", fontWeight: 600 }}>
-                  ✅ 역량 검사 완료! AI 분석 결과를 기다리는 중...
-                </p>
-              )}
-              <div className="flex gap-1.5">
-                {t.loading.map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full transition-all duration-500"
-                    style={{ background: i <= loadingStageIdx ? "#6C63FF" : "#E5E7EB" }}
-                  />
-                ))}
-              </div>
-              <p className="text-xs" style={{ color: "#9CA3AF" }}>{t.loading_hint}</p>
+        {(isLoading && !result && (assessmentCompleted || !showAssessment)) ? (
+          <div className="flex flex-col items-center gap-4 py-16 animate-fade-in">
+            <div className="relative w-20 h-20">
+              <div
+                className="absolute inset-0 rounded-full border-4 animate-spin"
+                style={{ borderColor: "rgba(108,99,255,0.15)", borderTopColor: "#6C63FF" }}
+              />
+              <div
+                className="absolute inset-3 rounded-full border-4 animate-spin"
+                style={{
+                  borderColor: "rgba(167,139,250,0.15)",
+                  borderBottomColor: "#A78BFA",
+                  animationDirection: "reverse",
+                  animationDuration: "1.5s",
+                }}
+              />
             </div>
-          )
-        )}
+            <p className="text-sm font-medium" style={{ color: "#4B5563" }}>
+              {loadingMsg || t.loading[0]}
+            </p>
+            {assessmentCompleted && competencyResult && (
+              <p style={{ color: "#6C63FF", fontSize: "13px", fontWeight: 600 }}>
+                ✅ 역량 검사 완료! AI 분석 결과를 기다리는 중...
+              </p>
+            )}
+            <div className="flex gap-1.5">
+              {t.loading.map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full transition-all duration-500"
+                  style={{ background: i <= loadingStageIdx ? "#6C63FF" : "#E5E7EB" }}
+                />
+              ))}
+            </div>
+            <p className="text-xs" style={{ color: "#9CA3AF" }}>{t.loading_hint}</p>
+          </div>
+        ) : null}
 
         {/* 에러 */}
         {error && !isLoading && (
@@ -1189,4 +1513,57 @@ export default function Home() {
 
                 <div style={{
                   fontSize: "26px", fontWeight: 900,
+                  color: plan.dark ? "white" : "#1E1B4B",
+                  marginBottom: "4px", letterSpacing: "-0.01em",
+                }}>
+                  {plan.name}
+                  {plan.price && <span style={{ fontSize: "14px", fontWeight: 500, color: plan.dark ? "#A5B4FC" : "#9CA3AF" }}>{plan.price}</span>}
+                </div>
+                <div style={{ fontSize: "12px", color: plan.dark ? "#A5B4FC" : "#9CA3AF", marginBottom: "20px" }}>{plan.sub}</div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "22px", flex: 1 }}>
+                  {plan.features.map((f) => (
+                    <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: plan.dark ? "#C7D2FE" : "#374151", lineHeight: 1.4 }}>
+                      <span style={{ color: plan.dark ? "#D4AF37" : plan.tagColor, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>
+                      <span style={{ wordBreak: "keep-all" }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {plan.comingSoon ? (
+                  <div style={{
+                    width: "100%", padding: "11px",
+                    borderRadius: "12px", textAlign: "center",
+                    background: plan.dark ? "rgba(255,255,255,0.08)" : "#F9FAFB",
+                    color: plan.dark ? "rgba(255,255,255,0.35)" : "#9CA3AF",
+                    fontSize: "13px", fontWeight: 600,
+                  }}>곧 출시됩니다</div>
+                ) : (
+                  <button
+                    onClick={() => { setAuthReason(undefined); setShowAuthModal(true); }}
+                    style={{
+                      width: "100%", padding: "12px",
+                      borderRadius: "12px", border: "2px solid #6C63FF",
+                      background: "white", color: "#6C63FF",
+                      fontSize: "14px", fontWeight: 700, cursor: "pointer",
+                    }}
+                  >
+                    무료로 시작하기
+                  </button>
+                )}
+              </div>
+            ));
+          })()}
+        </div>
+      </div>
+
+      <footer
+        className="relative z-10 text-center py-6 text-xs border-t"
+        style={{ color: "#9CA3AF", borderColor: "#EDE9FE" }}
+      >
+        {t.footer}
+      </footer>
+    </main>
+  );
+}
                 

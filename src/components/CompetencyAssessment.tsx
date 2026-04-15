@@ -45,7 +45,7 @@ export default function CompetencyAssessment({
   const [round, setRound] = useState(0);
   const [scores, setScores] = useState<CompetencyScores>({ ...EMPTY_SCORES });
   const [behaviorData, setBehaviorData] = useState<BehaviorData[]>([]);
-  const [timeLeft, setTimeLeft] = useState(20);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
@@ -124,7 +124,7 @@ export default function CompetencyAssessment({
     }
     setRound(nextRound);
     setSelectedIdx(null);
-    setTimeLeft(20);
+    setTimeLeft(60);
     roundStartRef.current = Date.now();
     const nextS = currentScenarios[nextRound];
     if (nextS?.type === "rank" && nextS.items) {
@@ -148,31 +148,11 @@ export default function CompetencyAssessment({
           const curBehavior = behaviorRef.current;
           const elapsed = Date.now() - roundStartRef.current;
 
-          if (s.type === "rank") {
-            const partial = calcRankScores(rankItemsRef.current, s);
-            const newScores = { ...curScores };
-            (Object.entries(partial) as [CompetencyKey, number][]).forEach(([k, v]) => {
-              newScores[k] = (newScores[k] || 0) + v;
-            });
-            const newBehavior = [...curBehavior, { round: roundRef.current, type: "rank", time: elapsed, order: rankItemsRef.current }];
-            setScores(newScores);
-            setBehaviorData(newBehavior);
-            showFeedback("⏰ 시간 초과!");
-            setTimeout(() => advanceRound(roundRef.current + 1, scenariosRef.current, newScores, newBehavior), 1100);
-          } else if (s.choices) {
-            const autoIdx = Math.floor(Math.random() * s.choices.length);
-            const choice = s.choices[autoIdx];
-            const newScores = { ...curScores };
-            (Object.entries(choice.skills) as [CompetencyKey, number][]).forEach(([k, v]) => {
-              newScores[k] = (newScores[k] || 0) + v;
-            });
-            const newBehavior = [...curBehavior, { round: roundRef.current, type: s.type, choiceIdx: autoIdx, time: elapsed }];
-            setScores(newScores);
-            setBehaviorData(newBehavior);
-            setSelectedIdx(autoIdx);
-            showFeedback("⏰ 시간 초과!");
-            setTimeout(() => advanceRound(roundRef.current + 1, scenariosRef.current, newScores, newBehavior), 1100);
-          }
+          // 시간 초과: 점수 없이 건너뜀 (랜덤 선택 안 함)
+          const newBehavior = [...curBehavior, { round: roundRef.current, type: s.type || "scenario", time: elapsed, skipped: true }];
+          setBehaviorData(newBehavior);
+          showFeedback("⏰ 시간 초과 — 다음 문제로 넘어갑니다");
+          setTimeout(() => advanceRound(roundRef.current + 1, scenariosRef.current, curScores, newBehavior), 1500);
           return 0;
         }
         return t - 1;
@@ -195,7 +175,7 @@ export default function CompetencyAssessment({
     scoresRef.current = fresh;
     setBehaviorData([]);
     behaviorRef.current = [];
-    setTimeLeft(20);
+    setTimeLeft(60);
     setSelectedIdx(null);
     if (built[0]?.type === "rank" && built[0].items) {
       const shuffled = [...built[0].items].sort(() => Math.random() - 0.5);
@@ -402,7 +382,7 @@ export default function CompetencyAssessment({
         </div>
         <span style={{
           fontSize: "20px", fontWeight: 700, minWidth: "36px", textAlign: "right",
-          color: timeLeft <= 5 ? "#EF4444" : "#6C63FF",
+          color: timeLeft <= 10 ? "#EF4444" : "#6C63FF",
           fontVariantNumeric: "tabular-nums",
         }}>{timeLeft}</span>
       </div>

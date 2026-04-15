@@ -264,7 +264,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
               onBlur={(e) => { e.currentTarget.style.borderColor = "#EDE9FE"; }}
             />
             <button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               style={{
                 padding: "10px 16px", borderRadius: "12px", border: "none",
