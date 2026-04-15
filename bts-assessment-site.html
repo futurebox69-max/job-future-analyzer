@@ -187,6 +187,14 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
   .section-title { font-size:22px; }
   .dim-grid { grid-template-columns:1fr; }
 }
+/* ===== LOADING SCREEN ===== */
+.loading-center { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:40px 20px; text-align:center; }
+.loading-emoji { font-size:48px; margin-bottom:16px; animation:loadingPulse 1.5s infinite; }
+@keyframes loadingPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+.loading-title { font-size:20px; font-weight:700; color:var(--text); margin-bottom:24px; }
+.loading-bar-wrap { width:200px; height:6px; background:#EDE9FE; border-radius:3px; overflow:hidden; margin-bottom:16px; }
+.loading-bar-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:3px; transition:width 0.3s; }
+.loading-status { font-size:13px; color:var(--text-dim); min-height:20px; }
 </style>
 </head>
 <body>
@@ -384,7 +392,17 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
   <div class="feedback" id="feedback"></div>
 </div>
 
-<!-- ===== SCREEN 4: RESULT + CHATBOT ===== -->
+<!-- ===== SCREEN 3.5: LOADING ===== -->
+<div class="screen" id="loadingScreen">
+  <div class="loading-center">
+    <div class="loading-emoji">🔬</div>
+    <div class="loading-title">역량을 분석하고 있습니다</div>
+    <div class="loading-bar-wrap"><div class="loading-bar-fill" id="loadingFill" style="width:0%"></div></div>
+    <div class="loading-status" id="loadingStatus"></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 4: RESULT ===== -->
 <div class="screen" id="resultScreen">
   <div class="result-hero">
     <div class="result-emoji" id="resEmoji"></div>
@@ -402,25 +420,6 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
   <div class="result-card">
     <div class="result-card-title">💡 사고방식 메타분석</div>
     <div id="metaInsight" class="insight-text"></div>
-  </div>
-
-  <!-- 챗봇 -->
-  <div class="result-card" style="background:transparent; border:none; box-shadow:none; padding:24px 0;">
-    <div class="result-card-title" style="padding:0 20px;">🤖 AI 커리어 코치</div>
-  </div>
-  <div class="chat-area" id="chatArea"></div>
-
-  <!-- BTS CTA -->
-  <div class="bts-cta" id="btsCta" style="display:none;">
-    <h3>🔮 Build Tomorrow Skills</h3>
-    <p>당신의 역량을 특정 직업과 교차 분석하면<br>더 구체적인 전략이 나옵니다</p>
-    <button class="bts-btn" id="btsCTABtn">BTS에서 심층 분석 받기 →</button>
-    <div class="bts-features">
-      <span class="bts-feat">AI 대체율 분석</span>
-      <span class="bts-feat">10년 예측</span>
-      <span class="bts-feat">전환 경로</span>
-      <span class="bts-feat">스킬 로드맵</span>
-    </div>
   </div>
 
   <footer>
@@ -788,15 +787,60 @@ function classifyType(normScores) {
 // ===== FINISH & RESULT =====
 function finishAssessment(){
   clearInterval(timerInterval);
-  const maxS = Math.max(...Object.values(scores))||1;
-  const topKey = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
-  const arch = ARCHETYPES[topKey];
-  const avgTime = behaviorData.length > 0 ? behaviorData.reduce((s,d)=>s+d.time,0)/behaviorData.length/1000 : 10;
-  const qtypeMap = {scenario:'논리적 · 현실지향',game:'은유적 · 게임친화',image:'직관적 · 감각형',rank:'분석적 · 체계형'};
+  showLoading(() => renderResult());
+}
 
-  competencyResult = {scores,topKey,archetype:arch.title,avgTime,qtype:selectedQType,qtypeMeaning:qtypeMap[selectedQType]};
+function showLoading(callback) {
+  showScreen('loadingScreen');
+  const fill = document.getElementById('loadingFill');
+  const status = document.getElementById('loadingStatus');
+  const messages = ['6차원 역량 교차 분석 중...', '유형 패턴 매칭 중...', '맞춤 인사이트 생성 중...'];
+  let progress = 0;
+  let msgIdx = 0;
+  status.textContent = messages[0];
 
-  // Show result screen
+  const interval = setInterval(() => {
+    progress += Math.random() * 15 + 5;
+    if (progress > 95) progress = 95;
+    fill.style.width = progress + '%';
+    msgIdx++;
+    if (msgIdx < messages.length) status.textContent = messages[msgIdx];
+  }, 600);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    fill.style.width = '100%';
+    status.textContent = '완료!';
+    setTimeout(callback, 300);
+  }, 2000);
+}
+
+function renderResult(){
+  const normScores = normalizeScores(scores);
+  const typeKey = classifyType(normScores);
+  const arch = ARCHETYPES[typeKey];
+  const verdict = TYPE_VERDICTS[typeKey];
+  const avgScore = Math.round(Object.values(normScores).reduce((a,b)=>a+b,0) / 6);
+  const sorted = Object.entries(normScores).sort((a,b)=>b[1]-a[1]);
+  const topKey = sorted[0][0];
+  const avgTime = behaviorData.length > 0
+    ? behaviorData.reduce((s,d)=>s+d.time,0)/behaviorData.length/1000 : 10;
+  const qtypeMap = {scenario:'논리적 · 현실지향',game:'은유적 · 게임친화',
+    image:'직관적 · 감각형',rank:'분석적 · 체계형'};
+
+  competencyResult = {
+    rawScores: scores,
+    scores: normScores,
+    typeKey,
+    topKey,
+    archetype: arch.title,
+    avgScore,
+    verdict,
+    avgTime,
+    qtype: selectedQType,
+    qtypeMeaning: qtypeMap[selectedQType]
+  };
+
   showScreen('resultScreen');
   document.getElementById('resEmoji').textContent = arch.emoji;
   document.getElementById('resType').textContent = arch.title;
@@ -805,13 +849,15 @@ function finishAssessment(){
   // Score rows
   const rowsEl = document.getElementById('scoreRows');
   rowsEl.innerHTML = '';
-  Object.entries(scores).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+  sorted.forEach(([k,v])=>{
     const s = SKILLS_INFO[k];
-    const pct = Math.round(v/maxS*100);
+    const pct = v;
     rowsEl.innerHTML += `<div class="score-row"><div class="score-icon">${s.icon}</div><div class="score-info"><div class="score-label"><span class="score-name">${s.name}</span><span class="score-val">${pct}%</span></div><div class="score-bar"><div class="score-fill" style="width:0%;background:${s.color}"></div></div></div></div>`;
   });
   setTimeout(()=>{
-    document.querySelectorAll('.score-fill').forEach(el=>{el.style.width=el.parentElement.previousElementSibling.querySelector('.score-val').textContent});
+    document.querySelectorAll('.score-fill').forEach(el=>{
+      el.style.width=el.parentElement.previousElementSibling.querySelector('.score-val').textContent;
+    });
   },100);
 
   // Meta insight
@@ -822,123 +868,7 @@ function finishAssessment(){
     `→ 당신은 ${selectedQType==='scenario'?'현실의 맥락에서 논리적으로 판단하는':selectedQType==='game'?'게임적 사고로 전략을 세우는':selectedQType==='image'?'직관과 감각으로 빠르게 판단하는':'체계적으로 분석하고 정리하는'} 유형입니다.<br><br>`+
     `평균 응답시간: <span class="insight-highlight">${avgTime.toFixed(1)}초</span><br>`+
     `→ ${style}`;
-
-  // Start chatbot
-  startChatbot();
 }
-
-// ===== CHATBOT =====
-const chatArea = document.getElementById('chatArea');
-let chatStep = 0;
-
-function addBotMsg(text, delay){
-  return new Promise(resolve=>{
-    // typing indicator
-    const typing = document.createElement('div');
-    typing.className='chat-bubble chat-bot chat-typing';
-    typing.innerHTML='<span></span><span></span><span></span>';
-    chatArea.appendChild(typing);
-    chatArea.scrollIntoView({behavior:'smooth',block:'end'});
-
-    setTimeout(()=>{
-      typing.remove();
-      const bubble = document.createElement('div');
-      bubble.className='chat-bubble chat-bot';
-      bubble.innerHTML=text;
-      chatArea.appendChild(bubble);
-      chatArea.scrollIntoView({behavior:'smooth',block:'end'});
-      resolve();
-    }, delay||1200);
-  });
-}
-
-function addUserMsg(text){
-  const bubble = document.createElement('div');
-  bubble.className='chat-bubble chat-user';
-  bubble.textContent=text;
-  chatArea.appendChild(bubble);
-}
-
-function addOptions(opts){
-  return new Promise(resolve=>{
-    const container = document.createElement('div');
-    container.className='chat-options';
-    opts.forEach(opt=>{
-      const btn = document.createElement('button');
-      btn.className='chat-opt';
-      btn.textContent=opt.text;
-      btn.addEventListener('click',()=>{
-        container.remove();
-        addUserMsg(opt.text);
-        resolve(opt.key);
-      });
-      btn.addEventListener('touchend',e=>{
-        e.preventDefault();
-        container.remove();
-        addUserMsg(opt.text);
-        resolve(opt.key);
-      });
-      container.appendChild(btn);
-    });
-    chatArea.appendChild(container);
-    chatArea.scrollIntoView({behavior:'smooth',block:'end'});
-  });
-}
-
-async function startChatbot(){
-  chatArea.innerHTML='';
-  const arch = ARCHETYPES[competencyResult.topKey];
-  const topSkill = SKILLS_INFO[competencyResult.topKey];
-  const weakKey = Object.entries(competencyResult.scores).sort((a,b)=>a[1]-b[1])[0][0];
-  const weakSkill = SKILLS_INFO[weakKey];
-
-  await addBotMsg(`안녕하세요! 검사 결과를 보니, 당신은 <strong>${arch.emoji} ${arch.title}</strong>이시네요.`,1500);
-  await addBotMsg(`<strong>${topSkill.icon} ${topSkill.name}</strong>이 가장 높고, <strong>${weakSkill.icon} ${weakSkill.name}</strong>이 상대적으로 낮아요.`,1200);
-  await addBotMsg(`궁금한 게 있으신가요?`,800);
-
-  const choice1 = await addOptions([
-    {text:'이 결과가 내 직업에 어떤 영향을 줘?', key:'job'},
-    {text:'약한 역량을 어떻게 키울 수 있어?', key:'improve'},
-    {text:'AI 시대에 내 역량으로 뭘 할 수 있어?', key:'future'}
-  ]);
-
-  if(choice1==='job'){
-    await addBotMsg(`좋은 질문이에요! 하지만 정확한 분석을 하려면 <strong>당신의 직업</strong>을 알아야 해요.`,1200);
-    await addBotMsg(`<strong>BTS(Build Tomorrow Skills)</strong>에서는 직업명을 입력하면 AI가 <strong>대체율을 분석</strong>하고, 당신의 역량 검사 결과와 <strong>교차 분석</strong>해서 맞춤 전략을 제시합니다.`,1500);
-  } else if(choice1==='improve'){
-    await addBotMsg(`${weakSkill.icon} ${weakSkill.name}을 키우는 가장 좋은 방법은 <strong>실전 경험</strong>이에요.`,1200);
-    await addBotMsg(`하지만 어떤 경험이 효과적인지는 <strong>직업과 상황</strong>에 따라 달라요. <strong>BTS</strong>에서는 직업별 맞춤 스킬 로드맵을 제공합니다.`,1400);
-  } else {
-    await addBotMsg(`${arch.emoji} ${arch.title}의 강점은 AI가 쉽게 대체할 수 없는 영역이에요!`,1200);
-    await addBotMsg(`하지만 구체적으로 어떤 직업에서 이 강점이 빛나는지, <strong>10년 후 전망</strong>은 어떤지 알려면 심층 분석이 필요해요.`,1400);
-  }
-
-  await addBotMsg(`무료로 심층 분석을 받아보시겠어요?`,1000);
-
-  const choice2 = await addOptions([
-    {text:'네, BTS에서 분석 받을래요!', key:'go'},
-    {text:'나중에 할게요', key:'later'}
-  ]);
-
-  if(choice2==='go'){
-    await addBotMsg(`좋아요! 🎉 BTS로 이동합니다. 역량 검사 결과가 자동으로 연동돼요.`,1200);
-    document.getElementById('btsCta').style.display='block';
-    document.getElementById('btsCta').scrollIntoView({behavior:'smooth',block:'center'});
-  } else {
-    await addBotMsg(`알겠어요! 언제든 다시 오세요. 아래에서 BTS 링크를 확인할 수 있어요. 😊`,1000);
-    document.getElementById('btsCta').style.display='block';
-  }
-}
-
-// BTS CTA
-document.getElementById('btsCTABtn').addEventListener('click',()=>{
-  // TODO: 실제 BTS 도메인으로 변경
-  window.open('https://job-future-analyzer.vercel.app','_blank');
-});
-document.getElementById('btsCTABtn').addEventListener('touchend',e=>{
-  e.preventDefault();
-  window.open('https://job-future-analyzer.vercel.app','_blank');
-});
 
 </script>
 </body>
