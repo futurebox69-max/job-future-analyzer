@@ -999,8 +999,8 @@ export default function Home() {
 
                 <p style={{ fontSize: "13px", color: "#C7D2FE", lineHeight: 1.7, marginBottom: "14px" }}>
                   직업의 미래는 나 혼자만의 문제가 아닙니다. <strong style={{ color: "white" }}>자녀 3명까지 함께</strong> 진단하고
-                  각자의 적성과 미래 직업을 분석해 드립니다. 매일 아침 HORIZON Daily Card로
-                  AI가 직업 세계의 변화를 짧고 강하게 전달합니다.
+                  각자의 적성과 미래 직업을 분석해 드립니다. 매일 아침 AI가
+                  직업 세계의 변화를 카드 한 장으로 짧고 강하게 전달합니다.
                   월간 트렌드 리포트로 업종 전체 흐름도 놓치지 않습니다.
                 </p>
 
@@ -1009,7 +1009,7 @@ export default function Home() {
                     ["🔄", "기본 분석 30회", "나와 가족 모두를 위한 충분한 분석 횟수"],
                     ["👨‍👩‍👧‍👦", "가족 진단 (자녀 3인)", "자녀의 미래 직업·적성을 AI가 청소년 눈높이로 분석"],
                     ["🤖", "AI 코치 무제한", "언제든 커리어 고민을 AI 코치에게 상담, 횟수 제한 없음"],
-                    ["🌅", "HORIZON Daily Card", "매일 아침 AI가 보내주는 미래 직업 인사이트 카드"],
+                    ["🌅", "AI 미래직업 데일리 카드", "매일 아침 카카오톡·이메일로 직업 트렌드 핵심 1가지를 카드로 전송"],
                     ["📈", "월간 직업 트렌드 리포트", "매월 업종별 AI 대체 현황과 신흥 직업 트렌드 리포트 제공"],
                   ].map(([icon, title, desc]) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
@@ -1612,7 +1612,7 @@ export default function Home() {
                   "가족 진단 (자녀 3인)",
                   "전공·학교 추천",
                   "AI 챗봇 무제한",
-                  "HORIZON Daily Card",
+                  "AI 미래직업 데일리 카드 (매일 발송)",
                   "월간 직업 트렌드 리포트",
                 ],
               },
