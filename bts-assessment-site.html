@@ -276,6 +276,26 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .family-count { display:flex; gap:10px; justify-content:center; margin-top:20px; }
 .family-count-btn { width:44px; height:44px; border-radius:12px; border:2px solid var(--border); background:var(--surface); font-size:18px; font-weight:700; cursor:pointer; transition:all 0.2s; }
 .family-count-btn.selected { border-color:var(--primary); background:var(--primary-light); color:var(--primary); }
+
+/* ===== FAMILY RESULT ===== */
+.family-result-hero { text-align:center; padding:40px 20px 20px; }
+.family-member-tabs { display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+.family-tab { padding:8px 16px; border-radius:10px; border:1.5px solid var(--border); background:var(--surface); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.family-tab.active { border-color:var(--primary); background:var(--primary-light); color:var(--primary); }
+.family-compare-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.family-compare-name { width:60px; font-size:11px; font-weight:600; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.family-compare-bar-wrap { flex:1; height:8px; background:#EDE9FE; border-radius:4px; overflow:hidden; }
+.family-compare-bar { height:100%; border-radius:4px; transition:width 1s ease; }
+.family-compare-val { width:36px; font-size:11px; font-weight:700; color:var(--primary); }
+.family-talk-card { background:linear-gradient(135deg,#FFF7ED,#FEF3C7); border:1px solid #FDE68A; border-radius:16px; padding:20px; margin:0 20px 16px; max-width:500px; margin-left:auto; margin-right:auto; }
+.family-talk-card h4 { font-size:14px; font-weight:700; margin-bottom:10px; }
+.family-talk-item { font-size:13px; color:var(--text-dim); line-height:1.6; margin-bottom:8px; padding-left:16px; position:relative; }
+.family-talk-item::before { content:'💬'; position:absolute; left:0; }
+.family-type-card { display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px; margin-bottom:8px; }
+.family-type-emoji { font-size:28px; }
+.family-type-info { flex:1; }
+.family-type-name { font-size:14px; font-weight:700; }
+.family-type-label { font-size:11px; color:var(--text-dim); }
 </style>
 </head>
 <body>
@@ -575,6 +595,41 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
     </p>
     <p style="font-size:12px; color:var(--text-light);">© 2026 LoginFuture Ministry. All rights reserved.</p>
     <p style="font-size:12px; color:var(--text-light); margin-top:4px;">AI 시대의 커리어 내비게이션 — <a href="https://job-future-analyzer.vercel.app" style="color:var(--primary); text-decoration:none; font-weight:600;">BTS(Build Tomorrow Skills)</a></p>
+  </footer>
+</div>
+
+<!-- ===== SCREEN: FAMILY RESULT ===== -->
+<div class="screen" id="familyResultScreen">
+  <div class="family-result-hero">
+    <div style="font-size:48px; margin-bottom:8px;">👨‍👩‍👧‍👦</div>
+    <div class="section-title" style="font-size:22px;">우리 가족 역량 비교</div>
+    <div class="section-desc" style="font-size:13px;" id="familySummary"></div>
+  </div>
+
+  <div class="result-card" id="familyTypeCards">
+    <div class="result-card-title">👥 가족 구성원 유형</div>
+    <div id="familyTypeList"></div>
+  </div>
+
+  <div class="result-card" id="familyCompareCard">
+    <div class="result-card-title">📊 역량 비교</div>
+    <div id="familyCompareChart"></div>
+  </div>
+
+  <div class="family-talk-card" id="familyTalkCard">
+    <h4>🗣️ 가족 대화 주제</h4>
+    <div id="familyTalkList"></div>
+  </div>
+
+  <div class="result-card" id="familyShareCard" style="display:none;"></div>
+  <div class="bts-cta" id="familyBtsCta" style="display:none;"></div>
+
+  <footer>
+    <p class="disclaimer" style="font-size:11px; color:var(--text-light); line-height:1.6; max-width:500px; margin:0 auto 12px; padding:0 20px;">
+      본 검사는 자기인식 탐색 도구이며, 임상적 진단이나 채용 평가의 목적으로 사용될 수 없습니다.
+      결과는 참고 자료이며, 전문적 진로 상담을 대체하지 않습니다.
+    </p>
+    <p style="font-size:12px; color:var(--text-light);">© 2026 LoginFuture Ministry. All rights reserved.</p>
   </footer>
 </div>
 
@@ -1421,6 +1476,155 @@ function renderResult(){
     `→ ${style}`;
 
   setupShareButtons();
+
+  // 가족 모드: 현재 구성원 결과 저장 + 다음 사람 or 비교 결과
+  if (gameMode === 'family') {
+    familyMembers.push({
+      name: playerName,
+      scores: {...scores},
+      normScores: {...normScores},
+      typeKey,
+      archetype: arch.title,
+      archetypeEmoji: arch.emoji,
+      avgScore
+    });
+
+    currentFamilyIdx++;
+
+    if (currentFamilyIdx < familySize) {
+      // 다음 가족 구성원
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'name-submit';
+      nextBtn.style.cssText = 'max-width:500px; margin:20px auto; display:block;';
+      nextBtn.textContent = `다음 가족 (${currentFamilyIdx + 1}/${familySize}) →`;
+      nextBtn.addEventListener('click', () => {
+        document.getElementById('nameEmoji').textContent = ['🧑','👧','👦','👴','👵'][currentFamilyIdx] || '🧑';
+        document.getElementById('nameTitle').textContent = `${currentFamilyIdx + 1}번째 가족`;
+        document.getElementById('nameDesc').textContent = '이름을 입력하고 같은 검사를 진행합니다';
+        document.getElementById('playerNameInput').value = '';
+        document.getElementById('playerNameInput').placeholder = `${currentFamilyIdx + 1}번째 가족 이름`;
+        document.getElementById('nameSubmitBtn').disabled = true;
+        document.getElementById('familyCountSection').style.display = 'none';
+        showScreen('nameScreen');
+        document.getElementById('playerNameInput').focus();
+      });
+      const blurCardEl = document.getElementById('blurCard');
+      if (blurCardEl) blurCardEl.parentNode.insertBefore(nextBtn, blurCardEl);
+
+      // 가족 모드에서는 블러/이메일 숨기기 (마지막에만 표시)
+      if (blurCardEl) blurCardEl.style.display = 'none';
+    } else {
+      // 모든 가족 완료 → 비교 결과
+      setTimeout(() => renderFamilyResult(), 500);
+    }
+  }
+}
+
+function renderFamilyResult() {
+  showScreen('familyResultScreen');
+
+  document.getElementById('familySummary').textContent =
+    `${familyMembers.map(m=>m.name).join(', ')} — ${familyMembers.length}명의 가족 역량을 비교합니다`;
+
+  // 유형 카드
+  const typeList = document.getElementById('familyTypeList');
+  typeList.innerHTML = '';
+  familyMembers.forEach(m => {
+    typeList.innerHTML += `<div class="family-type-card">
+      <div class="family-type-emoji">${m.archetypeEmoji}</div>
+      <div class="family-type-info">
+        <div class="family-type-name">${m.name}</div>
+        <div class="family-type-label">${m.archetype} · 종합 ${m.avgScore}점</div>
+      </div>
+    </div>`;
+  });
+
+  // 6차원 비교 차트
+  const chart = document.getElementById('familyCompareChart');
+  chart.innerHTML = '';
+  const dimKeys = ['structural','creative','emotional','adaptive','ethical','collab'];
+  const colors = ['#6C63FF','#FF6B6B','#4ECDC4','#FFE66D','#A78BFA','#34D399'];
+
+  dimKeys.forEach(dk => {
+    const skill = SKILLS_INFO[dk];
+    chart.innerHTML += `<div style="margin-bottom:14px;">
+      <div style="font-size:12px; font-weight:600; margin-bottom:6px;">${skill.icon} ${skill.name}</div>
+      ${familyMembers.map((m, i) => `<div class="family-compare-row">
+        <div class="family-compare-name">${m.name}</div>
+        <div class="family-compare-bar-wrap">
+          <div class="family-compare-bar" style="width:0%;background:${colors[i % colors.length]}" data-target="${m.normScores[dk]}"></div>
+        </div>
+        <div class="family-compare-val">${m.normScores[dk]}%</div>
+      </div>`).join('')}
+    </div>`;
+  });
+
+  // 바 애니메이션
+  setTimeout(() => {
+    chart.querySelectorAll('.family-compare-bar').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 300);
+
+  // 가족 대화 주제
+  const talkList = document.getElementById('familyTalkList');
+  talkList.innerHTML = '';
+
+  let maxDiff = 0, maxDiffDim = 'structural';
+  dimKeys.forEach(dk => {
+    const vals = familyMembers.map(m => m.normScores[dk]);
+    const diff = Math.max(...vals) - Math.min(...vals);
+    if (diff > maxDiff) { maxDiff = diff; maxDiffDim = dk; }
+  });
+
+  const diffSkill = SKILLS_INFO[maxDiffDim];
+  const highest = familyMembers.reduce((a,b) => a.normScores[maxDiffDim] > b.normScores[maxDiffDim] ? a : b);
+  const lowest = familyMembers.reduce((a,b) => a.normScores[maxDiffDim] < b.normScores[maxDiffDim] ? a : b);
+
+  talkList.innerHTML += `<div class="family-talk-item">"${diffSkill.name}"에서 ${highest.name}(${highest.normScores[maxDiffDim]}%)과 ${lowest.name}(${lowest.normScores[maxDiffDim]}%)의 차이가 가장 커요. 서로의 관점을 이야기해 보세요.</div>`;
+
+  const types = [...new Set(familyMembers.map(m=>m.typeKey))];
+  if (types.length > 1) {
+    talkList.innerHTML += `<div class="family-talk-item">가족 안에 ${types.length}가지 다른 유형이 있어요! 다양성이 가족의 힘입니다.</div>`;
+  } else {
+    talkList.innerHTML += `<div class="family-talk-item">가족 모두 같은 유형(${familyMembers[0].archetype})이에요! 비슷한 강점을 가진 가족이네요.</div>`;
+  }
+
+  talkList.innerHTML += `<div class="family-talk-item">"AI 시대에 우리 가족이 가장 잘 할 수 있는 일은 뭘까?" 함께 이야기해 보세요.</div>`;
+
+  // 공유 버튼
+  const shareCard = document.getElementById('familyShareCard');
+  shareCard.style.display = 'block';
+  shareCard.innerHTML = `
+    <div class="result-card-title">📤 가족 결과 공유하기</div>
+    <div class="share-wrap">
+      <button class="share-btn" id="familyCopyBtn">📋 링크 복사</button>
+      <button class="share-btn" id="familyShareXBtn">𝕏 공유</button>
+    </div>
+  `;
+
+  document.getElementById('familyCopyBtn').addEventListener('click', async () => {
+    const text = `우리 가족 미래역량 검사 결과!\n${familyMembers.map(m=>`${m.name}: ${m.archetypeEmoji}${m.archetype} (${m.avgScore}점)`).join('\n')}\n→ ${location.href}`;
+    try { await navigator.clipboard.writeText(text); } catch {
+      const ta = document.createElement('textarea'); ta.value = text;
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    showToast('가족 결과가 복사되었습니다!');
+  });
+
+  document.getElementById('familyShareXBtn').addEventListener('click', () => {
+    const text = `우리 가족 미래역량 검사 결과! ${familyMembers.map(m=>`${m.name}=${m.archetypeEmoji}`).join(' ')}\n→ ${location.href}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'width=550,height=420');
+  });
+
+  // BTS CTA
+  const btsCta = document.getElementById('familyBtsCta');
+  btsCta.style.display = 'block';
+  btsCta.innerHTML = `
+    <h3>🔮 가족의 직업 미래도 분석하기</h3>
+    <p>각자의 역량을 직업과 교차 분석하면<br>더 구체적인 전환 전략이 나옵니다</p>
+    <button class="bts-btn" onclick="window.open('https://job-future-analyzer.vercel.app','_blank')">BTS에서 심층 분석 받기 →</button>
+  `;
 }
 
 </script>
