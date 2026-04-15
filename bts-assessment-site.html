@@ -93,7 +93,7 @@ button { font-family:inherit; cursor:pointer; touch-action:manipulation; }
 .assess-bar { flex:1; max-width:200px; height:6px; background:#EDE9FE; border-radius:3px; overflow:hidden; }
 .assess-fill { height:100%; background:var(--primary); border-radius:3px; transition:width 0.3s; }
 .assess-timer { font-size:24px; font-weight:900; color:var(--primary); font-variant-numeric:tabular-nums; }
-.assess-timer.warning { color:var(--coral); }
+.assess-timer.warning { color:#F59E0B; }
 .assess-count { font-size:12px; color:var(--text-dim); font-weight:600; }
 
 .assess-body { max-width:500px; margin:0 auto; padding:24px 20px; }
@@ -213,6 +213,10 @@ footer a { color:var(--primary); text-decoration:none; font-weight:600; }
 .email-submit { width:100%; padding:14px; border-radius:12px; background:linear-gradient(135deg,var(--primary),#8B5CF6); color:#fff; font-size:14px; font-weight:600; border:none; transition:opacity 0.2s; }
 .email-submit:disabled { opacity:0.4; cursor:not-allowed; }
 .email-note { font-size:11px; color:var(--text-light); text-align:center; margin-top:4px; }
+
+/* ===== QUESTION TRANSITION ===== */
+.assess-body { transition:opacity 0.3s ease; }
+.assess-body.fade-out { opacity:0; }
 </style>
 </head>
 <body>
@@ -663,38 +667,45 @@ function startAssessment(qtype){
 
 function loadRound(){
   if(round >= scenarios.length){ finishAssessment(); return; }
-  const s = scenarios[round];
-  const total = scenarios.length;
-  document.getElementById('roundLabel').textContent = `${round+1}/${total}`;
-  document.getElementById('progressFill').style.width = `${(round+1)/total*100}%`;
-  timeLeft = 30;
-  roundStartTime = Date.now();
-  const timerEl = document.getElementById('timerDisplay');
-  timerEl.textContent = timeLeft;
-  timerEl.classList.remove('warning');
-  clearInterval(timerInterval);
-  timerInterval = setInterval(()=>{
-    timeLeft--;
-    timerEl.textContent = timeLeft;
-    if(timeLeft <= 10) timerEl.classList.add('warning');
-    if(timeLeft <= 0){
-      clearInterval(timerInterval);
-      behaviorData.push({round,type:s.type,time:Date.now()-roundStartTime,skipped:true});
-      showFeedback('⏰ 시간 초과');
-      setTimeout(()=>{ round++; loadRound(); },1200);
-    }
-  },1000);
 
   const body = document.getElementById('assessBody');
-  body.innerHTML = '';
+  body.classList.add('fade-out');
 
-  if(s.type === 'scenario'){
-    renderTextChoices(s, body);
-  } else if(s.type === 'image'){
-    renderImageChoices(s, body);
-  } else if(s.type === 'rank'){
-    renderRankChoices(s, body);
-  }
+  setTimeout(() => {
+    const s = scenarios[round];
+    const total = scenarios.length;
+    document.getElementById('roundLabel').textContent = `${round+1}/${total}`;
+    document.getElementById('progressFill').style.width = `${(round+1)/total*100}%`;
+    timeLeft = 30;
+    roundStartTime = Date.now();
+    const timerEl = document.getElementById('timerDisplay');
+    timerEl.textContent = timeLeft;
+    timerEl.classList.remove('warning');
+    clearInterval(timerInterval);
+    timerInterval = setInterval(()=>{
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if(timeLeft <= 5) timerEl.classList.add('warning');
+      if(timeLeft <= 0){
+        clearInterval(timerInterval);
+        behaviorData.push({round,type:s.type,time:Date.now()-roundStartTime,skipped:true});
+        showFeedback('⏰ 시간 초과');
+        setTimeout(()=>{ round++; loadRound(); },1200);
+      }
+    },1000);
+
+    body.innerHTML = '';
+
+    if(s.type === 'scenario'){
+      renderTextChoices(s, body);
+    } else if(s.type === 'image'){
+      renderImageChoices(s, body);
+    } else if(s.type === 'rank'){
+      renderRankChoices(s, body);
+    }
+
+    body.classList.remove('fade-out');
+  }, 300);
 }
 
 function renderTextChoices(s, container){
