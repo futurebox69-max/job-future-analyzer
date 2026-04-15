@@ -299,6 +299,6 @@ const btsUrl = `https://job-future-analyzer.vercel.app?competency=${token}`;
 
 | 파일 | 작업 |
 |------|------|
-| `bts-assessment-site.html` | 기존 886줄 수정/추가 → ~1,500줄 |
+| `bts-assessment-site.html` | 기존 886줄 수정/추가 → ~1,500~1,800줄 |
 
 신규 파일 없음. 단일 HTML 유지.
