@@ -124,7 +124,7 @@ export default function Home() {
   const [showAssessment, setShowAssessment] = useState(false);
   const [assessmentCompleted, setAssessmentCompleted] = useState(false);
   // 첫 화면 서비스 선택: null=선택 전, "free"=무료, "paid"=유료(출시예정)
-  const [serviceMode, setServiceMode] = useState<"free" | "paid" | null>(null);
+  const [serviceMode, setServiceMode] = useState<"free" | "paid" | null>("free");
 
   const popularJobs =
     lang === "ko" ? POPULAR_JOBS_KO :
@@ -553,6 +553,22 @@ export default function Home() {
               {t.update_tag}
             </span>
           </div>
+          {/* 신뢰 숫자 바 */}
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
+            {[
+              { icon: "🧠", text: "Claude AI 기반 분석" },
+              { icon: "🔄", text: "매월 데이터 업데이트" },
+              { icon: "⚡", text: "결과 즉시 저장" },
+            ].map(({ icon, text }) => (
+              <div key={text} style={{
+                display: "flex", alignItems: "center", gap: "6px",
+                background: "rgba(255,255,255,0.12)", borderRadius: "100px",
+                padding: "5px 14px", fontSize: "12px", color: "rgba(255,255,255,0.85)", fontWeight: 600,
+              }}>
+                <span>{icon}</span><span>{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -563,295 +579,6 @@ export default function Home() {
           serviceMode==="paid" → 출시예정 안내
       ═══════════════════════════════════════ */}
 
-      {/* ── 서비스 선택 카드 ── */}
-      {serviceMode === null && (
-        <div
-          className="max-w-3xl mx-auto px-4"
-          style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
-        >
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "16px",
-          }}>
-            {/* 무료 서비스 카드 */}
-            <div
-              style={{
-                background: "white",
-                borderRadius: "28px",
-                padding: "32px 24px 28px",
-                boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
-                display: "flex", flexDirection: "column",
-                cursor: "pointer",
-                border: "2px solid transparent",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#6C63FF";
-                e.currentTarget.style.transform = "translateY(-4px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "transparent";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-              onClick={() => setServiceMode("free")}
-            >
-              <div style={{
-                display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
-                padding: "4px 14px", fontSize: "12px", color: "#6C63FF",
-                fontWeight: 700, letterSpacing: "0.06em", marginBottom: "16px", width: "fit-content",
-              }}>FREE</div>
-              <div style={{ fontSize: "28px", marginBottom: "8px" }}>🆓</div>
-              <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>
-                무료 분석
-              </h3>
-              <p style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.7, marginBottom: "20px" }}>
-                로그인 후 무료로 시작합니다<br />결과는 내 계정에 저장됩니다
-              </p>
-              <ul style={{ flex: 1, listStyle: "none", padding: 0, margin: "0 0 20px" }}>
-                {[
-                  "8차원 AI 대체율 심층 분석",
-                  "10년 직업 미래 예측",
-                  "스킬 갭 분석",
-                  "미래역량 검사",
-                  "5개 언어 지원",
-                  "즉시 결과 확인",
-                ].map((f) => (
-                  <li key={f} style={{
-                    fontSize: "13px", color: "#374151",
-                    padding: "5px 0", display: "flex", alignItems: "center", gap: "8px",
-                  }}>
-                    <span style={{ color: "#6C63FF", fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                style={{
-                  width: "100%", padding: "14px", borderRadius: "14px", border: "none",
-                  background: "linear-gradient(135deg, #6C63FF, #4158D0)",
-                  color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
-                }}
-              >
-                무료 분석 시작하기
-              </button>
-            </div>
-
-            {/* 유료 서비스 카드 */}
-            <div
-              style={{
-                background: "linear-gradient(145deg, #1E1B4B 0%, #312E81 100%)",
-                borderRadius: "28px",
-                padding: "32px 24px 28px",
-                boxShadow: "0 24px 64px rgba(79,70,229,0.25), 0 4px 20px rgba(0,0,0,0.15)",
-                display: "flex", flexDirection: "column",
-                cursor: "pointer",
-                border: "2px solid transparent",
-                transition: "all 0.2s ease",
-                position: "relative",
-                overflow: "hidden",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#A78BFA";
-                e.currentTarget.style.transform = "translateY(-4px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "transparent";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-              onClick={() => setServiceMode("paid")}
-            >
-              {/* 곧 출시 뱃지 */}
-              <div style={{
-                position: "absolute", top: "16px", right: "16px",
-                background: "linear-gradient(135deg, #F59E0B, #FCD34D)",
-                borderRadius: "100px", padding: "4px 12px",
-                fontSize: "11px", fontWeight: 700, color: "#78350F",
-              }}>곧 출시</div>
-
-              <div style={{
-                display: "inline-block",
-                background: "rgba(255,255,255,0.12)",
-                borderRadius: "100px",
-                padding: "4px 14px", fontSize: "12px", color: "#C4B5FD",
-                fontWeight: 700, letterSpacing: "0.06em", marginBottom: "16px", width: "fit-content",
-              }}>PREMIUM</div>
-              <div style={{ fontSize: "28px", marginBottom: "8px" }}>💎</div>
-              <h3 style={{ fontSize: "20px", fontWeight: 800, color: "white", marginBottom: "6px" }}>
-                유료 서비스
-              </h3>
-              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.65)", lineHeight: 1.6, marginBottom: "20px" }}>
-                무제한 분석 + 심화 기능<br />₩9,900부터 · 곧 출시 예정
-              </p>
-              <ul style={{ flex: 1, listStyle: "none", padding: 0, margin: "0 0 20px" }}>
-                {[
-                  "무제한 분석 횟수",
-                  "AI 커리어 코치 (무제한)",
-                  "비전 시나리오 3가지",
-                  "직업 추천 + 역량 로드맵",
-                  "가족 진단 (자녀 3인)",
-                  "학교·학원 기관용 플랜",
-                ].map((f) => (
-                  <li key={f} style={{
-                    fontSize: "13px", color: "rgba(255,255,255,0.85)",
-                    padding: "5px 0", display: "flex", alignItems: "center", gap: "8px",
-                  }}>
-                    <span style={{ color: "#A78BFA", fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                style={{
-                  width: "100%", padding: "14px", borderRadius: "14px",
-                  background: "rgba(255,255,255,0.15)",
-                  backdropFilter: "blur(10px)",
-                  color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
-                  outline: "1px solid rgba(255,255,255,0.25)",
-                }}
-              >
-                서비스 내용 보기 →
-              </button>
-            </div>
-          </div>
-
-          {/* 모바일용: 세로 스택 */}
-          <style dangerouslySetInnerHTML={{ __html: `
-            @media (max-width: 600px) {
-              .service-selector-grid { grid-template-columns: 1fr !important; }
-            }
-          ` }} />
-
-          {/* ── 문제 공감 섹션 ── */}
-          <div style={{ marginTop: "64px", textAlign: "center", padding: "0 8px" }}>
-            <div style={{
-              display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#6C63FF", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "16px",
-            }}>WHY BTS</div>
-            <h2 style={{
-              fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 900, color: "#1E1B4B",
-              lineHeight: 1.3, marginBottom: "24px", wordBreak: "keep-all",
-            }}>
-              직업만 보면 절반만 보는 것입니다
-            </h2>
-            <div style={{
-              maxWidth: "540px", margin: "0 auto",
-              background: "white", borderRadius: "24px",
-              padding: "28px 32px",
-              boxShadow: "0 8px 32px rgba(65,88,208,0.1)",
-              border: "1px solid #EDE9FE",
-              textAlign: "left",
-            }}>
-              <p style={{ fontSize: "15px", color: "#374151", lineHeight: 1.9, marginBottom: "16px" }}>
-                같은 직업이어도<br />
-                <strong style={{ color: "#1E1B4B" }}>누구는 버티고, 누구는 흔들립니다.</strong>
-              </p>
-              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.8, marginBottom: "16px" }}>
-                차이는 단순히 직업 이름이 아니라<br />
-                준비 상태와 역량 구조에 있습니다.
-              </p>
-              <div style={{
-                background: "#F5F4FF", borderRadius: "14px",
-                padding: "14px 18px",
-                borderLeft: "4px solid #6C63FF",
-              }}>
-                <p style={{ fontSize: "14px", color: "#4C1D95", lineHeight: 1.7, margin: 0, fontWeight: 600 }}>
-                  BTS는 직업의 변화 가능성만 보지 않습니다.<br />
-                  당신도 함께 봅니다.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* ── 이 앱이 다른 이유 섹션 ── */}
-          <div style={{ marginTop: "64px", textAlign: "center", padding: "0 8px" }}>
-            <div style={{
-              display: "inline-block", background: "#FEF3C7", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "16px",
-            }}>DIFFERENCE</div>
-            <h2 style={{
-              fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 900, color: "#1E1B4B",
-              lineHeight: 1.3, marginBottom: "32px",
-            }}>
-              이 앱이 다른 이유
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-              {[
-                { icon: "🔍", title: "직업 분석", desc: "당신의 직업이 앞으로 어떤 방향으로 움직일지 분석합니다" },
-                { icon: "🔗", title: "역량 연결", desc: "직업 변화와 나의 현재 역량을 함께 봅니다" },
-                { icon: "🎯", title: "행동 제안", desc: "결과만 던지고 끝내지 않습니다. 지금 줄일 것, 키울 것, 시작할 것을 제안합니다" },
-                { icon: "📈", title: "지속 추적", desc: "한 번 보고 끝나는 분석이 아니라 계속 변하는 미래를 따라갈 수 있게 돕습니다" },
-              ].map(({ icon, title, desc }) => (
-                <div key={title} style={{
-                  background: "white", borderRadius: "20px",
-                  padding: "24px 20px",
-                  boxShadow: "0 4px 20px rgba(65,88,208,0.08)",
-                  border: "1px solid #EDE9FE",
-                  textAlign: "left",
-                }}>
-                  <div style={{ fontSize: "28px", marginBottom: "10px" }}>{icon}</div>
-                  <div style={{ fontSize: "15px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>{title}</div>
-                  <div style={{ fontSize: "13px", color: "#6B7280", lineHeight: 1.7 }}>{desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ── 대상자 섹션 ── */}
-          <div style={{ marginTop: "64px", marginBottom: "24px", textAlign: "center", padding: "0 8px" }}>
-            <div style={{
-              display: "inline-block", background: "#F0FDF4", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#059669", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "16px",
-            }}>WHO NEEDS THIS</div>
-            <h2 style={{
-              fontSize: "clamp(22px, 4vw, 32px)", fontWeight: 900, color: "#1E1B4B",
-              lineHeight: 1.3, marginBottom: "24px",
-            }}>
-              이런 분께 필요합니다
-            </h2>
-            <div style={{
-              maxWidth: "480px", margin: "0 auto",
-              background: "white", borderRadius: "24px",
-              padding: "28px 32px",
-              boxShadow: "0 8px 32px rgba(65,88,208,0.1)",
-              border: "1px solid #EDE9FE",
-              textAlign: "left",
-            }}>
-              {[
-                { icon: "💼", text: "내 직업의 미래가 걱정되는 직장인" },
-                { icon: "🔄", text: "이직과 전환을 고민하는 분" },
-                { icon: "👨‍👩‍👧", text: "자녀 진로를 준비하는 부모" },
-                { icon: "📚", text: "학생을 지도하는 교사와 상담자" },
-                { icon: "⛪", text: "청소년과 청년의 길을 돕는 교회와 기관" },
-              ].map(({ icon, text }) => (
-                <div key={text} style={{
-                  display: "flex", alignItems: "center", gap: "14px",
-                  padding: "12px 0",
-                  borderBottom: "1px solid #F3F4F6",
-                }}>
-                  <span style={{ fontSize: "20px", flexShrink: 0 }}>{icon}</span>
-                  <span style={{ fontSize: "14px", color: "#374151", fontWeight: 500 }}>{text}</span>
-                </div>
-              ))}
-              <div style={{ marginTop: "20px" }}>
-                <button
-                  onClick={() => setServiceMode("free")}
-                  style={{
-                    width: "100%", padding: "14px", borderRadius: "14px", border: "none",
-                    background: "linear-gradient(135deg, #6C63FF, #4158D0)",
-                    color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
-                  }}
-                >
-                  무료 분석 시작하기
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
-
       {/* ── 무료: 기존 검색 카드 ── */}
       {serviceMode === "free" && (
         <div
@@ -859,20 +586,6 @@ export default function Home() {
           className="max-w-2xl mx-auto px-4"
           style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
         >
-          {/* 뒤로 버튼 */}
-          <button
-            onClick={() => { setServiceMode(null); setResult(null); setError(null); }}
-            style={{
-              display: "flex", alignItems: "center", gap: "6px",
-              background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)",
-              border: "1px solid rgba(108,99,255,0.2)", borderRadius: "100px",
-              padding: "6px 14px", fontSize: "13px", color: "#6C63FF",
-              fontWeight: 600, cursor: "pointer", marginBottom: "12px",
-            }}
-          >
-            ← 처음으로
-          </button>
-
           <div
             style={{
               background: "white",
@@ -955,6 +668,158 @@ export default function Home() {
               </div>
             )}
           </div>
+          <div style={{ textAlign: "center", marginTop: "12px" }}>
+            <button
+              onClick={() => setServiceMode("paid")}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#6C63FF", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
+            >
+              유료 플랜 자세히 보기 →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── 랜딩 섹션 (결과 없을 때만 표시) ── */}
+      {serviceMode === "free" && !result && !isLoading && (
+        <div className="max-w-3xl mx-auto px-4">
+
+          {/* 문제 공감 */}
+          <div style={{ marginTop: "56px", textAlign: "center" }}>
+            <div style={{
+              display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#6C63FF", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "14px",
+            }}>WHY BTS</div>
+            <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "20px", wordBreak: "keep-all" }}>
+              직업만 보면 절반만 보는 것입니다
+            </h2>
+            <div style={{
+              background: "white", borderRadius: "20px", padding: "24px 28px",
+              boxShadow: "0 8px 32px rgba(65,88,208,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
+            }}>
+              <p style={{ fontSize: "15px", color: "#374151", lineHeight: 1.9, marginBottom: "14px" }}>
+                같은 직업이어도<br />
+                <strong style={{ color: "#1E1B4B" }}>누구는 버티고, 누구는 밀립니다.</strong>
+              </p>
+              <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.8, marginBottom: "14px" }}>
+                차이는 직업 이름이 아니라 준비 상태와 역량 구조에 있습니다.
+              </p>
+              <div style={{ background: "#F5F4FF", borderRadius: "12px", padding: "14px 18px", borderLeft: "4px solid #6C63FF" }}>
+                <p style={{ fontSize: "14px", color: "#4C1D95", lineHeight: 1.7, margin: 0, fontWeight: 600 }}>
+                  BTS는 직업의 변화 가능성만 보지 않습니다. 당신도 함께 봅니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 8개 분석 축 */}
+          <div style={{ marginTop: "56px", textAlign: "center" }}>
+            <div style={{
+              display: "inline-block", background: "#FEF3C7", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "14px",
+            }}>8 DIMENSIONS</div>
+            <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "8px" }}>
+              직업의 미래를 보는 8개 기준
+            </h2>
+            <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px" }}>
+              하나의 수치가 아니라, 8개 구조 축으로 입체적으로 분석합니다
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              {[
+                { icon: "⚡", name: "자동화 위험도", risk: "AI·로봇이 이 일을 직접 대체할 가능성" },
+                { icon: "🤝", name: "AI 협업 가능성", risk: "AI를 도구로 써서 오히려 강해질 수 있는지" },
+                { icon: "📈", name: "수요 변화 방향", risk: "10년 후 이 직업의 사회적 필요가 늘어나는지" },
+                { icon: "🏰", name: "진입장벽 높이", risk: "이 직업을 대체하기 얼마나 어려운지" },
+                { icon: "💰", name: "소득 방어력", risk: "변화 속에서도 수입 수준을 유지할 수 있는지" },
+                { icon: "🌊", name: "시장 변동성", risk: "경기·기술·정책 변화에 얼마나 흔들리는지" },
+                { icon: "🔄", name: "직업 전환 가능성", risk: "다른 직업으로 이동하기 얼마나 쉬운지" },
+                { icon: "🚀", name: "성장 확장 기회", risk: "AI 시대에 오히려 새 기회가 생기는지" },
+              ].map(({ icon, name, risk }) => (
+                <div key={name} style={{
+                  background: "white", borderRadius: "16px", padding: "18px 16px",
+                  boxShadow: "0 4px 16px rgba(65,88,208,0.07)", border: "1px solid #EDE9FE", textAlign: "left",
+                }}>
+                  <div style={{ fontSize: "22px", marginBottom: "8px" }}>{icon}</div>
+                  <div style={{ fontSize: "14px", fontWeight: 800, color: "#1E1B4B", marginBottom: "4px" }}>{name}</div>
+                  <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.6 }}>{risk}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 이 앱이 다른 이유 */}
+          <div style={{ marginTop: "56px", textAlign: "center" }}>
+            <div style={{
+              display: "inline-block", background: "#F0FDF4", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#059669", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "14px",
+            }}>DIFFERENCE</div>
+            <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "24px" }}>
+              이 앱이 다른 이유
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              {[
+                { icon: "🔍", title: "직업 분석", desc: "당신의 직업이 앞으로 어떤 방향으로 움직일지 분석합니다" },
+                { icon: "🔗", title: "역량 연결", desc: "직업 변화와 나의 현재 역량을 함께 봅니다" },
+                { icon: "🎯", title: "행동 제안", desc: "지금 줄일 것, 키울 것, 시작할 것을 제안합니다" },
+                { icon: "📈", title: "지속 추적", desc: "계속 변하는 미래를 따라갈 수 있게 돕습니다" },
+              ].map(({ icon, title, desc }) => (
+                <div key={title} style={{
+                  background: "white", borderRadius: "16px", padding: "20px 16px",
+                  boxShadow: "0 4px 16px rgba(65,88,208,0.07)", border: "1px solid #EDE9FE", textAlign: "left",
+                }}>
+                  <div style={{ fontSize: "24px", marginBottom: "8px" }}>{icon}</div>
+                  <div style={{ fontSize: "14px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>{title}</div>
+                  <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.6 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 대상자 */}
+          <div style={{ marginTop: "56px", marginBottom: "56px", textAlign: "center" }}>
+            <div style={{
+              display: "inline-block", background: "#FFF7ED", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#C2410C", fontWeight: 700,
+              letterSpacing: "0.06em", marginBottom: "14px",
+            }}>WHO NEEDS THIS</div>
+            <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "20px" }}>
+              직업이 걱정되는 분이라면
+            </h2>
+            <div style={{
+              background: "white", borderRadius: "20px", padding: "24px 28px",
+              boxShadow: "0 8px 32px rgba(65,88,208,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
+            }}>
+              {[
+                { icon: "💼", text: "내 직업의 미래가 걱정되는 직장인" },
+                { icon: "🔄", text: "이직과 전환을 고민하는 분" },
+                { icon: "👨‍👩‍👧", text: "자녀 진로를 준비하는 부모" },
+                { icon: "📚", text: "학생을 지도하는 교사와 상담자" },
+                { icon: "⛪", text: "청소년과 청년의 길을 돕는 교회와 기관" },
+              ].map(({ icon, text }, i, arr) => (
+                <div key={text} style={{
+                  display: "flex", alignItems: "center", gap: "14px",
+                  padding: "13px 0",
+                  borderBottom: i < arr.length - 1 ? "1px solid #F3F4F6" : "none",
+                }}>
+                  <span style={{ fontSize: "20px", flexShrink: 0 }}>{icon}</span>
+                  <span style={{ fontSize: "14px", color: "#374151", fontWeight: 500 }}>{text}</span>
+                </div>
+              ))}
+              <button
+                onClick={() => { const el = document.querySelector("input"); el?.focus(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                style={{
+                  width: "100%", marginTop: "20px", padding: "14px", borderRadius: "14px", border: "none",
+                  background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+                  color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
+                }}
+              >
+                내 직업 무료 분석하기
+              </button>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -966,7 +831,7 @@ export default function Home() {
         >
           {/* 뒤로 버튼 */}
           <button
-            onClick={() => setServiceMode(null)}
+            onClick={() => setServiceMode("free")}
             style={{
               display: "flex", alignItems: "center", gap: "6px",
               background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)",
@@ -992,13 +857,13 @@ export default function Home() {
                 borderRadius: "100px", padding: "6px 18px",
                 fontSize: "13px", fontWeight: 700, color: "#92400E", marginBottom: "16px",
               }}>
-                ⏳ 곧 출시됩니다
+                ⏳ 얼리버드 모집 중
               </div>
               <h2 style={{ fontSize: "26px", fontWeight: 900, color: "#1E1B4B", marginBottom: "8px" }}>
-                유료 서비스 미리보기
+                BTS 유료 플랜 안내
               </h2>
               <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.7 }}>
-                출시 전 사전 등록하시면 <strong style={{ color: "#6C63FF" }}>얼리버드 특별 할인</strong>을 받으실 수 있습니다
+                지금 얼리버드 신청하시면 <strong style={{ color: "#6C63FF" }}>출시 즉시 30% 할인가</strong>가 자동 적용됩니다
               </p>
             </div>
 
