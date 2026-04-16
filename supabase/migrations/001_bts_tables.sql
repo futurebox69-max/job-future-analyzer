@@ -35,7 +35,7 @@ CREATE TABLE bts_purchases (
   amount INTEGER NOT NULL,            -- 12900
   payment_key TEXT,                    -- 토스페이먼츠 결제키
   order_id TEXT UNIQUE NOT NULL,       -- 주문번호
-  status TEXT NOT NULL DEFAULT 'pending',  -- pending | completed | refunded
+  status TEXT NOT NULL DEFAULT 'pending',  -- pending | completed | generating | failed | refunded
   report JSONB,                        -- 생성된 리포트 저장
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
