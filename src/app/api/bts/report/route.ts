@@ -66,8 +66,9 @@ export async function POST(req: NextRequest) {
     if (purchase.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    // 결제 완료 상태인지 확인
-    if (purchase.status !== 'completed') {
+    // 결제 완료 또는 생성 실패(재시도) 상태인지 확인
+    // pending = 아직 결제 안 됨, refunded = 환불됨 → 거부
+    if (purchase.status !== 'completed' && purchase.status !== 'failed') {
       return NextResponse.json({ error: 'Payment not completed' }, { status: 403 })
     }
     // assessment_id 일치 확인
