@@ -1,7 +1,7 @@
 // src/app/bts/report/view/page.tsx
-// 규칙 1: 서버 기준 인증 — Authorization 헤더로 JWT 전송
-// 규칙 3: 결제 상태를 서버에서 검증 후 리포트 접근
-// 규칙 4: confirming/generating/done/error 상태 구분
+// 두 가지 진입 경로:
+// 1. 토스 결제 성공 리다이렉트: ?orderId=...&paymentKey=...&amount=...
+// 2. 기존 결제 완료 후 리포트 접근: ?purchaseId=...&assessmentId=...
 'use client'
 
 import { useSearchParams } from 'next/navigation'
@@ -15,41 +15,108 @@ type ViewStatus = 'confirming' | 'generating' | 'done' | 'error'
 
 function ReportViewContent() {
   const params = useSearchParams()
+  // 진입 경로 1: 토스 결제 성공 리다이렉트
   const orderId = params.get('orderId')
   const paymentKey = params.get('paymentKey')
   const amount = params.get('amount')
+  // 진입 경로 2: 기존 결제 완료 후 접근
+  const directPurchaseId = params.get('purchaseId')
+  const directAssessmentId = params.get('assessmentId')
+  const needsGeneration = params.get('needsGeneration')
+
   const { user } = useAuth()
   const [report, setReport] = useState<DeepReport | null>(null)
   const [status, setStatus] = useState<ViewStatus>('confirming')
   const [errorMsg, setErrorMsg] = useState('')
+  const [retryInfo, setRetryInfo] = useState<{ purchaseId: string; assessmentId: string } | null>(null)
   const processedRef = useRef(false)
 
+  // JWT 토큰 가져오기 헬퍼
+  const getAuthToken = async (): Promise<string | null> => {
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    return session?.access_token ?? null
+  }
+
+  // 리포트 생성 요청 헬퍼
+  const requestReport = async (purchaseId: string, assessmentId: string, token: string) => {
+    setStatus('generating')
+    const reportRes = await fetch('/api/bts/report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ assessmentId, purchaseId }),
+    })
+
+    if (!reportRes.ok) {
+      const err = await reportRes.json()
+      throw new Error(err.error || '리포트 생성에 실패했습니다.')
+    }
+
+    const { report } = await reportRes.json()
+    setReport(report)
+    setStatus('done')
+  }
+
   useEffect(() => {
-    if (!orderId || !paymentKey || !amount || !user || processedRef.current) return
+    if (!user || processedRef.current) return
     processedRef.current = true
 
-    const processPayment = async () => {
+    const process = async () => {
       try {
-        // 규칙 1: 서버에 JWT 토큰 전송하여 인증
-        const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
-        const token = session?.access_token
+        const token = await getAuthToken()
         if (!token) {
           setErrorMsg('로그인이 필요합니다.')
           setStatus('error')
           return
         }
 
-        const authHeaders = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+        // ── 진입 경로 2: 기존 결제 완료 (중복 결제 방지에서 리다이렉트됨) ──
+        if (directPurchaseId && directAssessmentId) {
+          setRetryInfo({ purchaseId: directPurchaseId, assessmentId: directAssessmentId })
+
+          if (needsGeneration) {
+            // 리포트 미완료 → 생성 시도
+            await requestReport(directPurchaseId, directAssessmentId, token)
+          } else {
+            // 리포트 완료 → 조회
+            setStatus('generating')
+            const reportRes = await fetch('/api/bts/report', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                assessmentId: directAssessmentId,
+                purchaseId: directPurchaseId,
+              }),
+            })
+            if (!reportRes.ok) throw new Error('리포트를 불러올 수 없습니다.')
+            const { report } = await reportRes.json()
+            setReport(report)
+            setStatus('done')
+          }
+          return
         }
 
-        // 1. 결제 승인 (서버에서 토스 결제 확인 + DB 업데이트)
+        // ── 진입 경로 1: 토스 결제 성공 리다이렉트 ──
+        if (!orderId || !paymentKey || !amount) {
+          setErrorMsg('필수 결제 정보가 없습니다.')
+          setStatus('error')
+          return
+        }
+
+        // 1. 결제 승인
         setStatus('confirming')
         const confirmRes = await fetch('/api/bts/payment/confirm', {
           method: 'POST',
-          headers: authHeaders,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify({ paymentKey, orderId, amount: Number(amount) }),
         })
 
@@ -60,90 +127,36 @@ function ReportViewContent() {
           return
         }
         const { purchaseId, assessmentId } = await confirmRes.json()
+        setRetryInfo({ purchaseId, assessmentId })
 
-        // 2. 리포트 생성 (서버에서 결제 검증 후 Claude 호출)
-        setStatus('generating')
-        const reportRes = await fetch('/api/bts/report', {
-          method: 'POST',
-          headers: authHeaders,
-          body: JSON.stringify({ assessmentId, purchaseId }),
-        })
-
-        if (!reportRes.ok) {
-          const err = await reportRes.json()
-          // 규칙 4: 실패 시 재시도 안내 (결제는 이미 완료)
-          setErrorMsg(err.error || '리포트 생성에 실패했습니다.')
-          setStatus('error')
-          return
-        }
-        const { report: generatedReport } = await reportRes.json()
-
-        setReport(generatedReport)
-        setStatus('done')
+        // 2. 리포트 생성
+        await requestReport(purchaseId, assessmentId, token)
       } catch (err) {
         console.error(err)
-        setErrorMsg('처리 중 오류가 발생했습니다.')
+        setErrorMsg(err instanceof Error ? err.message : '처리 중 오류가 발생했습니다.')
         setStatus('error')
       }
     }
 
-    processPayment()
-  }, [orderId, paymentKey, amount, user])
+    process()
+  }, [user, orderId, paymentKey, amount, directPurchaseId, directAssessmentId, needsGeneration])
 
-  // 리포트 생성 실패 시 재시도
+  // 리포트 생성 재시도
   const handleRetry = async () => {
-    if (!user) return
+    if (!retryInfo) return
     setStatus('generating')
     setErrorMsg('')
 
     try {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
+      const token = await getAuthToken()
       if (!token) {
         setErrorMsg('로그인이 필요합니다.')
         setStatus('error')
         return
       }
-
-      // orderId로 purchase 정보 다시 조회
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: purchase } = await (supabase as any)
-        .from('bts_purchases')
-        .select('id, assessment_id')
-        .eq('order_id', orderId)
-        .single()
-
-      if (!purchase) {
-        setErrorMsg('주문 정보를 찾을 수 없습니다.')
-        setStatus('error')
-        return
-      }
-
-      const reportRes = await fetch('/api/bts/report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          assessmentId: purchase.assessment_id,
-          purchaseId: purchase.id,
-        }),
-      })
-
-      if (!reportRes.ok) {
-        const err = await reportRes.json()
-        setErrorMsg(err.error || '리포트 생성에 실패했습니다.')
-        setStatus('error')
-        return
-      }
-
-      const { report: generatedReport } = await reportRes.json()
-      setReport(generatedReport)
-      setStatus('done')
-    } catch {
-      setErrorMsg('다시 시도 중 오류가 발생했습니다.')
+      await requestReport(retryInfo.purchaseId, retryInfo.assessmentId, token)
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : '다시 시도 중 오류가 발생했습니다.')
       setStatus('error')
     }
   }
@@ -172,13 +185,17 @@ function ReportViewContent() {
       <div className="text-center py-16 max-w-md mx-auto px-4">
         <p className="text-red-500 font-semibold mb-2">오류가 발생했습니다</p>
         <p className="text-sm text-slate-500 mb-6">{errorMsg}</p>
-        <p className="text-xs text-slate-400 mb-4">결제는 정상 처리되었습니다. 리포트 생성만 다시 시도합니다.</p>
-        <button
-          onClick={handleRetry}
-          className="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors"
-        >
-          리포트 다시 생성
-        </button>
+        {retryInfo && (
+          <>
+            <p className="text-xs text-slate-400 mb-4">결제는 정상 처리되었습니다. 리포트 생성만 다시 시도합니다.</p>
+            <button
+              onClick={handleRetry}
+              className="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors"
+            >
+              리포트 다시 생성
+            </button>
+          </>
+        )}
       </div>
     )
   }
@@ -193,7 +210,6 @@ function ReportViewContent() {
 
       {report && <PaidReport report={report} />}
 
-      {/* 90일 플랜 업셀 (Phase 1.5 예고) */}
       <div className="mt-12 bg-slate-50 rounded-xl p-6 text-center">
         <p className="text-sm text-slate-500">
           이제 무엇이 약한지 알았습니다. 다음 단계는 바꾸는 것입니다.

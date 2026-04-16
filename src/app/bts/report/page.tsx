@@ -1,8 +1,9 @@
 // src/app/bts/report/page.tsx
+// 중복 결제 방지: 이미 paid된 구매가 있으면 리포트 뷰로 리다이렉트
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase'
@@ -15,36 +16,87 @@ function ReportIntroContent() {
   const router = useRouter()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [checking, setChecking] = useState(true)
+
+  // ── 중복 결제 방지: 이미 결제 완료된 구매가 있으면 리포트 뷰로 이동 ──
+  useEffect(() => {
+    if (!user || !assessmentId) {
+      setChecking(false)
+      return
+    }
+    const supabase = createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(supabase as any)
+      .from('bts_purchases')
+      .select('id, order_id, purchase_status, report_status')
+      .eq('user_id', user.id)
+      .eq('assessment_id', assessmentId)
+      .eq('product_type', 'deep_report')
+      .eq('purchase_status', 'paid')
+      .maybeSingle()
+      .then(({ data }: { data: { id: string; order_id: string; report_status: string } | null }) => {
+        if (data) {
+          // 이미 결제 완료 → 리포트 상태에 따라 분기
+          if (data.report_status === 'completed') {
+            // 리포트도 완료 → 바로 리포트 뷰 (결제 승인 불필요)
+            router.replace(`/bts/report/view?purchaseId=${data.id}&assessmentId=${assessmentId}`)
+          } else {
+            // 결제는 했지만 리포트 미완료 → 리포트 생성 페이지
+            router.replace(`/bts/report/view?purchaseId=${data.id}&assessmentId=${assessmentId}&needsGeneration=true`)
+          }
+        } else {
+          setChecking(false)
+        }
+      })
+  }, [user, assessmentId, router])
 
   const handlePayment = async () => {
     if (!user || !assessmentId) return
     setLoading(true)
 
     try {
-      // 1. 주문 레코드 생성 (클라이언트의 anon key로 — RLS INSERT 정책 허용)
-      const orderId = `BTS-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
       const supabase = createClient()
 
+      // ── 중복 주문 방지: pending 상태의 기존 주문 재사용 ──
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: insertError } = await (supabase as any).from('bts_purchases').insert({
-        user_id: user.id,
-        assessment_id: assessmentId,
-        product_type: 'deep_report',
-        amount: PRICES.DEEP_REPORT,
-        order_id: orderId,
-        status: 'pending',
-      })
+      const { data: existingOrder } = await (supabase as any)
+        .from('bts_purchases')
+        .select('id, order_id')
+        .eq('user_id', user.id)
+        .eq('assessment_id', assessmentId)
+        .eq('product_type', 'deep_report')
+        .eq('purchase_status', 'pending')
+        .maybeSingle()
 
-      if (insertError) {
-        console.error('Order creation error:', insertError)
-        setLoading(false)
-        return
+      let orderId: string
+
+      if (existingOrder) {
+        // 기존 pending 주문 재사용
+        orderId = existingOrder.order_id
+      } else {
+        // 새 주문 생성
+        orderId = `BTS-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: insertError } = await (supabase as any).from('bts_purchases').insert({
+          user_id: user.id,
+          assessment_id: assessmentId,
+          product_type: 'deep_report',
+          amount: PRICES.DEEP_REPORT,
+          order_id: orderId,
+          purchase_status: 'pending',
+          report_status: 'not_started',
+        })
+
+        if (insertError) {
+          console.error('Order creation error:', insertError)
+          setLoading(false)
+          return
+        }
       }
 
-      // 2. 토스페이먼츠 결제창 호출
+      // 토스페이먼츠 결제창 호출
       const { loadTossPayments } = await import('@tosspayments/tosspayments-sdk')
       const toss = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!)
-
       const payment = toss.payment({ customerKey: user.id })
 
       await payment.requestPayment({
@@ -61,20 +113,22 @@ function ReportIntroContent() {
     }
   }
 
+  if (checking) {
+    return <p className="text-center text-slate-400 py-16">확인 중...</p>
+  }
+
   return (
     <main className="max-w-lg mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold text-center text-slate-900 mb-8">
         통찰력 심층 리포트
       </h2>
 
-      {/* 결제 실패 안내 */}
       {paymentError && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-center">
           <p className="text-sm text-red-700">결제가 완료되지 않았습니다. 다시 시도해주세요.</p>
         </div>
       )}
 
-      {/* 포함 항목 */}
       <div className="space-y-3 mb-8">
         {[
           '통찰 구조 해석 — 왜 이런 결과가 나왔는지',
@@ -90,7 +144,6 @@ function ReportIntroContent() {
         ))}
       </div>
 
-      {/* CTA */}
       <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
         <p className="text-sm text-slate-500 mb-2">통찰력 심층 리포트</p>
         <p className="text-3xl font-bold text-indigo-600 mb-1">12,900원</p>

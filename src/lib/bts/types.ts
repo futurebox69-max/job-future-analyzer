@@ -83,6 +83,12 @@ export interface AssessmentRecord {
   created_at?: string
 }
 
+/** 결제 상태 (결제 처리만 추적) */
+export type PurchaseStatus = 'pending' | 'paid' | 'payment_failed' | 'refunded'
+
+/** 리포트 생성 상태 (리포트 생성만 추적) */
+export type ReportStatus = 'not_started' | 'generating' | 'completed' | 'generation_failed'
+
 /** DB 저장용 구매 기록 */
 export interface PurchaseRecord {
   id?: string
@@ -91,6 +97,7 @@ export interface PurchaseRecord {
   product_type: 'deep_report'
   amount: number
   payment_key: string
-  status: 'pending' | 'completed' | 'refunded'
+  purchase_status: PurchaseStatus
+  report_status: ReportStatus
   created_at?: string
 }

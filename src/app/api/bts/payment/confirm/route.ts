@@ -1,12 +1,9 @@
 // src/app/api/bts/payment/confirm/route.ts
-// 규칙 1: 서버 기준 인증 사용자 검증
-// 규칙 3: 결제 상태를 서버에서 검증
-// 규칙 5: SUPABASE_SERVICE_ROLE_KEY는 이 서버 코드 안에서만 사용
+// 상태 모델: purchase_status(결제) / report_status(리포트) 분리
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { PRICES } from '@/lib/bts/constants'
 
-// 규칙 5: lazy init, 서버 코드에서만 사용
 let _admin: ReturnType<typeof createClient> | null = null
 function getSupabaseAdmin() {
   if (!_admin) {
@@ -28,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // ── 규칙 1: 서버 기준 인증 검증 ──
+    // ── 서버 기준 인증 ──
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -39,16 +36,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    // 금액 검증 (서버에서 검증, 클라이언트 값 신뢰하지 않음)
+    // 금액 검증
     if (amount !== PRICES.DEEP_REPORT) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
 
-    // ── 주문 레코드 확인: 본인 주문인지 + pending 상태인지 ──
+    // ── 주문 레코드 확인: 본인 + pending ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: purchase } = await (admin as any)
       .from('bts_purchases')
-      .select('id, user_id, assessment_id, status')
+      .select('id, user_id, assessment_id, purchase_status')
       .eq('order_id', orderId)
       .single()
 
@@ -58,10 +55,10 @@ export async function POST(req: NextRequest) {
     if (purchase.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    if (purchase.status !== 'pending') {
-      // 이미 처리된 주문
+    if (purchase.purchase_status !== 'pending') {
+      // 이미 처리된 주문 (paid/payment_failed/refunded)
       return NextResponse.json({
-        success: true,
+        success: purchase.purchase_status === 'paid',
         purchaseId: purchase.id,
         assessmentId: purchase.assessment_id,
         alreadyProcessed: true,
@@ -81,21 +78,20 @@ export async function POST(req: NextRequest) {
     if (!tossRes.ok) {
       const errData = await tossRes.json()
       console.error('Toss confirm error:', errData)
-      // 결제 실패 → DB 상태도 failed로
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (admin as any)
         .from('bts_purchases')
-        .update({ status: 'failed' })
+        .update({ purchase_status: 'payment_failed' })
         .eq('order_id', orderId)
 
       return NextResponse.json({ error: errData.message || 'Payment failed' }, { status: 400 })
     }
 
-    // ── 결제 성공 → DB 업데이트 ──
+    // ── 결제 성공 → purchase_status: paid (report_status는 not_started 유지) ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (admin as any)
       .from('bts_purchases')
-      .update({ status: 'completed', payment_key: paymentKey })
+      .update({ purchase_status: 'paid', payment_key: paymentKey })
       .eq('order_id', orderId)
 
     return NextResponse.json({

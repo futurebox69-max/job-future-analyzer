@@ -1,8 +1,8 @@
 // src/app/api/bts/report/route.ts
-// 규칙 1: 서버 기준 인증 사용자 검증
-// 규칙 3: 결제 상태를 서버에서 검증한 사용자만 리포트 접근
-// 규칙 4: pending/completed/failed 상태 구분, 실패 케이스 처리
-// 규칙 5: SUPABASE_SERVICE_ROLE_KEY는 이 서버 코드 안에서만 사용
+// 상태 모델: purchase_status(결제) / report_status(리포트) 분리
+// - purchase_status === 'paid' 검증 (결제 완료만 접근)
+// - report_status === 'not_started' || 'generation_failed' → 생성 허용
+// - report_status === 'completed' → 기존 리포트 반환
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
@@ -11,7 +11,6 @@ import { calculateSubScores, calculateTotalScore, getGrade } from '@/lib/bts/sco
 import { classifyInsightType } from '@/lib/bts/classify'
 import type { InsightResult, DeepReport } from '@/lib/bts/types'
 
-// 규칙 5: lazy init, 서버 코드에서만 사용
 let _admin: ReturnType<typeof createClient> | null = null
 function getSupabaseAdmin() {
   if (!_admin) {
@@ -39,8 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // ── 규칙 1: 서버 기준 인증 검증 ──
-    // Authorization 헤더에서 Supabase JWT를 검증하여 실제 인증 사용자 확인
+    // ── 서버 기준 인증 ──
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -51,53 +49,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    // ── 규칙 3: 결제 상태를 서버에서 검증 ──
+    // ── 구매 레코드 조회 ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: purchase } = await (admin as any)
       .from('bts_purchases')
-      .select('id, user_id, assessment_id, status, report')
+      .select('id, user_id, assessment_id, purchase_status, report_status, report')
       .eq('id', purchaseId)
       .single()
 
     if (!purchase) {
       return NextResponse.json({ error: 'Purchase not found' }, { status: 404 })
     }
-    // 본인 구매인지 확인
     if (purchase.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    // 결제 완료 또는 생성 실패(재시도) 상태인지 확인
-    // pending = 아직 결제 안 됨, refunded = 환불됨 → 거부
-    if (purchase.status !== 'completed' && purchase.status !== 'failed') {
-      return NextResponse.json({ error: 'Payment not completed' }, { status: 403 })
-    }
-    // assessment_id 일치 확인
     if (purchase.assessment_id !== assessmentId) {
       return NextResponse.json({ error: 'Assessment mismatch' }, { status: 400 })
     }
 
-    // 이미 리포트가 있으면 즉시 반환
-    if (purchase.report) {
-      return NextResponse.json({ report: purchase.report, status: 'completed' })
+    // ── 결제 상태 검증: paid만 허용 ──
+    if (purchase.purchase_status !== 'paid') {
+      return NextResponse.json({ error: 'Payment not completed' }, { status: 403 })
+    }
+
+    // ── 리포트 상태 검증 ──
+    // completed → 기존 리포트 반환
+    if (purchase.report_status === 'completed' && purchase.report) {
+      return NextResponse.json({ report: purchase.report, reportStatus: 'completed' })
+    }
+    // generating → 이미 생성 중 (중복 요청 방지)
+    if (purchase.report_status === 'generating') {
+      return NextResponse.json({ error: 'Report is already being generated' }, { status: 409 })
+    }
+    // not_started 또는 generation_failed → 생성 진행
+    if (purchase.report_status !== 'not_started' && purchase.report_status !== 'generation_failed') {
+      return NextResponse.json({ error: 'Invalid report status' }, { status: 400 })
     }
 
     // ── 검사 결과 조회 ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: assessment } = await (admin as any)
       .from('bts_assessments')
-      .select('profile, answers, sub_scores, total_score, grade, insight_type, user_id')
+      .select('profile, answers, user_id')
       .eq('id', assessmentId)
       .single()
 
     if (!assessment) {
       return NextResponse.json({ error: 'Assessment not found' }, { status: 404 })
     }
-    // 본인 검사인지 확인
     if (assessment.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // ── 규칙 2: 점수와 유형은 서버에서 다시 계산 ──
+    // ── 서버에서 점수/유형 재계산 (클라이언트 값 불신) ──
     const subScores = calculateSubScores(assessment.answers)
     const totalScore = calculateTotalScore(subScores)
     const grade = getGrade(totalScore)
@@ -112,12 +116,11 @@ export async function POST(req: NextRequest) {
       profile: assessment.profile,
     }
 
-    // ── 규칙 4: 리포트 생성 상태 관리 ──
-    // pending → generating (실패 시 failed)
+    // ── report_status → generating ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (admin as any)
       .from('bts_purchases')
-      .update({ status: 'generating' })
+      .update({ report_status: 'generating' })
       .eq('id', purchaseId)
 
     let report: DeepReport
@@ -141,28 +144,27 @@ export async function POST(req: NextRequest) {
       }
       report = JSON.parse(cleaned) as DeepReport
     } catch (genError) {
-      // 규칙 4: 생성 실패 → failed 상태로 업데이트
       console.error('Report generation error:', genError)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (admin as any)
         .from('bts_purchases')
-        .update({ status: 'failed' })
+        .update({ report_status: 'generation_failed' })
         .eq('id', purchaseId)
 
       return NextResponse.json({
         error: 'Report generation failed. Payment is safe — please retry.',
-        status: 'failed',
+        reportStatus: 'generation_failed',
       }, { status: 500 })
     }
 
-    // 생성 성공 → completed + 리포트 저장
+    // ── 생성 성공 → report_status: completed + report 저장 ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (admin as any)
       .from('bts_purchases')
-      .update({ report, status: 'completed' })
+      .update({ report, report_status: 'completed' })
       .eq('id', purchaseId)
 
-    return NextResponse.json({ report, status: 'completed' })
+    return NextResponse.json({ report, reportStatus: 'completed' })
   } catch (err) {
     console.error('Report API error:', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
