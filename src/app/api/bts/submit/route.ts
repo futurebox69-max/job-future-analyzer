@@ -19,16 +19,24 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = getSupabaseAdmin()
+
   try {
-    const body = await req.json()
-    const { answers, profile, userId } = body as {
-      answers: UserAnswer[]
-      profile: BtsProfile
-      userId: string
+    // ── 서버 기준 인증 (JWT) ──
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const token = authHeader.slice(7)
+    const { data: { user }, error: authError } = await admin.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const body = await req.json()
+    const { answers, profile } = body as {
+      answers: UserAnswer[]
+      profile: BtsProfile
     }
 
     // 점수 계산
@@ -37,12 +45,12 @@ export async function POST(req: NextRequest) {
     const grade = getGrade(totalScore)
     const insightType = classifyInsightType(subScores)
 
-    // DB 저장 (서비스 역할로)
+    // DB 저장 (서비스 역할로, authenticated user.id 강제)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (getSupabaseAdmin() as any)
+    const { data, error } = await (admin as any)
       .from('bts_assessments')
       .insert({
-        user_id: userId,
+        user_id: user.id,
         profile,
         sub_scores: subScores,
         total_score: totalScore,

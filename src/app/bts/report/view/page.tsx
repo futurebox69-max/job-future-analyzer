@@ -39,6 +39,7 @@ function ReportViewContent() {
   }
 
   // 리포트 생성 요청 헬퍼
+  // 409 = 이미 생성 중 → 자동 재조회 (3초 후)
   const requestReport = async (purchaseId: string, assessmentId: string, token: string) => {
     setStatus('generating')
     const reportRes = await fetch('/api/bts/report', {
@@ -50,14 +51,52 @@ function ReportViewContent() {
       body: JSON.stringify({ assessmentId, purchaseId }),
     })
 
+    if (reportRes.status === 409) {
+      // 이미 generating 중 → 3초 후 재조회 (최대 20회 = 60초)
+      await pollForReport(purchaseId, assessmentId, token)
+      return
+    }
+
     if (!reportRes.ok) {
       const err = await reportRes.json()
       throw new Error(err.error || '리포트 생성에 실패했습니다.')
     }
 
-    const { report } = await reportRes.json()
-    setReport(report)
+    const data = await reportRes.json()
+    setReport(data.report)
     setStatus('done')
+  }
+
+  // 생성 중인 리포트를 폴링으로 기다리는 헬퍼
+  const pollForReport = async (purchaseId: string, assessmentId: string, token: string) => {
+    for (let i = 0; i < 20; i++) {
+      await new Promise(r => setTimeout(r, 3000))
+
+      const res = await fetch('/api/bts/report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ assessmentId, purchaseId }),
+      })
+
+      if (res.status === 409) continue // 아직 생성 중
+
+      if (res.ok) {
+        const data = await res.json()
+        if (data.report) {
+          setReport(data.report)
+          setStatus('done')
+          return
+        }
+      }
+
+      // 생성 실패 또는 다른 에러 → 재시도 가능 상태로 전환
+      const err = await res.json().catch(() => ({ error: '리포트 생성에 실패했습니다.' }))
+      throw new Error(err.error || '리포트 생성에 실패했습니다.')
+    }
+    throw new Error('리포트 생성 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.')
   }
 
   useEffect(() => {

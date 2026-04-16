@@ -4,6 +4,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
+import { createClient } from '@/lib/supabase'
 import TestProgress from '@/components/bts/TestProgress'
 import InsightQuestionCard from '@/components/bts/InsightQuestionCard'
 import { INSIGHT_QUESTIONS } from '@/lib/bts/questions'
@@ -61,10 +62,18 @@ export default function BtsTestPage() {
   const submitTest = async (finalAnswers: UserAnswer[]) => {
     const profile = JSON.parse(sessionStorage.getItem('bts_profile') || '{}')
 
+    // JWT 토큰 가져오기
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) return
+
     const res = await fetch('/api/bts/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ answers: finalAnswers, profile, userId: user?.id }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ answers: finalAnswers, profile }),
     })
 
     if (res.ok) {
