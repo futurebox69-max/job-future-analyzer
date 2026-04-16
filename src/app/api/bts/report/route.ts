@@ -86,19 +86,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid report status' }, { status: 400 })
     }
 
-    // ── 검사 결과 조회 ──
+    // ── 검사 결과 조회 (user_id 함께 검증) ──
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: assessment } = await (admin as any)
       .from('bts_assessments')
-      .select('profile, answers, user_id')
+      .select('profile, answers')
       .eq('id', assessmentId)
+      .eq('user_id', user.id)
       .single()
 
     if (!assessment) {
       return NextResponse.json({ error: 'Assessment not found' }, { status: 404 })
-    }
-    if (assessment.user_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // ── 서버에서 점수/유형 재계산 (클라이언트 값 불신) ──
@@ -116,12 +114,21 @@ export async function POST(req: NextRequest) {
       profile: assessment.profile,
     }
 
-    // ── report_status → generating ──
+    // ── 원자적 상태 전이: report_status → generating ──
+    // 동시 요청 시 단 1개만 성공하도록 WHERE 조건에 현재 상태를 포함
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any)
+    const { data: transitioned } = await (admin as any)
       .from('bts_purchases')
       .update({ report_status: 'generating' })
       .eq('id', purchaseId)
+      .eq('user_id', user.id)
+      .in('report_status', ['not_started', 'generation_failed'])
+      .select('id')
+
+    if (!transitioned || transitioned.length === 0) {
+      // 다른 요청이 이미 generating으로 전환했거나 completed됨
+      return NextResponse.json({ error: 'Report is already being generated' }, { status: 409 })
+    }
 
     let report: DeepReport
     try {
@@ -150,6 +157,7 @@ export async function POST(req: NextRequest) {
         .from('bts_purchases')
         .update({ report_status: 'generation_failed' })
         .eq('id', purchaseId)
+        .eq('user_id', user.id)
 
       return NextResponse.json({
         error: 'Report generation failed. Payment is safe — please retry.',
@@ -163,6 +171,7 @@ export async function POST(req: NextRequest) {
       .from('bts_purchases')
       .update({ report, report_status: 'completed' })
       .eq('id', purchaseId)
+      .eq('user_id', user.id)
 
     return NextResponse.json({ report, reportStatus: 'completed' })
   } catch (err) {

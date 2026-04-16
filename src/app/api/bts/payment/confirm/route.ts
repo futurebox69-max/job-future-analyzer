@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
         .from('bts_purchases')
         .update({ purchase_status: 'payment_failed' })
         .eq('order_id', orderId)
+        .eq('user_id', user.id)
 
       return NextResponse.json({ error: errData.message || 'Payment failed' }, { status: 400 })
     }
@@ -93,6 +94,7 @@ export async function POST(req: NextRequest) {
       .from('bts_purchases')
       .update({ purchase_status: 'paid', payment_key: paymentKey })
       .eq('order_id', orderId)
+      .eq('user_id', user.id)
 
     return NextResponse.json({
       success: true,

@@ -58,12 +58,12 @@ CREATE POLICY "Users can insert own purchases"
 -- 서비스 역할은 RLS를 자동 우회하므로 별도 UPDATE 정책 불필요.
 -- 일반 사용자의 UPDATE는 의도적으로 차단한다.
 
--- 중복 결제 방지: 같은 assessment에 대해 결제 완료된(paid) 구매가 1개만 존재하도록
+-- 활성 주문 유일성: 같은 assessment에 대해 pending 또는 paid 주문이 1개만 존재하도록
 -- payment_failed/refunded는 여러 개 허용 (재시도 가능)
--- partial unique index: purchase_status = 'paid'인 행만 유니크 제약
-CREATE UNIQUE INDEX idx_bts_purchases_unique_paid
+-- partial unique index: pending 또는 paid인 행만 유니크 제약
+CREATE UNIQUE INDEX idx_bts_purchases_unique_active
   ON bts_purchases(user_id, assessment_id, product_type)
-  WHERE purchase_status = 'paid';
+  WHERE purchase_status IN ('pending', 'paid');
 
 -- 인덱스
 CREATE INDEX idx_bts_purchases_user ON bts_purchases(user_id);
