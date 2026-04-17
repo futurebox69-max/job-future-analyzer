@@ -7,7 +7,6 @@
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { createClient } from '@/lib/supabase'
 import PaidReport from '@/components/bts/PaidReport'
 import type { DeepReport } from '@/lib/bts/types'
 
@@ -24,19 +23,12 @@ function ReportViewContent() {
   const directAssessmentId = params.get('assessmentId')
   const needsGeneration = params.get('needsGeneration')
 
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const [report, setReport] = useState<DeepReport | null>(null)
   const [status, setStatus] = useState<ViewStatus>('confirming')
   const [errorMsg, setErrorMsg] = useState('')
   const [retryInfo, setRetryInfo] = useState<{ purchaseId: string; assessmentId: string } | null>(null)
   const processedRef = useRef(false)
-
-  // JWT 토큰 가져오기 헬퍼
-  const getAuthToken = async (): Promise<string | null> => {
-    const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    return session?.access_token ?? null
-  }
 
   // 리포트 생성 요청 헬퍼
   // 409 = 이미 생성 중 → 자동 재조회 (3초 후)
@@ -52,7 +44,6 @@ function ReportViewContent() {
     })
 
     if (reportRes.status === 409) {
-      // 이미 generating 중 → 3초 후 재조회 (최대 20회 = 60초)
       await pollForReport(purchaseId, assessmentId, token)
       return
     }
@@ -81,7 +72,7 @@ function ReportViewContent() {
         body: JSON.stringify({ assessmentId, purchaseId }),
       })
 
-      if (res.status === 409) continue // 아직 생성 중
+      if (res.status === 409) continue
 
       if (res.ok) {
         const data = await res.json()
@@ -92,7 +83,6 @@ function ReportViewContent() {
         }
       }
 
-      // 생성 실패 또는 다른 에러 → 재시도 가능 상태로 전환
       const err = await res.json().catch(() => ({ error: '리포트 생성에 실패했습니다.' }))
       throw new Error(err.error || '리포트 생성에 실패했습니다.')
     }
@@ -105,7 +95,7 @@ function ReportViewContent() {
 
     const process = async () => {
       try {
-        const token = await getAuthToken()
+        const token = session?.access_token ?? null
         if (!token) {
           setErrorMsg('로그인이 필요합니다.')
           setStatus('error')
@@ -117,10 +107,8 @@ function ReportViewContent() {
           setRetryInfo({ purchaseId: directPurchaseId, assessmentId: directAssessmentId })
 
           if (needsGeneration) {
-            // 리포트 미완료 → 생성 시도
             await requestReport(directPurchaseId, directAssessmentId, token)
           } else {
-            // 리포트 완료 → 조회
             setStatus('generating')
             const reportRes = await fetch('/api/bts/report', {
               method: 'POST',
@@ -178,7 +166,7 @@ function ReportViewContent() {
     }
 
     process()
-  }, [user, orderId, paymentKey, amount, directPurchaseId, directAssessmentId, needsGeneration])
+  }, [user, session, orderId, paymentKey, amount, directPurchaseId, directAssessmentId, needsGeneration])
 
   // 리포트 생성 재시도
   const handleRetry = async () => {
@@ -187,7 +175,7 @@ function ReportViewContent() {
     setErrorMsg('')
 
     try {
-      const token = await getAuthToken()
+      const token = session?.access_token ?? null
       if (!token) {
         setErrorMsg('로그인이 필요합니다.')
         setStatus('error')

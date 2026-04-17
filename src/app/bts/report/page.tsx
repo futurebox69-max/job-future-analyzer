@@ -36,12 +36,9 @@ function ReportIntroContent() {
       .maybeSingle()
       .then(({ data }: { data: { id: string; order_id: string; report_status: string } | null }) => {
         if (data) {
-          // 이미 결제 완료 → 리포트 상태에 따라 분기
           if (data.report_status === 'completed') {
-            // 리포트도 완료 → 바로 리포트 뷰 (결제 승인 불필요)
             router.replace(`/bts/report/view?purchaseId=${data.id}&assessmentId=${assessmentId}`)
           } else {
-            // 결제는 했지만 리포트 미완료 → 리포트 생성 페이지
             router.replace(`/bts/report/view?purchaseId=${data.id}&assessmentId=${assessmentId}&needsGeneration=true`)
           }
         } else {
@@ -56,6 +53,12 @@ function ReportIntroContent() {
 
     try {
       const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        alert('로그인 세션이 만료되었습니다. 다시 로그인해주세요.')
+        return
+      }
 
       // ── 중복 주문 방지: pending 상태의 기존 주문 재사용 ──
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,10 +74,8 @@ function ReportIntroContent() {
       let orderId: string
 
       if (existingOrder) {
-        // 기존 pending 주문 재사용
         orderId = existingOrder.order_id
       } else {
-        // 새 주문 생성
         orderId = `BTS-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: insertError } = await (supabase as any).from('bts_purchases').insert({
@@ -89,14 +90,15 @@ function ReportIntroContent() {
 
         if (insertError) {
           console.error('Order creation error:', insertError)
-          setLoading(false)
+          alert('주문 생성에 실패했습니다.')
           return
         }
       }
 
-      // 토스페이먼츠 결제창 호출
+      // 토스페이먼츠 결제창 호출 (v2 SDK)
       const { loadTossPayments } = await import('@tosspayments/tosspayments-sdk')
-      const toss = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!)
+      const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!
+      const toss = await loadTossPayments(clientKey)
       const payment = toss.payment({ customerKey: user.id })
 
       await payment.requestPayment({
@@ -107,8 +109,15 @@ function ReportIntroContent() {
         successUrl: `${window.location.origin}/bts/report/view?orderId=${orderId}`,
         failUrl: `${window.location.origin}/bts/report?id=${assessmentId}&error=payment_failed`,
       })
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Payment error:', err)
+      const message = err instanceof Error ? err.message : String(err)
+      if (message.includes('USER_CANCEL') || message.includes('CLOSE') || message.includes('PAY_PROCESS_CANCELED')) {
+        // 사용자 취소 — 조용히 처리
+      } else {
+        alert('결제 중 오류가 발생했습니다. 다시 시도해주세요.')
+      }
+    } finally {
       setLoading(false)
     }
   }

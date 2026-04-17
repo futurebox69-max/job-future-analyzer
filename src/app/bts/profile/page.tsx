@@ -11,7 +11,14 @@ export default function BtsProfilePage() {
   const router = useRouter()
 
   const handleLogin = async () => {
-    await signInWithGoogle()
+    // Google 로그인 후 /bts/profile로 돌아오도록 redirectTo 지정
+    const supabase = (await import('@/lib/supabase')).createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/bts/profile`,
+      },
+    })
   }
 
   const handleProfileSubmit = (profile: BtsProfile) => {
