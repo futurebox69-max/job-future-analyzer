@@ -6,6 +6,7 @@
 
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense, useRef } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import PaidReport from '@/components/bts/PaidReport'
 import type { DeepReport } from '@/lib/bts/types'
@@ -14,11 +15,9 @@ type ViewStatus = 'confirming' | 'generating' | 'done' | 'error'
 
 function ReportViewContent() {
   const params = useSearchParams()
-  // 진입 경로 1: 토스 결제 성공 리다이렉트
   const orderId = params.get('orderId')
   const paymentKey = params.get('paymentKey')
   const amount = params.get('amount')
-  // 진입 경로 2: 기존 결제 완료 후 접근
   const directPurchaseId = params.get('purchaseId')
   const directAssessmentId = params.get('assessmentId')
   const needsGeneration = params.get('needsGeneration')
@@ -30,8 +29,6 @@ function ReportViewContent() {
   const [retryInfo, setRetryInfo] = useState<{ purchaseId: string; assessmentId: string } | null>(null)
   const processedRef = useRef(false)
 
-  // 리포트 생성 요청 헬퍼
-  // 409 = 이미 생성 중 → 자동 재조회 (3초 후)
   const requestReport = async (purchaseId: string, assessmentId: string, token: string) => {
     setStatus('generating')
     const reportRes = await fetch('/api/bts/report', {
@@ -58,7 +55,6 @@ function ReportViewContent() {
     setStatus('done')
   }
 
-  // 생성 중인 리포트를 폴링으로 기다리는 헬퍼
   const pollForReport = async (purchaseId: string, assessmentId: string, token: string) => {
     for (let i = 0; i < 20; i++) {
       await new Promise(r => setTimeout(r, 3000))
@@ -102,7 +98,7 @@ function ReportViewContent() {
           return
         }
 
-        // ── 진입 경로 2: 기존 결제 완료 (중복 결제 방지에서 리다이렉트됨) ──
+        // ── 진입 경로 2: 기존 결제 완료 ──
         if (directPurchaseId && directAssessmentId) {
           setRetryInfo({ purchaseId: directPurchaseId, assessmentId: directAssessmentId })
 
@@ -136,7 +132,6 @@ function ReportViewContent() {
           return
         }
 
-        // 1. 결제 승인
         setStatus('confirming')
         const confirmRes = await fetch('/api/bts/payment/confirm', {
           method: 'POST',
@@ -156,7 +151,6 @@ function ReportViewContent() {
         const { purchaseId, assessmentId } = await confirmRes.json()
         setRetryInfo({ purchaseId, assessmentId })
 
-        // 2. 리포트 생성
         await requestReport(purchaseId, assessmentId, token)
       } catch (err) {
         console.error(err)
@@ -168,7 +162,6 @@ function ReportViewContent() {
     process()
   }, [user, session, orderId, paymentKey, amount, directPurchaseId, directAssessmentId, needsGeneration])
 
-  // 리포트 생성 재시도
   const handleRetry = async () => {
     if (!retryInfo) return
     setStatus('generating')
@@ -223,6 +216,9 @@ function ReportViewContent() {
             </button>
           </>
         )}
+        <Link href="/bts" className="block mt-6 text-sm text-slate-400 hover:text-slate-600 transition-colors">
+          ← 홈으로 돌아가기
+        </Link>
       </div>
     )
   }
@@ -244,6 +240,15 @@ function ReportViewContent() {
         <p className="text-xs text-slate-400 mt-2">
           90일 통찰력 강화 플랜 · 곧 출시 예정
         </p>
+      </div>
+
+      <div className="mt-8 text-center">
+        <Link
+          href="/bts"
+          className="inline-block text-sm text-indigo-600 font-medium hover:text-indigo-700 transition-colors"
+        >
+          ← 홈으로 돌아가기
+        </Link>
       </div>
     </main>
   )
