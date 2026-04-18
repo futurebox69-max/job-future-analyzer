@@ -2,6 +2,23 @@
 
 import { useState, useEffect, useCallback } from "react";
 
+interface AgentCostEntry {
+  key: string;
+  label: string;
+  emoji: string;
+  costPerCall: number;
+  today: { calls: number; costUSD: number; costKRW: number };
+  month: { calls: number; costUSD: number; costKRW: number };
+}
+
+interface AgentCosts {
+  agents: AgentCostEntry[];
+  total: {
+    today: { costUSD: number; costKRW: number };
+    month: { costUSD: number; costKRW: number };
+  };
+}
+
 interface StatsData {
   today: {
     date: string;
@@ -27,6 +44,7 @@ interface StatsData {
   modeStats: { name: string; count: number }[];
   hourStats: { hour: number; count: number }[];
   daily: { date: string; requests: number }[];
+  agentCosts?: AgentCosts;
 }
 
 const LANG_META: Record<string, { flag: string; label: string }> = {
@@ -221,6 +239,144 @@ export default function AdminPage() {
             color="#DC2626"
           />
         </div>
+
+        {/* ── 에이전트별 API 비용 ────────────────────────── */}
+        {data.agentCosts && (
+          <Card className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <SectionTitle>🤖 에이전트별 API 비용</SectionTitle>
+              <div className="flex gap-3 text-xs">
+                <span style={{ color: "#9CA3AF" }}>오늘 총</span>
+                <span className="font-bold" style={{ color: "#DC2626" }}>
+                  ${data.agentCosts.total.today.costUSD.toFixed(4)}
+                  <span className="font-normal ml-1" style={{ color: "#9CA3AF" }}>
+                    (₩{data.agentCosts.total.today.costKRW.toLocaleString()})
+                  </span>
+                </span>
+                <span style={{ color: "#9CA3AF" }}>이달 총</span>
+                <span className="font-bold" style={{ color: "#DC2626" }}>
+                  ${data.agentCosts.total.month.costUSD.toFixed(3)}
+                  <span className="font-normal ml-1" style={{ color: "#9CA3AF" }}>
+                    (₩{data.agentCosts.total.month.costKRW.toLocaleString()})
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            {/* 테이블 */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #EDE9FE" }}>
+                    <th className="text-left py-2 pr-4 font-semibold" style={{ color: "#6B7280", width: "36%" }}>에이전트</th>
+                    <th className="text-right py-2 px-3 font-semibold" style={{ color: "#6B7280" }}>단가</th>
+                    <th className="text-right py-2 px-3 font-semibold" style={{ color: "#2563EB" }}>오늘 호출</th>
+                    <th className="text-right py-2 px-3 font-semibold" style={{ color: "#2563EB" }}>오늘 비용</th>
+                    <th className="text-right py-2 px-3 font-semibold" style={{ color: "#7C3AED" }}>이달 호출</th>
+                    <th className="text-right py-2 pl-3 font-semibold" style={{ color: "#7C3AED" }}>이달 비용</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.agentCosts.agents.map((agent, i) => {
+                    // 이달 기준 최대값 계산 (막대 그래프용)
+                    const maxMonth = Math.max(...data.agentCosts!.agents.map(a => a.month.costUSD), 0.001);
+                    const barWidth = Math.round((agent.month.costUSD / maxMonth) * 100);
+                    return (
+                      <tr
+                        key={agent.key}
+                        style={{
+                          borderBottom: i < data.agentCosts!.agents.length - 1 ? "1px solid #F3F4F6" : "none",
+                          background: i % 2 === 0 ? "transparent" : "#FAFAFA",
+                        }}
+                      >
+                        {/* 에이전트명 */}
+                        <td className="py-3 pr-4">
+                          <div className="flex items-center gap-2">
+                            <span>{agent.emoji}</span>
+                            <div>
+                              <p className="font-medium" style={{ color: "#1E1B4B" }}>{agent.label}</p>
+                              {/* 이달 비용 비율 막대 */}
+                              <div className="mt-1 h-1.5 rounded-full" style={{ background: "#EDE9FE", width: "100px" }}>
+                                <div
+                                  className="h-1.5 rounded-full"
+                                  style={{ width: `${barWidth}%`, background: "#6C63FF" }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        {/* 단가 */}
+                        <td className="py-3 px-3 text-right font-mono text-xs" style={{ color: "#9CA3AF" }}>
+                          ${agent.costPerCall.toFixed(4)}
+                        </td>
+                        {/* 오늘 호출수 */}
+                        <td className="py-3 px-3 text-right font-semibold" style={{ color: "#2563EB" }}>
+                          {agent.today.calls.toLocaleString()}
+                        </td>
+                        {/* 오늘 비용 */}
+                        <td className="py-3 px-3 text-right">
+                          <span className="font-semibold" style={{ color: agent.today.costUSD > 0 ? "#DC2626" : "#9CA3AF" }}>
+                            ${agent.today.costUSD.toFixed(4)}
+                          </span>
+                          {agent.today.costKRW > 0 && (
+                            <span className="block text-xs" style={{ color: "#9CA3AF" }}>
+                              ₩{agent.today.costKRW.toLocaleString()}
+                            </span>
+                          )}
+                        </td>
+                        {/* 이달 호출수 */}
+                        <td className="py-3 px-3 text-right font-semibold" style={{ color: "#7C3AED" }}>
+                          {agent.month.calls.toLocaleString()}
+                        </td>
+                        {/* 이달 비용 */}
+                        <td className="py-3 pl-3 text-right">
+                          <span className="font-bold" style={{ color: agent.month.costUSD > 0 ? "#DC2626" : "#9CA3AF" }}>
+                            ${agent.month.costUSD.toFixed(3)}
+                          </span>
+                          {agent.month.costKRW > 0 && (
+                            <span className="block text-xs" style={{ color: "#9CA3AF" }}>
+                              ₩{agent.month.costKRW.toLocaleString()}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                {/* 합계 행 */}
+                <tfoot>
+                  <tr style={{ borderTop: "2px solid #EDE9FE" }}>
+                    <td colSpan={2} className="py-3 pr-4 font-bold" style={{ color: "#1E1B4B" }}>
+                      합계
+                    </td>
+                    <td className="py-3 px-3 text-right font-bold" style={{ color: "#2563EB" }}>
+                      {data.agentCosts.agents.reduce((s, a) => s + a.today.calls, 0).toLocaleString()}
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      <span className="font-bold" style={{ color: "#DC2626" }}>
+                        ${data.agentCosts.total.today.costUSD.toFixed(4)}
+                      </span>
+                      <span className="block text-xs" style={{ color: "#9CA3AF" }}>
+                        ₩{data.agentCosts.total.today.costKRW.toLocaleString()}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right font-bold" style={{ color: "#7C3AED" }}>
+                      {data.agentCosts.agents.reduce((s, a) => s + a.month.calls, 0).toLocaleString()}
+                    </td>
+                    <td className="py-3 pl-3 text-right">
+                      <span className="font-bold text-base" style={{ color: "#DC2626" }}>
+                        ${data.agentCosts.total.month.costUSD.toFixed(3)}
+                      </span>
+                      <span className="block text-xs font-semibold" style={{ color: "#6B7280" }}>
+                        ₩{data.agentCosts.total.month.costKRW.toLocaleString()}
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </Card>
+        )}
 
         {/* ── Row 2: 14일 추이 + 언어별 ──────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">

@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getProfileFromToken } from "@/lib/supabase-admin";
 import { createClient } from "@supabase/supabase-js";
+import { trackAgentCall } from "@/lib/cost-tracker";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
@@ -111,6 +112,8 @@ ${analysisContext ? `분석 데이터: ${JSON.stringify(analysisContext, null, 2
           .update({ monthly_chat_count: ((profile as { monthly_chat_count?: number }).monthly_chat_count ?? 0) + 1 })
           .eq("id", profile.id);
       }
+      // 비용 추적
+      trackAgentCall("chat_coach").catch(() => {});
     } catch { /* 백그라운드 저장 실패는 무시 */ }
   })();
 

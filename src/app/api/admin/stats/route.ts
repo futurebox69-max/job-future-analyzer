@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
+import { getAgentCostStats } from "@/lib/cost-tracker";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
@@ -65,12 +66,13 @@ export async function GET(request: NextRequest) {
     ...days.map((day) => redis.get<number>(`stats:req:${day}`)),
   ]);
 
-  // Redis에서 병렬 조회 (2차 — 신규 분류 통계)
-  const [langData, modeData, hourData, allJobsData] = await Promise.all([
+  // Redis에서 병렬 조회 (2차 — 신규 분류 통계 + 에이전트 비용)
+  const [langData, modeData, hourData, allJobsData, agentCosts] = await Promise.all([
     redis.zrange(`stats:lang:${m}`, 0, -1, { rev: true, withScores: true }),
     redis.zrange(`stats:mode:${m}`, 0, -1, { rev: true, withScores: true }),
     redis.zrange(`stats:hour:${d}`, 0, -1, { withScores: true }),
     redis.zrange(`stats:jobs:${m}`, 0, 29, { rev: true, withScores: true }),
+    getAgentCostStats(),
   ]);
 
   const tReq = todayReq ?? 0;
@@ -126,5 +128,6 @@ export async function GET(request: NextRequest) {
     modeStats,
     hourStats,
     daily,
+    agentCosts,   // 에이전트별 비용 내역
   });
 }

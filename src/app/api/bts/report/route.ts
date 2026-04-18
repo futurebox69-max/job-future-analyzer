@@ -5,6 +5,7 @@
 // - report_status === 'completed' → 기존 리포트 반환
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { trackAgentCall } from '@/lib/cost-tracker'
 import { createClient } from '@supabase/supabase-js'
 import { buildReportPrompt } from '@/lib/bts/report-prompt'
 import { calculateSubScores, calculateTotalScore, getGrade } from '@/lib/bts/scoring'
@@ -172,6 +173,8 @@ export async function POST(req: NextRequest) {
       .update({ report, report_status: 'completed' })
       .eq('id', purchaseId)
       .eq('user_id', user.id)
+
+    trackAgentCall("bts_report").catch(() => {}); // 비용 추적
 
     return NextResponse.json({ report, reportStatus: 'completed' })
   } catch (err) {

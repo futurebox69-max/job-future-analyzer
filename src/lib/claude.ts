@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { AnalysisResultSchema, AnalysisResult, DIMENSION_WEIGHTS, getRiskLevel } from "@/types/analysis";
 import { getLatestContext, formatContextForPrompt } from "@/lib/context";
 import { COUNTRY_CONTEXTS, LangCode } from "@/lib/i18n";
+import { trackAgentCall } from "@/lib/cost-tracker";
 
 function getClient() {
   const apiKey = process.env.JOB_ANALYZER_API_KEY;
@@ -239,6 +240,7 @@ export async function validateJobName(job: string): Promise<boolean> {
       ],
     });
     const text = res.content[0].type === "text" ? res.content[0].text.trim().toUpperCase() : "";
+    trackAgentCall("job_validate").catch(() => {}); // 비용 추적 (비동기, 실패 무시)
     return text.startsWith("YES");
   } catch {
     return true; // 검증 실패 시 허용 (서비스 중단 방지)
@@ -322,6 +324,8 @@ export async function analyzeJob(
   );
 
   const clamped = Math.max(0, Math.min(100, calculated));
+
+  trackAgentCall("job_analyze").catch(() => {}); // 비용 추적 (비동기, 실패 무시)
 
   return {
     ...validated.data,
