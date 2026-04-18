@@ -60,6 +60,14 @@ export const IndustryContextSchema = z.object({
   globalTrend: z.string(),      // 글로벌 동향
 });
 
+// 살아남는 스킬 3가지 (무료 리포트 핵심 섹션)
+export const SurvivalSkillSchema = z.object({
+  skill: z.string(),    // 스킬명 (짧고 명확하게)
+  reason: z.string(),   // AI가 대체 못하는 이유 (1문장, 30자 이내)
+  action: z.string(),   // 오늘부터 할 수 있는 실천 행동 (1문장, 40자 이내)
+  icon: z.string(),     // 대표 이모지
+});
+
 // 전체 분석 결과 스키마
 export const AnalysisResultSchema = z.object({
   jobName: z.string(),
@@ -83,10 +91,12 @@ export const AnalysisResultSchema = z.object({
   industryContext: IndustryContextSchema,
   summary: z.string(),
   consultingNote: z.string(), // 상담/강의용 핵심 인사이트 (300자)
+  survivalSkills: z.array(SurvivalSkillSchema).length(3).optional(), // 살아남는 스킬 3가지 (무료 리포트 핵심)
   mode: z.enum(["adult", "youth"]),
 });
 
 // TypeScript 타입 추출
+export type SurvivalSkill = z.infer<typeof SurvivalSkillSchema>;
 export type Dimension = z.infer<typeof DimensionSchema>;
 export type IcebergLayer = z.infer<typeof IcebergLayerSchema>;
 export type TransitionCard = z.infer<typeof TransitionCardSchema>;

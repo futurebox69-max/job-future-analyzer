@@ -24,6 +24,7 @@ import { FREE_LIMIT } from "@/lib/supabase";
 import CompetencyAssessment from "@/components/CompetencyAssessment";
 import CompetencyResultTab from "@/components/CompetencyResult";
 import { CompetencyResult as CompetencyResultType } from "@/types/competency";
+import SurvivalSkills from "@/components/SurvivalSkills";
 
 
 const POPULAR_JOBS_KO = [
@@ -135,6 +136,7 @@ export default function Home() {
 
   const SECTIONS = [
     { id: "overview",    icon: "📊", label: t.section_overview },
+    { id: "survival",    icon: "🛡️", label: lang === "ko" ? "생존스킬" : lang === "zh" ? "生存技能" : lang === "ja" ? "生存スキル" : lang === "es" ? "Supervivencia" : "Survival Skills" },
     { id: "competency",  icon: "🧠", label: "미래역량" },
     { id: "dimensions",  icon: "🎯", label: t.section_dimensions },
     { id: "horizon",     icon: "⏳", label: t.section_horizon },
@@ -1520,6 +1522,22 @@ export default function Home() {
                   </div>
                 ) : null}
                 {activeSection === "overview"    && <GaugeChart rate={result.overallRate} riskLevel={result.riskLevel} jobName={result.jobName} lang={lang} />}
+                {activeSection === "survival"    && result.survivalSkills && result.survivalSkills.length === 3 && (
+                  <SurvivalSkills skills={result.survivalSkills} jobName={result.jobName} lang={lang} />
+                )}
+                {activeSection === "survival"    && (!result.survivalSkills || result.survivalSkills.length !== 3) && (
+                  <div className="rounded-2xl border p-8 text-center" style={{ background: "#F8F7FF", borderColor: "#DDD6FE" }}>
+                    <p className="text-4xl mb-3">🛡️</p>
+                    <p className="font-bold text-lg mb-2" style={{ color: "#1E1B4B" }}>
+                      {lang === "ko" ? "살아남는 스킬 3가지" : "3 Survival Skills"}
+                    </p>
+                    <p className="text-sm" style={{ color: "#9CA3AF" }}>
+                      {lang === "ko"
+                        ? "이 결과는 이전에 캐시된 데이터입니다. 다시 분석하면 생존 스킬이 표시됩니다."
+                        : "This result is from cache. Re-analyze to see survival skills."}
+                    </p>
+                  </div>
+                )}
                 {activeSection === "dimensions"  && <SixDimensions dimensions={result.dimensions} lang={lang} />}
                 {activeSection === "horizon"     && <TimeHorizonChart data={result.timeHorizon} lang={lang} />}
                 {activeSection === "skills"      && <SkillGapAnalysis data={result.skillGap} lang={lang} />}
