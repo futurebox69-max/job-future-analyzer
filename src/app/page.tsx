@@ -281,7 +281,7 @@ export default function Home() {
     profile.monthly_usage >= FREE_LIMIT - 1 && profile.monthly_usage < FREE_LIMIT;
 
   return (
-    <main className="min-h-screen" style={{ background: "#F8F7FF" }}>
+    <main className="min-h-screen" style={{ background: "#0B1B2B" }}>
 
       {/* Auth 모달 */}
       {showAuthModal && (
@@ -333,7 +333,7 @@ export default function Home() {
       ═══════════════════════════════════════ */}
       <div
         style={{
-          background: "linear-gradient(135deg, #FF6B6B 0%, #C850C0 42%, #4158D0 100%)",
+          background: "linear-gradient(135deg, #0B1B2B 0%, #0F2438 55%, #142B44 100%)",
           position: "relative",
           overflow: "hidden",
           paddingBottom: "88px",
@@ -361,26 +361,40 @@ export default function Home() {
           className="max-w-4xl mx-auto px-5 pt-5 flex items-center justify-between"
           style={{ gap: "12px" }}
         >
-          {/* BTS 브랜드 로고 */}
+          {/* REFRAME 브랜드 로고 */}
           <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+            <a
+              href="https://futurebox.live"
+              style={{
+                color: "rgba(255,255,255,0.55)",
+                fontSize: "11px",
+                fontWeight: 600,
+                letterSpacing: "0.05em",
+                textDecoration: "none",
+                marginBottom: "4px",
+                display: "block",
+              }}
+            >
+              ← REFRAME
+            </a>
             <div style={{
-              color: "white",
-              fontSize: "28px",
+              color: "#C9A24B",
+              fontSize: "22px",
               fontWeight: 900,
               letterSpacing: "-0.02em",
               textShadow: "0 2px 12px rgba(0,0,0,0.18)",
             }}>
-              BTS
+              직업의 미래
             </div>
             <div style={{
-              color: "rgba(255,255,255,0.65)",
+              color: "rgba(255,255,255,0.55)",
               fontSize: "8px",
               fontWeight: 700,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               marginTop: "2px",
             }}>
-              BUILD TOMORROW SKILLS
+              내 삶을 다시 설계하다
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
