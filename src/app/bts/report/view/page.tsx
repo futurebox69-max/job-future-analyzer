@@ -226,7 +226,7 @@ function ReportViewContent() {
   return (
     <main className="max-w-lg mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <p className="text-green-500 text-2xl mb-2">✅</p>
+        <p className="text-green-500 text-2xl mb-2"></p>
         <h2 className="text-xl font-bold text-slate-900">통찰력 심층 리포트</h2>
         <p className="text-sm text-slate-400 mt-1">결제 완료</p>
       </div>

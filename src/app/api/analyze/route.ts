@@ -168,16 +168,28 @@ export async function POST(request: NextRequest): Promise<Response> {
     }
   }
 
-  // 비로그인: 분석 불가 (서버에서도 차단)
+  // 비로그인: IP 기반 1회 익명 분석 허용 (24시간 TTL)
+  // 카운트 증가는 분석 성공 후에 처리 (실패한 분석 차감 방지)
   if (userRole === "guest") {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: "로그인 후 이용할 수 있습니다.",
-        code: "LOGIN_REQUIRED",
-      }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
+    const guestIp = getClientIp(request);
+    const guestDay = new Date().toISOString().slice(0, 10);
+    const anonKey = `anon_used:${guestIp}:${guestDay}`;
+    try {
+      const used = await redis.get<number>(anonKey);
+      if (used !== null && used >= 1) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "무료 분석 1회를 모두 사용했습니다. 계속 분석하려면 로그인해 주세요.",
+            code: "ANON_LIMIT",
+          }),
+          { status: 401, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    } catch (e) {
+      // Redis 조회 실패 시 graceful degradation: 분석 진행 허용
+      console.warn("익명 사용량 조회 실패 (분석 진행):", e);
+    }
   }
 
   // 무료 로그인: 3회 제한
@@ -206,11 +218,27 @@ export async function POST(request: NextRequest): Promise<Response> {
       // 로그인 사용자면 usage 증가
       let newUsage = monthlyUsage;
       if (userId && token && userRole !== "admin" && userRole !== "premium") {
-        const result = await incrementUsage(token, userId);
-        if (result) newUsage = result.monthly_usage;
+        const incResult = await incrementUsage(token, userId);
+        if (incResult) newUsage = incResult.monthly_usage;
       }
-      const remaining = userRole === "admin" || userRole === "premium"
-        ? 999 : Math.max(0, FREE_LIMIT - newUsage);
+      // 비로그인 사용자면 IP 기반 익명 사용량 +1 (24시간 TTL)
+      if (userRole === "guest") {
+        const ip = getClientIp(request);
+        const day = new Date().toISOString().slice(0, 10);
+        const anonKey = `anon_used:${ip}:${day}`;
+        try {
+          await redis.incr(anonKey);
+          await redis.expire(anonKey, 60 * 60 * 25);
+        } catch (e) {
+          console.warn("익명 사용량 증가 실패 (응답 진행):", e);
+        }
+      }
+      const remaining =
+        userRole === "admin" || userRole === "premium"
+          ? 999
+          : userRole === "guest"
+            ? 0
+            : Math.max(0, FREE_LIMIT - newUsage);
       return new Response(
         JSON.stringify({ success: true, data: cached, remaining, fromCache: true }),
         { headers: { "Content-Type": "application/json", "X-Cache": "HIT" } }
@@ -269,13 +297,29 @@ export async function POST(request: NextRequest): Promise<Response> {
           const usageResult = await incrementUsage(token, userId);
           if (usageResult) newUsage = usageResult.monthly_usage;
         }
+        // 비로그인 사용자면 IP 기반 익명 사용량 +1 (24시간 TTL)
+        const anonIncrement: Promise<unknown> =
+          userRole === "guest"
+            ? (async () => {
+                const ip = getClientIp(request);
+                const day = new Date().toISOString().slice(0, 10);
+                const anonKey = `anon_used:${ip}:${day}`;
+                await redis.incr(anonKey);
+                await redis.expire(anonKey, 60 * 60 * 25);
+              })().catch((e) => console.warn("익명 사용량 증가 실패:", e))
+            : Promise.resolve();
         await Promise.all([
           redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL }).catch(() => {}),
           trackStats("claude_call", trimmed, safeLang, mode),
+          anonIncrement,
         ]);
 
-        const remaining = userRole === "admin" || userRole === "premium"
-          ? 999 : Math.max(0, FREE_LIMIT - newUsage);
+        const remaining =
+          userRole === "admin" || userRole === "premium"
+            ? 999
+            : userRole === "guest"
+              ? 0
+              : Math.max(0, FREE_LIMIT - newUsage);
 
         send({
           type: "result",

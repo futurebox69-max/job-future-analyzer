@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { getLang, LangCode } from "@/lib/i18n";
+import JobIcon from "./JobIcon";
 
 interface JobInputProps {
   onAnalyze: (job: string) => void;
@@ -72,9 +73,10 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
           disabled={isLoading || !job.trim()}
           className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-3 rounded-xl font-medium text-base transition-all duration-200 flex items-center gap-2 text-white"
           style={{
-            background: isLoading || !job.trim() ? "#D1D5DB" : "#6C63FF",
+            background: isLoading || !job.trim() ? "#D1D5DB" : "#C9A24B",
             cursor: isLoading || !job.trim() ? "not-allowed" : "pointer",
-            boxShadow: isLoading || !job.trim() ? "none" : "0 2px 8px rgba(108,99,255,0.35)",
+            boxShadow: isLoading || !job.trim() ? "none" : "0 2px 8px rgba(201,162,75,0.35)",
+            color: isLoading || !job.trim() ? "white" : "#0B1B2B",
           }}
         >
           {isLoading ? (
@@ -84,7 +86,7 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
             </>
           ) : (
             <>
-              🔍 {t.analyze_btn}
+              <JobIcon name="search" size={16} color="#0B1B2B" /> {t.analyze_btn}
             </>
           )}
         </button>

@@ -76,7 +76,7 @@ function ReportIntroContent() {
       if (existingOrder) {
         orderId = existingOrder.order_id
       } else {
-        orderId = `BTS-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        orderId = `JF-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: insertError } = await (supabase as any).from('bts_purchases').insert({
           user_id: user.id,
@@ -147,7 +147,7 @@ function ReportIntroContent() {
           '핵심 행동 제안 — 오늘부터 시작',
         ].map((item, i) => (
           <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
-            <span className="text-green-500 mt-0.5">✓</span>
+            <span className="text-green-500 mt-0.5"></span>
             <p className="text-sm text-slate-700">{item}</p>
           </div>
         ))}

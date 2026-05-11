@@ -53,7 +53,7 @@ export default function ConsultingNote({ note, jobName, lang = "ko" }: Props) {
       }}
     >
       <div className="flex items-start gap-3 mb-4">
-        <span className="text-2xl">📋</span>
+        <span className="text-2xl"></span>
         <div>
           <h2 className="text-lg font-bold" style={{ color: "#1E1B4B" }}>{L.title}</h2>
           <p className="text-sm" style={{ color: "#7C3AED" }}>{L.subtitle} ({jobName})</p>
@@ -65,7 +65,7 @@ export default function ConsultingNote({ note, jobName, lang = "ko" }: Props) {
       </div>
 
       <div className="mt-3 flex items-center gap-2 text-sm" style={{ color: "#9CA3AF" }}>
-        <span>⚠️</span>
+        <span></span>
         <span>{L.disclaimer}</span>
       </div>
     </section>

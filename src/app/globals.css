@@ -13,6 +13,24 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-noto-sans-kr);
+  --font-serif-accent: var(--font-gowun-batang);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/* 명조체 강조 — 헤드라인 키워드 한 단어에 골드 색으로 적용 */
+.accent {
+  font-family: var(--font-gowun-batang), 'Noto Serif KR', serif;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+/* 모노스페이스 라벨 — 메타/섹션 태그 */
+.label-mono {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
 body {

@@ -13,7 +13,7 @@ export default function LockedPreview({ assessmentId }: Props) {
       {/* 블러 잠금 영역 */}
       <div className="bg-slate-50 rounded-xl p-5 relative overflow-hidden">
         <div className="absolute inset-0 backdrop-blur-sm bg-white/60 z-10 flex flex-col items-center justify-center">
-          <span className="text-2xl mb-2">🔒</span>
+          <span className="text-2xl mb-2"></span>
           <p className="text-sm font-semibold text-slate-700">심층 해석 잠김</p>
         </div>
         <div className="space-y-3 text-sm text-slate-400">

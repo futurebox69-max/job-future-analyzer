@@ -25,71 +25,74 @@ import CompetencyAssessment from "@/components/CompetencyAssessment";
 import CompetencyResultTab from "@/components/CompetencyResult";
 import { CompetencyResult as CompetencyResultType } from "@/types/competency";
 import SurvivalSkills from "@/components/SurvivalSkills";
+import JobIcon from "@/components/JobIcon";
 
+
+const JOB_ICONS = ["stethoscope", "graduation-cap", "scale", "laptop", "pill", "heart-pulse", "calculator", "landmark", "flame", "shield"] as const;
 
 const POPULAR_JOBS_KO = [
-  { icon: "👨‍⚕️", name: "의사",     job: "의사" },
-  { icon: "👩‍🏫", name: "교사",     job: "교사" },
-  { icon: "⚖️",  name: "변호사",   job: "변호사" },
-  { icon: "💻",  name: "프로그래머", job: "프로그래머" },
-  { icon: "💊",  name: "약사",     job: "약사" },
-  { icon: "👩‍⚕️", name: "간호사",   job: "간호사" },
-  { icon: "📊",  name: "회계사",   job: "회계사" },
-  { icon: "🏛️", name: "공무원",   job: "공무원" },
-  { icon: "🚒",  name: "소방관",   job: "소방관" },
-  { icon: "👮",  name: "경찰관",   job: "경찰관" },
+  { icon: JOB_ICONS[0], name: "의사",     job: "의사" },
+  { icon: JOB_ICONS[1], name: "교사",     job: "교사" },
+  { icon: JOB_ICONS[2], name: "변호사",   job: "변호사" },
+  { icon: JOB_ICONS[3], name: "프로그래머", job: "프로그래머" },
+  { icon: JOB_ICONS[4], name: "약사",     job: "약사" },
+  { icon: JOB_ICONS[5], name: "간호사",   job: "간호사" },
+  { icon: JOB_ICONS[6], name: "회계사",   job: "회계사" },
+  { icon: JOB_ICONS[7], name: "공무원",   job: "공무원" },
+  { icon: JOB_ICONS[8], name: "소방관",   job: "소방관" },
+  { icon: JOB_ICONS[9], name: "경찰관",   job: "경찰관" },
 ];
 
 const POPULAR_JOBS_EN = [
-  { icon: "👨‍⚕️", name: "Doctor",       job: "Doctor" },
-  { icon: "👩‍🏫", name: "Teacher",       job: "Teacher" },
-  { icon: "⚖️",  name: "Lawyer",        job: "Lawyer" },
-  { icon: "💻",  name: "Programmer",    job: "Programmer" },
-  { icon: "💊",  name: "Pharmacist",    job: "Pharmacist" },
-  { icon: "👩‍⚕️", name: "Nurse",         job: "Nurse" },
-  { icon: "📊",  name: "Accountant",    job: "Accountant" },
-  { icon: "🏛️", name: "Civil Servant", job: "Civil Servant" },
-  { icon: "🚒",  name: "Firefighter",   job: "Firefighter" },
-  { icon: "👮",  name: "Police Officer",job: "Police Officer" },
+  { icon: JOB_ICONS[0], name: "Doctor",       job: "Doctor" },
+  { icon: JOB_ICONS[1], name: "Teacher",       job: "Teacher" },
+  { icon: JOB_ICONS[2], name: "Lawyer",        job: "Lawyer" },
+  { icon: JOB_ICONS[3], name: "Programmer",    job: "Programmer" },
+  { icon: JOB_ICONS[4], name: "Pharmacist",    job: "Pharmacist" },
+  { icon: JOB_ICONS[5], name: "Nurse",         job: "Nurse" },
+  { icon: JOB_ICONS[6], name: "Accountant",    job: "Accountant" },
+  { icon: JOB_ICONS[7], name: "Civil Servant", job: "Civil Servant" },
+  { icon: JOB_ICONS[8], name: "Firefighter",   job: "Firefighter" },
+  { icon: JOB_ICONS[9], name: "Police Officer",job: "Police Officer" },
 ];
 
 const POPULAR_JOBS_ZH = [
-  { icon: "👨‍⚕️", name: "医生",   job: "医生" },
-  { icon: "👩‍🏫", name: "教师",   job: "教师" },
-  { icon: "⚖️",  name: "律师",   job: "律师" },
-  { icon: "💻",  name: "程序员", job: "程序员" },
-  { icon: "💊",  name: "药剂师", job: "药剂师" },
-  { icon: "👩‍⚕️", name: "护士",   job: "护士" },
-  { icon: "📊",  name: "会计师", job: "会计师" },
-  { icon: "🏛️", name: "公务员", job: "公务员" },
-  { icon: "🚒",  name: "消防员", job: "消防员" },
-  { icon: "👮",  name: "警察",   job: "警察" },
+  { icon: JOB_ICONS[0], name: "医生",   job: "医生" },
+  { icon: JOB_ICONS[1], name: "教师",   job: "教师" },
+  { icon: JOB_ICONS[2], name: "律师",   job: "律师" },
+  { icon: JOB_ICONS[3], name: "程序员", job: "程序员" },
+  { icon: JOB_ICONS[4], name: "药剂师", job: "药剂师" },
+  { icon: JOB_ICONS[5], name: "护士",   job: "护士" },
+  { icon: JOB_ICONS[6], name: "会计师", job: "会计师" },
+  { icon: JOB_ICONS[7], name: "公务员", job: "公务员" },
+  { icon: JOB_ICONS[8], name: "消防员", job: "消防员" },
+  { icon: JOB_ICONS[9], name: "警察",   job: "警察" },
 ];
 
 const POPULAR_JOBS_JA = [
-  { icon: "👨‍⚕️", name: "医師",       job: "医師" },
-  { icon: "👩‍🏫", name: "教師",       job: "教師" },
-  { icon: "⚖️",  name: "弁護士",     job: "弁護士" },
-  { icon: "💻",  name: "プログラマー", job: "プログラマー" },
-  { icon: "💊",  name: "薬剤師",     job: "薬剤師" },
-  { icon: "👩‍⚕️", name: "看護師",     job: "看護師" },
-  { icon: "📊",  name: "会計士",     job: "会計士" },
-  { icon: "🏛️", name: "公務員",     job: "公務員" },
-  { icon: "🚒",  name: "消防士",     job: "消防士" },
-  { icon: "👮",  name: "警察官",     job: "警察官" },
+  { icon: JOB_ICONS[0], name: "医師",       job: "医師" },
+  { icon: JOB_ICONS[1], name: "教師",       job: "教師" },
+  { icon: JOB_ICONS[2], name: "弁護士",     job: "弁護士" },
+  { icon: JOB_ICONS[3], name: "プログラマー", job: "プログラマー" },
+  { icon: JOB_ICONS[4], name: "薬剤師",     job: "薬剤師" },
+  { icon: JOB_ICONS[5], name: "看護師",     job: "看護師" },
+  { icon: JOB_ICONS[6], name: "会計士",     job: "会計士" },
+  { icon: JOB_ICONS[7], name: "公務員",     job: "公務員" },
+  { icon: JOB_ICONS[8], name: "消防士",     job: "消防士" },
+  { icon: JOB_ICONS[9], name: "警察官",     job: "警察官" },
 ];
 
 const POPULAR_JOBS_ES = [
-  { icon: "👨‍⚕️", name: "Médico",       job: "Médico" },
-  { icon: "👩‍🏫", name: "Maestro",       job: "Maestro" },
-  { icon: "⚖️",  name: "Abogado",       job: "Abogado" },
-  { icon: "💻",  name: "Programador",   job: "Programador" },
-  { icon: "💊",  name: "Farmacéutico",  job: "Farmacéutico" },
-  { icon: "👩‍⚕️", name: "Enfermero",     job: "Enfermero" },
-  { icon: "📊",  name: "Contador",      job: "Contador" },
-  { icon: "🏛️", name: "Funcionario",   job: "Funcionario" },
-  { icon: "🚒",  name: "Bombero",       job: "Bombero" },
-  { icon: "👮",  name: "Policía",       job: "Policía" },
+  { icon: JOB_ICONS[0], name: "Médico",       job: "Médico" },
+  { icon: JOB_ICONS[1], name: "Maestro",       job: "Maestro" },
+  { icon: JOB_ICONS[2], name: "Abogado",       job: "Abogado" },
+  { icon: JOB_ICONS[3], name: "Programador",   job: "Programador" },
+  { icon: JOB_ICONS[4], name: "Farmacéutico",  job: "Farmacéutico" },
+  { icon: JOB_ICONS[5], name: "Enfermero",     job: "Enfermero" },
+  { icon: JOB_ICONS[6], name: "Contador",      job: "Contador" },
+  { icon: JOB_ICONS[7], name: "Funcionario",   job: "Funcionario" },
+  { icon: JOB_ICONS[8], name: "Bombero",       job: "Bombero" },
+  { icon: JOB_ICONS[9], name: "Policía",       job: "Policía" },
 ];
 
 export default function Home() {
@@ -127,6 +130,22 @@ export default function Home() {
   // 첫 화면 서비스 선택: null=선택 전, "free"=무료, "paid"=유료(출시예정)
   const [serviceMode, setServiceMode] = useState<"free" | "paid" | null>("free");
 
+  // G1 — ?track= 파라미터 읽기·보존 (adult / teen)
+  const [trackParam, setTrackParam] = useState<"adult" | "teen" | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("track");
+    if (t === "adult" || t === "teen") {
+      setTrackParam(t);
+      sessionStorage.setItem("reframe_track", t);
+    } else {
+      const stored = sessionStorage.getItem("reframe_track");
+      if (stored === "adult" || stored === "teen") {
+        setTrackParam(stored as "adult" | "teen");
+      }
+    }
+  }, []);
+
   const popularJobs =
     lang === "ko" ? POPULAR_JOBS_KO :
     lang === "zh" ? POPULAR_JOBS_ZH :
@@ -135,18 +154,18 @@ export default function Home() {
     POPULAR_JOBS_EN;
 
   const SECTIONS = [
-    { id: "overview",    icon: "📊", label: t.section_overview },
-    { id: "survival",    icon: "🛡️", label: lang === "ko" ? "생존스킬" : lang === "zh" ? "生存技能" : lang === "ja" ? "生存スキル" : lang === "es" ? "Supervivencia" : "Survival Skills" },
-    { id: "competency",  icon: "🧠", label: "미래역량" },
-    { id: "dimensions",  icon: "🎯", label: t.section_dimensions },
-    { id: "horizon",     icon: "⏳", label: t.section_horizon },
-    { id: "skills",      icon: "🎓", label: t.section_skills },
-    { id: "iceberg",     icon: "🧊", label: t.section_iceberg },
-    { id: "income",      icon: "💰", label: t.section_income },
-    { id: "industry",    icon: "🏭", label: t.section_industry },
-    { id: "transitions", icon: "🚀", label: t.section_transitions },
-    { id: "consulting",  icon: "📝", label: t.section_consulting },
-    { id: "coach",       icon: "🔮", label: t.section_coach },
+    { id: "overview",    icon: "barchart",       label: t.section_overview },
+    { id: "survival",    icon: "shield",         label: lang === "ko" ? "생존스킬" : lang === "zh" ? "生存技能" : lang === "ja" ? "生存スキル" : lang === "es" ? "Supervivencia" : "Survival Skills" },
+    { id: "competency",  icon: "brain",          label: "미래역량" },
+    { id: "dimensions",  icon: "target",         label: t.section_dimensions },
+    { id: "horizon",     icon: "hourglass",      label: t.section_horizon },
+    { id: "skills",      icon: "graduation-cap", label: t.section_skills },
+    { id: "iceberg",     icon: "snowflake",      label: t.section_iceberg },
+    { id: "income",      icon: "dollar-sign",    label: t.section_income },
+    { id: "industry",    icon: "factory",        label: t.section_industry },
+    { id: "transitions", icon: "rocket",         label: t.section_transitions },
+    { id: "consulting",  icon: "pen-line",       label: t.section_consulting },
+    { id: "coach",       icon: "sparkles",       label: t.section_coach },
   ];
 
   const [activeSection, setActiveSection] = useState("overview");
@@ -175,10 +194,18 @@ export default function Home() {
   const handleAnalyze = async (job: string) => {
     // ── 권한 체크 ──────────────────────────────
     if (!user) {
-      // 비로그인: 분석 불가, 로그인 모달
-      setAuthReason("분석을 이용하려면 로그인이 필요합니다. 무료로 3회 분석할 수 있습니다.");
-      setShowAuthModal(true);
-      return;
+      // 비로그인: localStorage로 1회 익명 분석 허용
+      const anonUsed =
+        typeof window !== "undefined"
+          ? localStorage.getItem("anonymousAnalysisUsed")
+          : null;
+      if (anonUsed) {
+        // 이미 1회 사용 → 로그인 유도
+        setAuthReason("무료 분석 1회를 모두 사용했습니다. 계속 분석하려면 로그인해 주세요.");
+        setShowAuthModal(true);
+        return;
+      }
+      // 첫 익명 분석은 진행 (성공 후 localStorage에 기록)
     } else if (profile && profile.role === "free") {
       // 무료 로그인: 3회 체크
       const used = profile.monthly_usage;
@@ -245,6 +272,10 @@ export default function Home() {
                 setResult(event.data);
                 if (event.remaining !== undefined) setRemaining(event.remaining);
                 setFromCache(event.fromCache ?? false);
+                // 비로그인 첫 분석 성공 → 익명 사용량 마킹
+                if (!user && typeof window !== "undefined") {
+                  localStorage.setItem("anonymousAnalysisUsed", new Date().toISOString());
+                }
                 setTimeout(() => {
                   document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }, 100);
@@ -265,6 +296,10 @@ export default function Home() {
         setResult(data.data);
         if (data.remaining !== undefined) setRemaining(data.remaining);
         setFromCache(data.fromCache ?? false);
+        // 비로그인 첫 분석 성공 → 익명 사용량 마킹
+        if (!user && typeof window !== "undefined") {
+          localStorage.setItem("anonymousAnalysisUsed", new Date().toISOString());
+        }
         setTimeout(() => {
           document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 100);
@@ -300,7 +335,7 @@ export default function Home() {
             width: "100%", maxWidth: "400px",
             boxShadow: "0 24px 64px rgba(0,0,0,0.18)",
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🚀</div>
+            <JobIcon name="rocket" size={40} color="#C9A24B" style={{ marginBottom: "12px" }} />
             <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1E1B4B", marginBottom: "12px" }}>
               무료 분석 3회를<br />모두 사용하셨습니다
             </h2>
@@ -311,7 +346,7 @@ export default function Home() {
             </p>
             <button style={{
               width: "100%", padding: "16px", borderRadius: "14px", border: "none",
-              background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+              background: "linear-gradient(135deg, #C9A24B, #B8912A)",
               color: "white", fontSize: "16px", fontWeight: 700, cursor: "pointer",
               marginBottom: "10px",
             }}>
@@ -319,7 +354,7 @@ export default function Home() {
             </button>
             <button onClick={() => setShowUpgradePopup(false)} style={{
               width: "100%", padding: "12px", borderRadius: "14px",
-              border: "1.5px solid #EDE9FE", background: "white",
+              border: "1.5px solid #F2EBDC", background: "white",
               color: "#6B7280", fontSize: "14px", cursor: "pointer",
             }}>
               다음에
@@ -422,7 +457,7 @@ export default function Home() {
                       cursor: "pointer", backdropFilter: "blur(10px)",
                     }}
                   >
-                    <span>👤</span>
+                    <span></span>
                     <span>{user.email?.split("@")[0]}</span>
                     <span style={{ fontSize: "10px", opacity: 0.7 }}>▼</span>
                   </button>
@@ -497,7 +532,7 @@ export default function Home() {
                 fontWeight: 500,
               }}
             >
-              <span style={{ color: "#FFE066", fontSize: "10px" }}>✦</span>
+              <span style={{ color: "#FFE066", fontSize: "10px" }}></span>
               <span style={{ fontWeight: 800 }}>{t.analyzed_before}{totalCount.toLocaleString()}</span>
               <span style={{ opacity: 0.85 }}>{t.analyzed_after}</span>
             </div>
@@ -517,7 +552,30 @@ export default function Home() {
             }}
           >
             {t.hero_line1}<br />
-            <span style={{ opacity: 0.96 }}>{t.hero_line2}</span>
+            <span style={{ opacity: 0.96 }}>
+              {(() => {
+                const line = t.hero_line2;
+                const accentMap: Record<string, string> = {
+                  ko: "구조적인",
+                  en: "Survive",
+                  zh: "存活",
+                  ja: "生き残れる",
+                  es: "Sobrevivirá",
+                };
+                const keyword = accentMap[lang] ?? "";
+                if (keyword && line.includes(keyword)) {
+                  const idx = line.indexOf(keyword);
+                  return (
+                    <>
+                      {line.slice(0, idx)}
+                      <span className="accent">{keyword}</span>
+                      {line.slice(idx + keyword.length)}
+                    </>
+                  );
+                }
+                return line;
+              })()}
+            </span>
           </h1>
 
           <p style={{
@@ -549,7 +607,7 @@ export default function Home() {
               border: "1px solid rgba(255,255,255,0.22)",
             }}
           >
-            <span style={{ fontSize: "20px" }}>🔄</span>
+            <JobIcon name="refresh" size={20} color="#C9A24B" />
             <span style={{
               color: "rgba(255,255,255,0.95)",
               fontSize: "18px",
@@ -572,16 +630,17 @@ export default function Home() {
           {/* 신뢰 숫자 바 */}
           <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
             {[
-              { icon: "🧠", text: "Claude AI 기반 분석" },
-              { icon: "🔄", text: "매월 데이터 업데이트" },
-              { icon: "⚡", text: "결과 즉시 저장" },
+              { icon: "brain",   text: "Claude AI 기반 분석" },
+              { icon: "refresh", text: "매월 데이터 업데이트" },
+              { icon: "zap",     text: "결과 즉시 저장" },
             ].map(({ icon, text }) => (
               <div key={text} style={{
                 display: "flex", alignItems: "center", gap: "6px",
                 background: "rgba(255,255,255,0.12)", borderRadius: "100px",
                 padding: "5px 14px", fontSize: "12px", color: "rgba(255,255,255,0.85)", fontWeight: 600,
               }}>
-                <span>{icon}</span><span>{text}</span>
+                <JobIcon name={icon} size={14} color="#C9A24B" />
+                <span>{text}</span>
               </div>
             ))}
           </div>
@@ -607,7 +666,7 @@ export default function Home() {
               background: "white",
               borderRadius: "28px",
               padding: "28px 28px 22px",
-              boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
+              boxShadow: "0 24px 64px rgba(201,162,75,0.18), 0 4px 20px rgba(0,0,0,0.07)",
             }}
           >
             {/* 사용량 카운터 + 경고 */}
@@ -633,7 +692,7 @@ export default function Home() {
                 borderRadius: "12px", padding: "10px 14px", marginBottom: "12px",
                 fontSize: "13px", color: "#92400E", fontWeight: 500,
               }}>
-                ⚠️ 이번 달 {FREE_LIMIT - (profile?.monthly_usage ?? 0)}회 남았습니다.
+                이번 달 {FREE_LIMIT - (profile?.monthly_usage ?? 0)}회 남았습니다.
                 프리미엄으로 업그레이드하면 무제한 분석이 가능합니다.
               </div>
             )}
@@ -655,28 +714,28 @@ export default function Home() {
                       key={job}
                       onClick={() => handleAnalyze(job)}
                       style={{
-                        background: "#F5F4FF", border: "1.5px solid #EDE9FE",
-                        borderRadius: "16px", padding: "12px 6px", color: "#5B52D6",
+                        background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.25)",
+                        borderRadius: "16px", padding: "12px 6px", color: "#C9A24B",
                         fontWeight: 600, cursor: "pointer", transition: "all 0.15s ease",
                         textAlign: "center", display: "flex", flexDirection: "column",
                         alignItems: "center", gap: "6px",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "#6C63FF";
-                        e.currentTarget.style.color = "white";
-                        e.currentTarget.style.borderColor = "#6C63FF";
+                        e.currentTarget.style.background = "#C9A24B";
+                        e.currentTarget.style.color = "#0B1B2B";
+                        e.currentTarget.style.borderColor = "#C9A24B";
                         e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(108,99,255,0.3)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(201,162,75,0.3)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "#F5F4FF";
-                        e.currentTarget.style.color = "#5B52D6";
-                        e.currentTarget.style.borderColor = "#EDE9FE";
+                        e.currentTarget.style.background = "rgba(201,162,75,0.08)";
+                        e.currentTarget.style.color = "#C9A24B";
+                        e.currentTarget.style.borderColor = "rgba(201,162,75,0.25)";
                         e.currentTarget.style.transform = "translateY(0)";
                         e.currentTarget.style.boxShadow = "none";
                       }}
                     >
-                      <span style={{ fontSize: "24px", lineHeight: 1 }}>{icon}</span>
+                      <JobIcon name={icon} size={24} />
                       <span style={{ fontSize: "13px", lineHeight: 1.3, wordBreak: "keep-all" }}>{name}</span>
                     </button>
                   ))}
@@ -687,7 +746,7 @@ export default function Home() {
           <div style={{ textAlign: "center", marginTop: "12px" }}>
             <button
               onClick={() => setServiceMode("paid")}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#6C63FF", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#C9A24B", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
             >
               유료 플랜 자세히 보기 →
             </button>
@@ -701,17 +760,17 @@ export default function Home() {
 
           {/* 문제 공감 */}
           <div style={{ marginTop: "56px", textAlign: "center" }}>
-            <div style={{
-              display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#6C63FF", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "14px",
-            }}>WHY BTS</div>
+            <div className="label-mono" style={{
+              display: "inline-block", background: "rgba(201,162,75,0.12)", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#C9A24B", fontWeight: 500,
+              marginBottom: "14px",
+            }}>WHY THIS</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "20px", wordBreak: "keep-all" }}>
               직업만 보면 절반만 보는 것입니다
             </h2>
             <div style={{
               background: "white", borderRadius: "20px", padding: "24px 28px",
-              boxShadow: "0 8px 32px rgba(65,88,208,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
+              boxShadow: "0 8px 32px rgba(201,162,75,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
             }}>
               <p style={{ fontSize: "15px", color: "#374151", lineHeight: 1.9, marginBottom: "14px" }}>
                 같은 직업이어도<br />
@@ -720,9 +779,9 @@ export default function Home() {
               <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.8, marginBottom: "14px" }}>
                 차이는 직업 이름이 아니라 준비 상태와 역량 구조에 있습니다.
               </p>
-              <div style={{ background: "#F5F4FF", borderRadius: "12px", padding: "14px 18px", borderLeft: "4px solid #6C63FF" }}>
-                <p style={{ fontSize: "14px", color: "#4C1D95", lineHeight: 1.7, margin: 0, fontWeight: 600 }}>
-                  BTS는 직업의 변화 가능성만 보지 않습니다. 당신도 함께 봅니다.
+              <div style={{ background: "rgba(201,162,75,0.08)", borderRadius: "12px", padding: "14px 18px", borderLeft: "4px solid #C9A24B" }}>
+                <p style={{ fontSize: "14px", color: "#1E1B4B", lineHeight: 1.7, margin: 0, fontWeight: 600 }}>
+                  이 분석은 직업의 변화 가능성만 보지 않습니다. 당신도 함께 봅니다.
                 </p>
               </div>
             </div>
@@ -730,10 +789,10 @@ export default function Home() {
 
           {/* 8개 분석 축 */}
           <div style={{ marginTop: "56px", textAlign: "center" }}>
-            <div style={{
-              display: "inline-block", background: "#FEF3C7", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "14px",
+            <div className="label-mono" style={{
+              display: "inline-block", background: "rgba(254,243,199,0.9)", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 500,
+              marginBottom: "14px",
             }}>8 DIMENSIONS</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "8px" }}>
               직업의 미래를 보는 8개 기준
@@ -743,20 +802,20 @@ export default function Home() {
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               {[
-                { icon: "⚡", name: "자동화 위험도", risk: "AI·로봇이 이 일을 직접 대체할 가능성" },
-                { icon: "🤝", name: "AI 협업 가능성", risk: "AI를 도구로 써서 오히려 강해질 수 있는지" },
-                { icon: "📈", name: "수요 변화 방향", risk: "10년 후 이 직업의 사회적 필요가 늘어나는지" },
-                { icon: "🏰", name: "진입장벽 높이", risk: "이 직업을 대체하기 얼마나 어려운지" },
-                { icon: "💰", name: "소득 방어력", risk: "변화 속에서도 수입 수준을 유지할 수 있는지" },
-                { icon: "🌊", name: "시장 변동성", risk: "경기·기술·정책 변화에 얼마나 흔들리는지" },
-                { icon: "🔄", name: "직업 전환 가능성", risk: "다른 직업으로 이동하기 얼마나 쉬운지" },
-                { icon: "🚀", name: "성장 확장 기회", risk: "AI 시대에 오히려 새 기회가 생기는지" },
+                { icon: "zap",          name: "자동화 위험도",   risk: "AI·로봇이 이 일을 직접 대체할 가능성" },
+                { icon: "handshake",    name: "AI 협업 가능성",  risk: "AI를 도구로 써서 오히려 강해질 수 있는지" },
+                { icon: "chart-line",   name: "수요 변화 방향",  risk: "10년 후 이 직업의 사회적 필요가 늘어나는지" },
+                { icon: "castle",       name: "진입장벽 높이",   risk: "이 직업을 대체하기 얼마나 어려운지" },
+                { icon: "dollar-sign",  name: "소득 방어력",     risk: "변화 속에서도 수입 수준을 유지할 수 있는지" },
+                { icon: "waves",        name: "시장 변동성",     risk: "경기·기술·정책 변화에 얼마나 흔들리는지" },
+                { icon: "refresh",      name: "직업 전환 가능성", risk: "다른 직업으로 이동하기 얼마나 쉬운지" },
+                { icon: "rocket",       name: "성장 확장 기회",   risk: "AI 시대에 오히려 새 기회가 생기는지" },
               ].map(({ icon, name, risk }) => (
                 <div key={name} style={{
                   background: "white", borderRadius: "16px", padding: "18px 16px",
-                  boxShadow: "0 4px 16px rgba(65,88,208,0.07)", border: "1px solid #EDE9FE", textAlign: "left",
+                  boxShadow: "0 4px 16px rgba(201,162,75,0.08)", border: "1px solid rgba(201,162,75,0.2)", textAlign: "left",
                 }}>
-                  <div style={{ fontSize: "22px", marginBottom: "8px" }}>{icon}</div>
+                  <JobIcon name={icon} size={22} color="#C9A24B" style={{ marginBottom: "8px" }} />
                   <div style={{ fontSize: "14px", fontWeight: 800, color: "#1E1B4B", marginBottom: "4px" }}>{name}</div>
                   <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.6 }}>{risk}</div>
                 </div>
@@ -766,26 +825,26 @@ export default function Home() {
 
           {/* 이 앱이 다른 이유 */}
           <div style={{ marginTop: "56px", textAlign: "center" }}>
-            <div style={{
-              display: "inline-block", background: "#F0FDF4", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#059669", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "14px",
+            <div className="label-mono" style={{
+              display: "inline-block", background: "rgba(240,253,244,0.95)", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#059669", fontWeight: 500,
+              marginBottom: "14px",
             }}>DIFFERENCE</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "24px" }}>
               이 앱이 다른 이유
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               {[
-                { icon: "🔍", title: "직업 분석", desc: "당신의 직업이 앞으로 어떤 방향으로 움직일지 분석합니다" },
-                { icon: "🔗", title: "역량 연결", desc: "직업 변화와 나의 현재 역량을 함께 봅니다" },
-                { icon: "🎯", title: "행동 제안", desc: "지금 줄일 것, 키울 것, 시작할 것을 제안합니다" },
-                { icon: "📈", title: "지속 추적", desc: "계속 변하는 미래를 따라갈 수 있게 돕습니다" },
+                { icon: "search",     title: "직업 분석", desc: "당신의 직업이 앞으로 어떤 방향으로 움직일지 분석합니다" },
+                { icon: "link",       title: "역량 연결", desc: "직업 변화와 나의 현재 역량을 함께 봅니다" },
+                { icon: "target",     title: "행동 제안", desc: "지금 줄일 것, 키울 것, 시작할 것을 제안합니다" },
+                { icon: "chart-line", title: "지속 추적", desc: "계속 변하는 미래를 따라갈 수 있게 돕습니다" },
               ].map(({ icon, title, desc }) => (
                 <div key={title} style={{
                   background: "white", borderRadius: "16px", padding: "20px 16px",
-                  boxShadow: "0 4px 16px rgba(65,88,208,0.07)", border: "1px solid #EDE9FE", textAlign: "left",
+                  boxShadow: "0 4px 16px rgba(201,162,75,0.08)", border: "1px solid rgba(201,162,75,0.2)", textAlign: "left",
                 }}>
-                  <div style={{ fontSize: "24px", marginBottom: "8px" }}>{icon}</div>
+                  <JobIcon name={icon} size={24} color="#C9A24B" style={{ marginBottom: "8px" }} />
                   <div style={{ fontSize: "14px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>{title}</div>
                   <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.6 }}>{desc}</div>
                 </div>
@@ -795,31 +854,31 @@ export default function Home() {
 
           {/* 대상자 */}
           <div style={{ marginTop: "56px", marginBottom: "56px", textAlign: "center" }}>
-            <div style={{
-              display: "inline-block", background: "#FFF7ED", borderRadius: "100px",
-              padding: "4px 16px", fontSize: "12px", color: "#C2410C", fontWeight: 700,
-              letterSpacing: "0.06em", marginBottom: "14px",
+            <div className="label-mono" style={{
+              display: "inline-block", background: "rgba(255,247,237,0.95)", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#C2410C", fontWeight: 500,
+              marginBottom: "14px",
             }}>WHO NEEDS THIS</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "20px" }}>
               직업이 걱정되는 분이라면
             </h2>
             <div style={{
               background: "white", borderRadius: "20px", padding: "24px 28px",
-              boxShadow: "0 8px 32px rgba(65,88,208,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
+              boxShadow: "0 8px 32px rgba(201,162,75,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
             }}>
               {[
-                { icon: "💼", text: "내 직업의 미래가 걱정되는 직장인" },
-                { icon: "🔄", text: "이직과 전환을 고민하는 분" },
-                { icon: "👨‍👩‍👧", text: "자녀 진로를 준비하는 부모" },
-                { icon: "📚", text: "학생을 지도하는 교사와 상담자" },
-                { icon: "⛪", text: "청소년과 청년의 길을 돕는 교회와 기관" },
+                { icon: "briefcase",      text: "내 직업의 미래가 걱정되는 직장인" },
+                { icon: "refresh",        text: "이직과 전환을 고민하는 분" },
+                { icon: "users",          text: "자녀 진로를 준비하는 부모" },
+                { icon: "books",          text: "학생을 지도하는 교사와 상담자" },
+                { icon: "church",         text: "청소년과 청년의 길을 돕는 교회와 기관" },
               ].map(({ icon, text }, i, arr) => (
                 <div key={text} style={{
                   display: "flex", alignItems: "center", gap: "14px",
                   padding: "13px 0",
                   borderBottom: i < arr.length - 1 ? "1px solid #F3F4F6" : "none",
                 }}>
-                  <span style={{ fontSize: "20px", flexShrink: 0 }}>{icon}</span>
+                  <JobIcon name={icon} size={20} color="#C9A24B" style={{ flexShrink: 0 }} />
                   <span style={{ fontSize: "14px", color: "#374151", fontWeight: 500 }}>{text}</span>
                 </div>
               ))}
@@ -827,7 +886,7 @@ export default function Home() {
                 onClick={() => { const el = document.querySelector("input"); el?.focus(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 style={{
                   width: "100%", marginTop: "20px", padding: "14px", borderRadius: "14px", border: "none",
-                  background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+                  background: "linear-gradient(135deg, #C9A24B, #B8912A)",
                   color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
                 }}
               >
@@ -851,8 +910,8 @@ export default function Home() {
             style={{
               display: "flex", alignItems: "center", gap: "6px",
               background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)",
-              border: "1px solid rgba(108,99,255,0.2)", borderRadius: "100px",
-              padding: "6px 14px", fontSize: "13px", color: "#6C63FF",
+              border: "1px solid rgba(201,162,75,0.2)", borderRadius: "100px",
+              padding: "6px 14px", fontSize: "13px", color: "#C9A24B",
               fontWeight: 600, cursor: "pointer", marginBottom: "12px",
             }}
           >
@@ -863,7 +922,7 @@ export default function Home() {
           <div style={{
             background: "white", borderRadius: "28px",
             padding: "36px 32px 32px",
-            boxShadow: "0 24px 64px rgba(65,88,208,0.18), 0 4px 20px rgba(0,0,0,0.07)",
+            boxShadow: "0 24px 64px rgba(201,162,75,0.18), 0 4px 20px rgba(0,0,0,0.07)",
           }}>
             {/* 헤더 */}
             <div style={{ textAlign: "center", marginBottom: "32px" }}>
@@ -876,10 +935,10 @@ export default function Home() {
                 ⏳ 얼리버드 모집 중
               </div>
               <h2 style={{ fontSize: "26px", fontWeight: 900, color: "#1E1B4B", marginBottom: "8px" }}>
-                BTS 유료 플랜 안내
+                직업의 미래 유료 플랜 안내
               </h2>
               <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.7 }}>
-                지금 얼리버드 신청하시면 <strong style={{ color: "#6C63FF" }}>출시 즉시 30% 할인가</strong>가 자동 적용됩니다
+                지금 얼리버드 신청하시면 <strong style={{ color: "#C9A24B" }}>출시 즉시 30% 할인가</strong>가 자동 적용됩니다
               </p>
             </div>
 
@@ -903,7 +962,7 @@ export default function Home() {
                       <span style={{ fontSize: "13px", fontWeight: 500, color: "#0891B2" }}>/월</span>
                     </div>
                   </div>
-                  <div style={{ fontSize: "36px" }}>🔍</div>
+                  <JobIcon name="search" size={36} color="#0891B2" />
                 </div>
 
                 {/* 한 줄 대상 설명 */}
@@ -911,8 +970,9 @@ export default function Home() {
                   background: "rgba(8,145,178,0.1)", borderRadius: "10px",
                   padding: "8px 12px", marginBottom: "14px",
                   fontSize: "13px", color: "#0C4A6E", fontWeight: 600,
+                  display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  💡 가볍게 시작하는 분께
+                  <JobIcon name="sparkles" size={14} color="#0891B2" />가볍게 시작하는 분께
                 </div>
 
                 {/* 왜 필요한가 */}
@@ -925,13 +985,13 @@ export default function Home() {
                 {/* 제공 방식 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {[
-                    ["🔄", "매월 10회", "다양한 직업을 자유롭게 분석"],
-                    ["⚙️", "업무별 대체 분석", "내 업무 중 AI가 먼저 대체할 세부 작업 식별"],
-                    ["🧠", "AI 협업 역량 점수", "AI와 함께 일하는 능력을 수치로 측정·가이드"],
-                    ["💆", "AI 불안 심리 케어", "직업 불안감을 실질적 행동 계획으로 전환"],
+                    ["refresh", "매월 10회",          "다양한 직업을 자유롭게 분석"],
+                    ["gear",    "업무별 대체 분석",   "내 업무 중 AI가 먼저 대체할 세부 작업 식별"],
+                    ["brain",   "AI 협업 역량 점수",  "AI와 함께 일하는 능력을 수치로 측정·가이드"],
+                    ["spa",     "AI 불안 심리 케어",  "직업 불안감을 실질적 행동 계획으로 전환"],
                   ].map(([icon, title, desc]) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <JobIcon name={icon} size={16} color="#0891B2" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
                         <span style={{ fontSize: "13px", fontWeight: 700, color: "#0C4A6E" }}>{title}</span>
                         <span style={{ fontSize: "12px", color: "#6B7280" }}> — {desc}</span>
@@ -964,15 +1024,16 @@ export default function Home() {
                       <span style={{ fontSize: "13px", fontWeight: 500, color: "#7C3AED" }}>/월</span>
                     </div>
                   </div>
-                  <div style={{ fontSize: "36px" }}>🗺️</div>
+                  <JobIcon name="map" size={36} color="#7C3AED" />
                 </div>
 
                 <div style={{
                   background: "rgba(124,58,237,0.1)", borderRadius: "10px",
                   padding: "8px 12px", marginBottom: "14px",
                   fontSize: "13px", color: "#4C1D95", fontWeight: 600,
+                  display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  💡 가장 추천하는 플랜
+                  <JobIcon name="sparkles" size={14} color="#7C3AED" />가장 추천하는 플랜
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
@@ -984,14 +1045,14 @@ export default function Home() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {[
-                    ["🔄", "기본 분석 20회", "매월 20회, 다양한 직업 시나리오 탐색 가능"],
-                    ["🌐", "비전 시나리오 3가지", "현재 유지 / 부분 전환 / 완전 전환 경로를 구체적 그림으로 제시"],
-                    ["🗺️", "직업 추천 + 역량 로드맵", "나에게 맞는 다음 직업과 갖춰야 할 역량을 단계별로 안내"],
-                    ["🤖", "AI 코치 월 30회", "분석 결과 기반 맞춤 커리어 상담을 AI가 즉시 제공"],
-                    ["💰", "연봉 협상 도우미", "내 직업·역량·시장 데이터를 바탕으로 협상 전략 제안"],
+                    ["refresh",     "기본 분석 20회",          "매월 20회, 다양한 직업 시나리오 탐색 가능"],
+                    ["globe",       "비전 시나리오 3가지",      "현재 유지 / 부분 전환 / 완전 전환 경로를 구체적 그림으로 제시"],
+                    ["map",         "직업 추천 + 역량 로드맵",  "나에게 맞는 다음 직업과 갖춰야 할 역량을 단계별로 안내"],
+                    ["sparkles",    "AI 코치 월 30회",          "분석 결과 기반 맞춤 커리어 상담을 AI가 즉시 제공"],
+                    ["dollar-sign", "연봉 협상 도우미",         "내 직업·역량·시장 데이터를 바탕으로 협상 전략 제안"],
                   ].map(([icon, title, desc]) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <JobIcon name={icon} size={16} color="#7C3AED" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
                         <span style={{ fontSize: "13px", fontWeight: 700, color: "#4C1D95" }}>{title}</span>
                         <span style={{ fontSize: "12px", color: "#6B7280" }}> — {desc}</span>
@@ -1019,7 +1080,7 @@ export default function Home() {
                       <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>/월</span>
                     </div>
                   </div>
-                  <div style={{ fontSize: "36px" }}>👑</div>
+                  <JobIcon name="crown" size={36} color="#D4AF37" />
                 </div>
 
                 <div style={{
@@ -1027,8 +1088,9 @@ export default function Home() {
                   padding: "8px 12px", marginBottom: "14px",
                   fontSize: "13px", color: "#FDE68A", fontWeight: 600,
                   border: "1px solid rgba(212,175,55,0.3)",
+                  display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  💡 부모와 자녀를 함께 보고 싶은 가정용 플랜
+                  <JobIcon name="sparkles" size={14} color="#D4AF37" />부모와 자녀를 함께 보고 싶은 가정용 플랜
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#C7D2FE", lineHeight: 1.7, marginBottom: "14px" }}>
@@ -1040,14 +1102,14 @@ export default function Home() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {[
-                    ["🔄", "기본 분석 30회", "나와 가족 모두를 위한 충분한 분석 횟수"],
-                    ["👨‍👩‍👧‍👦", "가족 진단 (자녀 3인)", "자녀의 미래 직업·적성을 AI가 청소년 눈높이로 분석"],
-                    ["🤖", "AI 코치 무제한", "언제든 커리어 고민을 AI 코치에게 상담, 횟수 제한 없음"],
-                    ["🌅", "AI 미래직업 데일리 카드", "매일 아침 카카오톡·이메일로 직업 트렌드 핵심 1가지를 카드로 전송"],
-                    ["📈", "월간 직업 트렌드 리포트", "매월 업종별 AI 대체 현황과 신흥 직업 트렌드 리포트 제공"],
+                    ["refresh",    "기본 분석 30회",            "나와 가족 모두를 위한 충분한 분석 횟수"],
+                    ["users",      "가족 진단 (자녀 3인)",       "자녀의 미래 직업·적성을 AI가 청소년 눈높이로 분석"],
+                    ["sparkles",   "AI 코치 무제한",             "언제든 커리어 고민을 AI 코치에게 상담, 횟수 제한 없음"],
+                    ["sunrise",    "AI 미래직업 데일리 카드",     "매일 아침 카카오톡·이메일로 직업 트렌드 핵심 1가지를 카드로 전송"],
+                    ["chart-line", "월간 직업 트렌드 리포트",     "매월 업종별 AI 대체 현황과 신흥 직업 트렌드 리포트 제공"],
                   ].map(([icon, title, desc]) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <JobIcon name={icon} size={16} color="#D4AF37" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
                         <span style={{ fontSize: "13px", fontWeight: 700, color: "#E0E7FF" }}>{title}</span>
                         <span style={{ fontSize: "12px", color: "#A5B4FC" }}> — {desc}</span>
@@ -1081,15 +1143,16 @@ export default function Home() {
                     </div>
                     <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "2px" }}>학교·학원 30명 기준</div>
                   </div>
-                  <div style={{ fontSize: "36px" }}>🏫</div>
+                  <JobIcon name="school" size={36} color="#059669" />
                 </div>
 
                 <div style={{
                   background: "rgba(5,150,105,0.1)", borderRadius: "10px",
                   padding: "8px 12px", marginBottom: "14px",
                   fontSize: "13px", color: "#064E3B", fontWeight: 600,
+                  display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  💡 학생들의 진로를 체계적으로 지도하는 학교·학원·진로상담 기관 선생님
+                  <JobIcon name="sparkles" size={14} color="#059669" />학생들의 진로를 체계적으로 지도하는 학교·학원·진로상담 기관 선생님
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
@@ -1101,15 +1164,15 @@ export default function Home() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {[
-                    ["👨‍🎓", "학생 30명 계정", "학생들이 각자 계정으로 자신의 진로를 직접 탐색"],
-                    ["🧭", "청소년 전용 진로 분석", "성인 기준이 아닌 청소년 적성·학업·미래직업 맞춤 분석"],
-                    ["🖥️", "선생님 대시보드", "반 전체 진행 상황·분석 결과를 한눈에 확인 및 관리"],
-                    ["📋", "학급 단위 진로 리포트", "반 전체의 진로 경향 통계와 집단 인사이트 리포트 제공"],
-                    ["🤖", "AI 진로 코치 (청소년 모드)", "학생이 궁금한 점을 AI 코치가 쉽고 친근하게 안내"],
-                    ["👪", "학부모 결과 공유", "자녀의 분석 결과를 학부모에게 안전하게 공유"],
+                    ["graduation-cap", "학생 30명 계정",            "학생들이 각자 계정으로 자신의 진로를 직접 탐색"],
+                    ["compass",        "청소년 전용 진로 분석",     "성인 기준이 아닌 청소년 적성·학업·미래직업 맞춤 분석"],
+                    ["monitor",        "선생님 대시보드",           "반 전체 진행 상황·분석 결과를 한눈에 확인 및 관리"],
+                    ["clipboard",      "학급 단위 진로 리포트",     "반 전체의 진로 경향 통계와 집단 인사이트 리포트 제공"],
+                    ["sparkles",       "AI 진로 코치 (청소년 모드)","학생이 궁금한 점을 AI 코치가 쉽고 친근하게 안내"],
+                    ["users",          "학부모 결과 공유",          "자녀의 분석 결과를 학부모에게 안전하게 공유"],
                   ].map(([icon, title, desc]) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                      <span style={{ fontSize: "16px", flexShrink: 0 }}>{icon}</span>
+                      <JobIcon name={icon} size={16} color="#059669" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
                         <span style={{ fontSize: "13px", fontWeight: 700, color: "#064E3B" }}>{title}</span>
                         <span style={{ fontSize: "12px", color: "#6B7280" }}> — {desc}</span>
@@ -1127,20 +1190,20 @@ export default function Home() {
               borderRadius: "18px", padding: "24px 20px", textAlign: "center",
               border: "1px solid #DDD6FE",
             }}>
-              <div style={{ fontSize: "22px", marginBottom: "8px" }}>🔔</div>
+              <div style={{ fontSize: "22px", marginBottom: "8px" }}></div>
               <div style={{ fontSize: "16px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>
                 출시 알림 신청
               </div>
               <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "16px", lineHeight: 1.6 }}>
                 유료 서비스 출시 시 이메일로 가장 먼저 알려드립니다<br />
-                <strong style={{ color: "#6C63FF" }}>사전 등록자 30% 얼리버드 할인</strong> 혜택 제공
+                <strong style={{ color: "#C9A24B" }}>사전 등록자 30% 얼리버드 할인</strong> 혜택 제공
               </div>
               <a
                 href="mailto:futurebox69@gmail.com?subject=유료서비스 출시 알림 신청&body=안녕하세요, 내 직업의 미래 유료 서비스 출시 알림을 신청합니다."
                 style={{
                   display: "inline-block",
                   padding: "13px 28px", borderRadius: "14px",
-                  background: "linear-gradient(135deg, #6C63FF, #4158D0)",
+                  background: "linear-gradient(135deg, #C9A24B, #B8912A)",
                   color: "white", fontSize: "15px", fontWeight: 700,
                   textDecoration: "none",
                 }}
@@ -1158,7 +1221,7 @@ export default function Home() {
                 onClick={() => setServiceMode("free")}
                 style={{
                   background: "none", border: "none", cursor: "pointer",
-                  color: "#6C63FF", fontSize: "14px", fontWeight: 600,
+                  color: "#C9A24B", fontSize: "14px", fontWeight: 600,
                   textDecoration: "underline",
                 }}
               >
@@ -1206,7 +1269,7 @@ export default function Home() {
             <div className="relative w-20 h-20">
               <div
                 className="absolute inset-0 rounded-full border-4 animate-spin"
-                style={{ borderColor: "rgba(108,99,255,0.15)", borderTopColor: "#6C63FF" }}
+                style={{ borderColor: "rgba(201,162,75,0.15)", borderTopColor: "#C9A24B" }}
               />
               <div
                 className="absolute inset-3 rounded-full border-4 animate-spin"
@@ -1222,8 +1285,8 @@ export default function Home() {
               {loadingMsg || t.loading[0]}
             </p>
             {assessmentCompleted && competencyResult && (
-              <p style={{ color: "#6C63FF", fontSize: "13px", fontWeight: 600 }}>
-                ✅ 역량 검사 완료! AI 분석 결과를 기다리는 중...
+              <p style={{ color: "#C9A24B", fontSize: "13px", fontWeight: 600 }}>
+                역량 검사 완료! AI 분석 결과를 기다리는 중...
               </p>
             )}
             <div className="flex gap-1.5">
@@ -1231,7 +1294,7 @@ export default function Home() {
                 <div
                   key={i}
                   className="w-1.5 h-1.5 rounded-full transition-all duration-500"
-                  style={{ background: i <= loadingStageIdx ? "#6C63FF" : "#E5E7EB" }}
+                  style={{ background: i <= loadingStageIdx ? "#C9A24B" : "#E5E7EB" }}
                 />
               ))}
             </div>
@@ -1328,7 +1391,7 @@ export default function Home() {
                   </span>
                 )}
                 {remaining !== null && profile?.role !== "admin" && (
-                  <span className="text-sm px-3 py-1 rounded-full" style={{ background: "#F5F4FF", color: "#6C63FF", border: "1px solid #EDE9FE" }}>
+                  <span className="text-sm px-3 py-1 rounded-full" style={{ background: "#F5F4FF", color: "#C9A24B", border: "1px solid #EDE9FE" }}>
                     {t.remaining}: {remaining}
                   </span>
                 )}
@@ -1342,7 +1405,7 @@ export default function Home() {
 
             {/* 요약 */}
             <div className="rounded-2xl p-5 border mb-6"
-              style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 1px 8px rgba(108,99,255,0.08)" }}>
+              style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 1px 8px rgba(201,162,75,0.08)" }}>
               <p className="text-base leading-relaxed text-center" style={{ color: "#4B5563" }}>
                 {result.summary}
               </p>
@@ -1363,15 +1426,15 @@ export default function Home() {
                     borderRadius: "100px",
                     fontSize: "14px",
                     fontWeight: activeSection === s.id ? 700 : 500,
-                    background: activeSection === s.id ? "#6C63FF" : "#F5F4FF",
-                    color: activeSection === s.id ? "white" : "#5B52D6",
-                    border: `1.5px solid ${activeSection === s.id ? "#6C63FF" : "#EDE9FE"}`,
+                    background: activeSection === s.id ? "#C9A24B" : "#F5F4FF",
+                    color: activeSection === s.id ? "white" : "#C9A24B",
+                    border: `1.5px solid ${activeSection === s.id ? "#C9A24B" : "#EDE9FE"}`,
                     cursor: "pointer",
                     transition: "all 0.15s",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {s.icon} {s.label}
+                  <JobIcon name={s.icon} size={14} color={activeSection === s.id ? "white" : "#C9A24B"} /> {s.label}
                 </button>
               ))}
             </div>
@@ -1388,12 +1451,12 @@ export default function Home() {
                   top: "24px",
                   borderRadius: "22px",
                   overflow: "hidden",
-                  boxShadow: "0 4px 24px rgba(108,99,255,0.13)",
+                  boxShadow: "0 4px 24px rgba(201,162,75,0.13)",
                 }}
               >
                 {/* 헤더 — 그라디언트 */}
                 <div style={{
-                  background: "linear-gradient(135deg, #6C63FF 0%, #4158D0 100%)",
+                  background: "linear-gradient(135deg, #0B1B2B 0%, #142B44 100%)",
                   padding: "18px 16px 16px",
                 }}>
                   <div style={{
@@ -1444,9 +1507,9 @@ export default function Home() {
                             width: "28px", height: "28px", borderRadius: "8px", flexShrink: 0,
                             background: isActive ? style.color : "#F3F4F6",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: "13px", transition: "all 0.13s",
+                            transition: "all 0.13s",
                           }}>
-                            {s.icon}
+                            <JobIcon name={s.icon} size={16} color={isActive ? "white" : "#6B7280"} />
                           </span>
                           <span style={{
                             fontSize: "13px", fontWeight: isActive ? 700 : 500,
@@ -1480,11 +1543,11 @@ export default function Home() {
                         width: "28px", height: "28px", borderRadius: "8px", flexShrink: 0,
                         background: activeSection === "coach" ? "rgba(255,255,255,0.35)" : "rgba(212,175,55,0.15)",
                         display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px",
-                      }}>🔮</span>
+                      }}></span>
                       <span style={{
                         fontSize: "13px", fontWeight: 700, color: "#92400E",
                       }}>
-                        {t.section_coach.replace("🔮 ", "").replace("🔮", "")}
+                        {t.section_coach.replace("", "").replace("", "")}
                       </span>
                     </button>
                   </div>
@@ -1502,7 +1565,7 @@ export default function Home() {
                   />
                 ) : activeSection === "competency" && !competencyResult ? (
                   <div style={{ textAlign: "center", padding: "60px 20px" }}>
-                    <div style={{ fontSize: "48px", marginBottom: "16px" }}>🧠</div>
+                    <div style={{ fontSize: "48px", marginBottom: "16px" }}></div>
                     <p style={{ color: "#1E1B4B", fontSize: "17px", fontWeight: 700, marginBottom: "8px" }}>
                       역량 검사를 진행하지 않았습니다
                     </p>
@@ -1523,12 +1586,12 @@ export default function Home() {
                         padding: "14px 36px",
                         borderRadius: "14px",
                         border: "none",
-                        background: "linear-gradient(135deg, #6C63FF, #8B5CF6)",
+                        background: "linear-gradient(135deg, #C9A24B, #8B5CF6)",
                         color: "#fff",
                         fontSize: "15px",
                         fontWeight: 700,
                         cursor: "pointer",
-                        boxShadow: "0 8px 24px rgba(108,99,255,0.3)",
+                        boxShadow: "0 8px 24px rgba(201,162,75,0.3)",
                       }}
                     >
                       지금 검사하기
@@ -1541,7 +1604,7 @@ export default function Home() {
                 )}
                 {activeSection === "survival"    && (!result.survivalSkills || result.survivalSkills.length !== 3) && (
                   <div className="rounded-2xl border p-8 text-center" style={{ background: "#F8F7FF", borderColor: "#DDD6FE" }}>
-                    <p className="text-4xl mb-3">🛡️</p>
+                    <p className="text-4xl mb-3"></p>
                     <p className="font-bold text-lg mb-2" style={{ color: "#1E1B4B" }}>
                       {lang === "ko" ? "살아남는 스킬 3가지" : "3 Survival Skills"}
                     </p>
@@ -1580,6 +1643,33 @@ export default function Home() {
                         WEF Future of Jobs 2025 · ILO · O*NET · Frey &amp; Osborne (2013·2023) · McKinsey (2023) · Autor (2022)
                       </p>
                     </div>
+
+                    {/* B1 — REFRAME 진단 유입 CTA */}
+                    <a
+                      href={`https://futurebox.live/${trackParam ? `?track=${trackParam}` : ""}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "18px 22px", borderRadius: "16px",
+                        background: "linear-gradient(135deg, #0B1B2B 0%, #142B44 100%)",
+                        border: "1px solid #C9A24B", textDecoration: "none",
+                        gap: "12px",
+                      }}
+                    >
+                      <div>
+                        <p style={{ fontSize: "15px", color: "#F2EBDC", fontWeight: 700, lineHeight: 1.4, margin: 0 }}>
+                          내 직무 구조를 더 깊이 보려면 → REFRAME
+                        </p>
+                      </div>
+                      <div style={{
+                        flexShrink: 0, width: "40px", height: "40px", borderRadius: "50%",
+                        background: "#C9A24B", display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "18px",
+                      }}>
+                        →
+                      </div>
+                    </a>
                   </div>
                 )}
               </div>
@@ -1593,7 +1683,7 @@ export default function Home() {
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <div style={{
             display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
-            padding: "5px 16px", fontSize: "13px", color: "#6C63FF", fontWeight: 600, marginBottom: "12px",
+            padding: "5px 16px", fontSize: "13px", color: "#C9A24B", fontWeight: 600, marginBottom: "12px",
           }}>요금제</div>
           <h2 style={{ fontSize: "28px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>
             지금은 무료로 시작하세요
@@ -1616,7 +1706,7 @@ export default function Home() {
           {(() => {
             const plans = [
               {
-                tag: "FREE", tagColor: "#6C63FF", tagBg: "#F0EEFF",
+                tag: "FREE", tagColor: "#C9A24B", tagBg: "#F0EEFF",
                 name: "무료", price: null, sub: "로그인 후 바로 시작",
                 dark: false, highlight: false, comingSoon: false,
                 features: [
@@ -1712,7 +1802,7 @@ export default function Home() {
                     : plan.dark
                       ? "0 4px 24px rgba(79,70,229,0.2)"
                       : plan.tag === "EDU" ? "0 4px 24px rgba(5,150,105,0.15)"
-                      : "0 2px 12px rgba(108,99,255,0.06)",
+                      : "0 2px 12px rgba(201,162,75,0.06)",
                   position: "relative",
                   overflow: "hidden",
                   display: "flex", flexDirection: "column" as const,
@@ -1750,7 +1840,7 @@ export default function Home() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "22px", flex: 1 }}>
                   {plan.features.map((f) => (
                     <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: plan.dark ? "#C7D2FE" : "#374151", lineHeight: 1.4 }}>
-                      <span style={{ color: plan.dark ? "#D4AF37" : plan.tagColor, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>
+                      <span style={{ color: plan.dark ? "#D4AF37" : plan.tagColor, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}></span>
                       <span style={{ wordBreak: "keep-all" }}>{f}</span>
                     </div>
                   ))}
@@ -1769,8 +1859,8 @@ export default function Home() {
                     onClick={() => { setAuthReason(undefined); setShowAuthModal(true); }}
                     style={{
                       width: "100%", padding: "12px",
-                      borderRadius: "12px", border: "2px solid #6C63FF",
-                      background: "white", color: "#6C63FF",
+                      borderRadius: "12px", border: "2px solid #C9A24B",
+                      background: "white", color: "#C9A24B",
                       fontSize: "14px", fontWeight: 700, cursor: "pointer",
                     }}
                   >

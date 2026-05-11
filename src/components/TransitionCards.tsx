@@ -20,8 +20,8 @@ const LABELS: Record<LangCode, {
   difficulty: Record<string, string>;
 }> = {
   ko: {
-    title: "🗺️ 전환 경로",
-    youth_title: "🗺️ 진로 전환 경로",
+    title: "전환 경로",
+    youth_title: "진로 전환 경로",
     types: { 이직: "이직", 전직: "전직", 창직: "창직" },
     type_descs: {
       이직: { adult: "같은 분야, 더 안전한 포지션", youth: "관련 진로 탐색" },
@@ -34,8 +34,8 @@ const LABELS: Record<LangCode, {
     difficulty: { 낮음: "낮음", 보통: "보통", 높음: "높음" },
   },
   en: {
-    title: "🗺️ Career Transition Paths",
-    youth_title: "🗺️ Career Path Options",
+    title: "Career Transition Paths",
+    youth_title: "Career Path Options",
     types: { 이직: "Job Switch", 전직: "Career Change", 창직: "New Career" },
     type_descs: {
       이직: { adult: "Same field, safer position", youth: "Explore related careers" },
@@ -48,8 +48,8 @@ const LABELS: Record<LangCode, {
     difficulty: { 낮음: "Low", 보통: "Medium", 높음: "High" },
   },
   zh: {
-    title: "🗺️ 转型路径",
-    youth_title: "🗺️ 职业路径选择",
+    title: "转型路径",
+    youth_title: "职业路径选择",
     types: { 이직: "换工作", 전직: "转行", 창직: "创造新职业" },
     type_descs: {
       이직: { adult: "同领域，更安全的职位", youth: "探索相关职业" },
@@ -62,8 +62,8 @@ const LABELS: Record<LangCode, {
     difficulty: { 낮음: "低", 보통: "中", 높음: "高" },
   },
   ja: {
-    title: "🗺️ 転換経路",
-    youth_title: "🗺️ 進路転換経路",
+    title: "転換経路",
+    youth_title: "進路転換経路",
     types: { 이직: "転職", 전직: "異業種転職", 창직: "新職業創造" },
     type_descs: {
       이직: { adult: "同分野でより安全なポジションへ", youth: "関連進路を探索" },
@@ -76,8 +76,8 @@ const LABELS: Record<LangCode, {
     difficulty: { 낮음: "低", 보통: "普通", 높음: "高" },
   },
   es: {
-    title: "🗺️ Rutas de Transición",
-    youth_title: "🗺️ Opciones de Carrera",
+    title: "Rutas de Transición",
+    youth_title: "Opciones de Carrera",
     types: { 이직: "Cambio de Empleo", 전직: "Cambio de Carrera", 창직: "Nueva Carrera" },
     type_descs: {
       이직: { adult: "Mismo campo, posición más segura", youth: "Explorar carreras relacionadas" },
@@ -92,9 +92,9 @@ const LABELS: Record<LangCode, {
 };
 
 const TYPE_STYLES = {
-  이직: { icon: "💼", bg: "#F5F4FF", border: "#DDD6FE", color: "#6C63FF", badgeBg: "#EDE9FE", badgeColor: "#6C63FF" },
-  전직: { icon: "🚀", bg: "#FFF7ED", border: "#FED7AA", color: "#EA580C", badgeBg: "#FFEDD5", badgeColor: "#EA580C" },
-  창직: { icon: "✨", bg: "#F0FDF4", border: "#BBF7D0", color: "#16A34A", badgeBg: "#DCFCE7", badgeColor: "#16A34A" },
+  이직: { icon: "", bg: "#F5F4FF", border: "#DDD6FE", color: "#6C63FF", badgeBg: "#EDE9FE", badgeColor: "#6C63FF" },
+  전직: { icon: "", bg: "#FFF7ED", border: "#FED7AA", color: "#EA580C", badgeBg: "#FFEDD5", badgeColor: "#EA580C" },
+  창직: { icon: "", bg: "#F0FDF4", border: "#BBF7D0", color: "#16A34A", badgeBg: "#DCFCE7", badgeColor: "#16A34A" },
 };
 
 const DIFFICULTY_COLORS = {

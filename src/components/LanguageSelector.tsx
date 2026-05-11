@@ -26,7 +26,7 @@ export default function LanguageSelector({ lang, onChange }: LanguageSelectorPro
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all hover:opacity-80"
-        style={{ background: "#F5F4FF", border: "1px solid #EDE9FE", color: "#6C63FF" }}
+        style={{ background: "rgba(201,162,75,0.12)", border: "1px solid rgba(201,162,75,0.25)", color: "#C9A24B" }}
       >
         <span>{current.flag}</span>
         <span>{current.nativeLabel}</span>
@@ -36,7 +36,7 @@ export default function LanguageSelector({ lang, onChange }: LanguageSelectorPro
       {open && (
         <div
           className="absolute right-0 mt-2 rounded-2xl overflow-hidden shadow-xl"
-          style={{ background: "#fff", border: "1px solid #EDE9FE", minWidth: 160, zIndex: 100 }}
+          style={{ background: "#fff", border: "1px solid rgba(201,162,75,0.25)", minWidth: 160, zIndex: 100 }}
         >
           {LANGUAGES.map((l) => (
             <button
@@ -44,14 +44,14 @@ export default function LanguageSelector({ lang, onChange }: LanguageSelectorPro
               onClick={() => { onChange(l.code); setOpen(false); }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors hover:bg-purple-50"
               style={{
-                color: l.code === lang ? "#6C63FF" : "#374151",
+                color: l.code === lang ? "#C9A24B" : "#374151",
                 fontWeight: l.code === lang ? 700 : 400,
-                background: l.code === lang ? "#F5F4FF" : "transparent",
+                background: l.code === lang ? "rgba(201,162,75,0.12)" : "transparent",
               }}
             >
               <span style={{ fontSize: 18 }}>{l.flag}</span>
               <span>{l.nativeLabel}</span>
-              {l.code === lang && <span className="ml-auto text-xs" style={{ color: "#6C63FF" }}>✓</span>}
+              {l.code === lang && <span className="ml-auto text-xs" style={{ color: "#C9A24B" }}>✓</span>}
             </button>
           ))}
         </div>

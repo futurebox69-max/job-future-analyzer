@@ -17,35 +17,35 @@ const LABELS: Record<LangCode, {
   action_label: string;
 }> = {
   ko: {
-    badge: "🛡️ AI 시대 생존 전략",
+    badge: "AI 시대 생존 전략",
     title: "살아남는 스킬 3가지",
     subtitle: (job) => `${job}이(가) AI 시대에도 살아남으려면 이 3가지가 핵심입니다`,
     reason_label: "대체 불가 이유",
     action_label: "오늘의 실천",
   },
   en: {
-    badge: "🛡️ AI Era Survival Strategy",
+    badge: "AI Era Survival Strategy",
     title: "3 Skills That Will Save Your Career",
     subtitle: (job) => `These 3 skills are critical for ${job} to survive the AI era`,
     reason_label: "Why AI Can't Replace It",
     action_label: "Action Today",
   },
   zh: {
-    badge: "🛡️ AI时代生存策略",
+    badge: "AI时代生存策略",
     title: "3项必备生存技能",
     subtitle: (job) => `${job}在AI时代生存的3项核心能力`,
     reason_label: "为何AI无法替代",
     action_label: "今日行动",
   },
   ja: {
-    badge: "🛡️ AI時代の生存戦略",
+    badge: "AI時代の生存戦略",
     title: "生き残る3つのスキル",
     subtitle: (job) => `${job}がAI時代を生き残るための3つの核心スキル`,
     reason_label: "AI代替不可の理由",
     action_label: "今日の実践",
   },
   es: {
-    badge: "🛡️ Estrategia de Supervivencia en la Era IA",
+    badge: "Estrategia de Supervivencia en la Era IA",
     title: "3 Habilidades para Sobrevivir",
     subtitle: (job) => `Estas 3 habilidades son clave para que ${job} sobreviva en la era IA`,
     reason_label: "Por qué la IA no puede reemplazarlo",
@@ -135,7 +135,7 @@ export default function SurvivalSkills({ skills, jobName, lang = "ko" }: Props) 
                   className="flex items-start gap-2 rounded-lg p-2.5"
                   style={{ background: "rgba(255,255,255,0.7)", border: `1px solid ${color.border}` }}
                 >
-                  <span className="text-sm">⚡</span>
+                  <span className="text-sm"></span>
                   <div>
                     <span className="text-xs font-bold" style={{ color: color.accent }}>
                       {L.action_label}&nbsp;

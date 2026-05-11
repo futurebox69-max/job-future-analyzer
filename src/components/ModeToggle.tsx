@@ -10,11 +10,11 @@ interface ModeToggleProps {
 }
 
 const MODE_LABELS: Record<LangCode, { adult: string; youth: string }> = {
-  ko: { adult: "👔 성인",    youth: "🎓 청소년" },
-  en: { adult: "👔 Adult",   youth: "🎓 Youth"  },
-  zh: { adult: "👔 成人",    youth: "🎓 青少年" },
-  ja: { adult: "👔 社会人",  youth: "🎓 若者"   },
-  es: { adult: "👔 Adulto",  youth: "🎓 Joven"  },
+  ko: { adult: "성인",    youth: "청소년" },
+  en: { adult: "Adult",   youth: "Youth"  },
+  zh: { adult: "成人",    youth: "青少年" },
+  ja: { adult: "社会人",  youth: "若者"   },
+  es: { adult: "Adulto",  youth: "Joven"  },
 };
 
 export default function ModeToggle({ mode, onChange, lang = "ko", variant = "default" }: ModeToggleProps) {
@@ -31,7 +31,7 @@ export default function ModeToggle({ mode, onChange, lang = "ko", variant = "def
       } : {
         background: "#FFFFFF",
         border: "1px solid #EDE9FE",
-        boxShadow: "0 2px 8px rgba(108,99,255,0.12)",
+        boxShadow: "0 2px 8px rgba(201,162,75,0.12)",
       }}
     >
       <button
@@ -40,13 +40,13 @@ export default function ModeToggle({ mode, onChange, lang = "ko", variant = "def
         style={mode === "adult" ? (
           isGlass ? {
             background: "rgba(255,255,255,0.9)",
-            color: "#6C63FF",
+            color: "#C9A24B",
             fontWeight: 700,
             boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
           } : {
-            background: "#6C63FF",
+            background: "#C9A24B",
             color: "white",
-            boxShadow: "0 2px 8px rgba(108,99,255,0.35)",
+            boxShadow: "0 2px 8px rgba(201,162,75,0.35)",
           }
         ) : (
           isGlass ? {
@@ -64,13 +64,13 @@ export default function ModeToggle({ mode, onChange, lang = "ko", variant = "def
         style={mode === "youth" ? (
           isGlass ? {
             background: "rgba(255,255,255,0.9)",
-            color: "#6C63FF",
+            color: "#C9A24B",
             fontWeight: 700,
             boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
           } : {
-            background: "#6C63FF",
+            background: "#C9A24B",
             color: "white",
-            boxShadow: "0 2px 8px rgba(108,99,255,0.35)",
+            boxShadow: "0 2px 8px rgba(201,162,75,0.35)",
           }
         ) : (
           isGlass ? {

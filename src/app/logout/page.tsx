@@ -24,7 +24,7 @@ export default function LogoutPage() {
         justifyContent: "center", background: "#F8F7FF",
       }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "32px", marginBottom: "12px" }}>👋</div>
+          <div style={{ fontSize: "32px", marginBottom: "12px" }}></div>
           <div style={{ fontSize: "16px", color: "#6B7280" }}>로그아웃 중...</div>
         </div>
       </div>

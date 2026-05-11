@@ -17,7 +17,7 @@ const LABELS: Record<LangCode, {
   global: string;
 }> = {
   ko: {
-    title: "🏭 업종별 세부 분석",
+    title: "업종별 세부 분석",
     subtitle: "같은 직업이라도 환경에 따라 다른 AI 대체 속도",
     large: "대기업",
     sme: "중소기업",
@@ -25,7 +25,7 @@ const LABELS: Record<LangCode, {
     global: "글로벌 동향",
   },
   en: {
-    title: "🏭 Industry-Specific Analysis",
+    title: "Industry-Specific Analysis",
     subtitle: "AI replacement speed varies by work environment",
     large: "Large Enterprise",
     sme: "SME / Small Business",
@@ -33,7 +33,7 @@ const LABELS: Record<LangCode, {
     global: "Global Trends",
   },
   zh: {
-    title: "🏭 行业细分分析",
+    title: "行业细分分析",
     subtitle: "同一职业在不同环境下AI替代速度不同",
     large: "大企业",
     sme: "中小企业",
@@ -41,7 +41,7 @@ const LABELS: Record<LangCode, {
     global: "全球动态",
   },
   ja: {
-    title: "🏭 業種別詳細分析",
+    title: "業種別詳細分析",
     subtitle: "同じ職業でも環境によってAI代替速度が異なる",
     large: "大企業",
     sme: "中小企業",
@@ -49,7 +49,7 @@ const LABELS: Record<LangCode, {
     global: "グローバル動向",
   },
   es: {
-    title: "🏭 Análisis por Sector Industrial",
+    title: "Análisis por Sector Industrial",
     subtitle: "La velocidad de reemplazo IA varía según el entorno laboral",
     large: "Gran Empresa",
     sme: "PYME / Pequeña Empresa",
@@ -62,10 +62,10 @@ export default function IndustryContext({ data, lang = "ko" }: Props) {
   const L = LABELS[lang];
 
   const CONTEXTS = [
-    { key: "largeEnterprise" as const, icon: "🏢", label: L.large, color: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE" },
-    { key: "sme" as const, icon: "🏪", label: L.sme, color: "#16A34A", bg: "#F0FDF4", border: "#BBF7D0" },
-    { key: "freelance" as const, icon: "🧑‍💻", label: L.freelance, color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
-    { key: "globalTrend" as const, icon: "🌍", label: L.global, color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
+    { key: "largeEnterprise" as const, icon: "", label: L.large, color: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE" },
+    { key: "sme" as const, icon: "", label: L.sme, color: "#16A34A", bg: "#F0FDF4", border: "#BBF7D0" },
+    { key: "freelance" as const, icon: "‍", label: L.freelance, color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+    { key: "globalTrend" as const, icon: "", label: L.global, color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
   ];
 
   return (
@@ -74,7 +74,7 @@ export default function IndustryContext({ data, lang = "ko" }: Props) {
       style={{ background: "#FFFFFF", borderColor: "#EDE9FE", boxShadow: "0 2px 16px rgba(108,99,255,0.07)" }}
     >
       <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: "#1E1B4B" }}>
-        <span>🏭</span> {L.title.replace("🏭 ", "")}
+        <span></span> {L.title.replace("", "")}
       </h2>
       <p className="text-sm mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 

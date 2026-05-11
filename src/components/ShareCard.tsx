@@ -45,15 +45,15 @@ function getShareText(result: AnalysisResult, lang: LangCode, appUrl: string): s
 
   switch (lang) {
     case "en":
-      return `🔮 Future of My Job — "${jobName}"\n\nAI Replacement Rate: ${overallRate}% (${riskLabel})\n10-Year Forecast: ${timeHorizon.year10}%\n\nKey Skills to Keep:\n${skills}\n\n${result.summary}\n\n👉 Check yours: ${appUrl}`;
+      return `Future of My Job — "${jobName}"\n\nAI Replacement Rate: ${overallRate}% (${riskLabel})\n10-Year Forecast: ${timeHorizon.year10}%\n\nKey Skills to Keep:\n${skills}\n\n${result.summary}\n\nCheck yours: ${appUrl}`;
     case "zh":
-      return `🔮 我的职业未来 — "${jobName}"\n\nAI取代率：${overallRate}%（${riskLabel}）\n10年预测：${timeHorizon.year10}%\n\n需要保持的关键技能：\n${skills}\n\n${result.summary}\n\n👉 查看您的职业：${appUrl}`;
+      return `我的职业未来 — "${jobName}"\n\nAI取代率：${overallRate}%（${riskLabel}）\n10年预测：${timeHorizon.year10}%\n\n需要保持的关键技能：\n${skills}\n\n${result.summary}\n\n查看您的职业：${appUrl}`;
     case "ja":
-      return `🔮 私の仕事の未来 — "${jobName}"\n\nAI代替率：${overallRate}%（${riskLabel}）\n10年後予測：${timeHorizon.year10}%\n\n強化すべきスキル：\n${skills}\n\n${result.summary}\n\n👉 あなたの職業を確認：${appUrl}`;
+      return `私の仕事の未来 — "${jobName}"\n\nAI代替率：${overallRate}%（${riskLabel}）\n10年後予測：${timeHorizon.year10}%\n\n強化すべきスキル：\n${skills}\n\n${result.summary}\n\nあなたの職業を確認：${appUrl}`;
     case "es":
-      return `🔮 Futuro de Mi Trabajo — "${jobName}"\n\nReemplazo IA: ${overallRate}% (${riskLabel})\nProyección 10 años: ${timeHorizon.year10}%\n\nHabilidades clave a mantener:\n${skills}\n\n${result.summary}\n\n👉 Comprueba la tuya: ${appUrl}`;
+      return `Futuro de Mi Trabajo — "${jobName}"\n\nReemplazo IA: ${overallRate}% (${riskLabel})\nProyección 10 años: ${timeHorizon.year10}%\n\nHabilidades clave a mantener:\n${skills}\n\n${result.summary}\n\nComprueba la tuya: ${appUrl}`;
     default:
-      return `🔮 내 직업의 미래 — "${jobName}"\n\nAI 대체율: ${overallRate}% (${riskLabel})\n10년 후 예측: ${timeHorizon.year10}%\n\n지금 강화할 역량:\n${skills}\n\n${result.summary}\n\n👉 내 직업 확인하기: ${appUrl}`;
+      return `내 직업의 미래 — "${jobName}"\n\nAI 대체율: ${overallRate}% (${riskLabel})\n10년 후 예측: ${timeHorizon.year10}%\n\n지금 강화할 역량:\n${skills}\n\n${result.summary}\n\n내 직업 확인하기: ${appUrl}`;
   }
 }
 
@@ -61,9 +61,9 @@ const LABELS = {
   ko: {
     share_btn: "결과 공유하기",
     share_title: "결과 카드 공유",
-    save_image: "📷 이미지로 저장",
-    copy_link: "🔗 텍스트 복사",
-    copied: "✅ 복사됨",
+    save_image: "이미지로 저장",
+    copy_link: "텍스트 복사",
+    copied: "복사됨",
     share_x: "X에 공유",
     share_threads: "Threads",
     share_kakao: "카카오톡",
@@ -76,9 +76,9 @@ const LABELS = {
   en: {
     share_btn: "Share Results",
     share_title: "Share Result Card",
-    save_image: "📷 Save as Image",
-    copy_link: "🔗 Copy Text",
-    copied: "✅ Copied",
+    save_image: "Save as Image",
+    copy_link: "Copy Text",
+    copied: "Copied",
     share_x: "Share on X",
     share_threads: "Threads",
     share_kakao: "KakaoTalk",
@@ -91,9 +91,9 @@ const LABELS = {
   zh: {
     share_btn: "分享结果",
     share_title: "分享结果卡片",
-    save_image: "📷 保存图片",
-    copy_link: "🔗 复制文本",
-    copied: "✅ 已复制",
+    save_image: "保存图片",
+    copy_link: "复制文本",
+    copied: "已复制",
     share_x: "分享到X",
     share_threads: "Threads",
     share_kakao: "KakaoTalk",
@@ -106,9 +106,9 @@ const LABELS = {
   ja: {
     share_btn: "結果をシェア",
     share_title: "結果カードをシェア",
-    save_image: "📷 画像を保存",
-    copy_link: "🔗 テキストをコピー",
-    copied: "✅ コピー済み",
+    save_image: "画像を保存",
+    copy_link: "テキストをコピー",
+    copied: "コピー済み",
     share_x: "Xでシェア",
     share_threads: "Threads",
     share_kakao: "KakaoTalk",
@@ -121,9 +121,9 @@ const LABELS = {
   es: {
     share_btn: "Compartir Resultado",
     share_title: "Compartir Tarjeta",
-    save_image: "📷 Guardar Imagen",
-    copy_link: "🔗 Copiar Texto",
-    copied: "✅ Copiado",
+    save_image: "Guardar Imagen",
+    copy_link: "Copiar Texto",
+    copied: "Copiado",
     share_x: "Compartir en X",
     share_threads: "Threads",
     share_kakao: "KakaoTalk",
@@ -241,7 +241,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
           boxShadow: "0 4px 20px rgba(108,99,255,0.35)",
         }}
       >
-        <span>📤</span>
+        <span></span>
         <span>{t.share_btn}</span>
       </button>
 
@@ -264,8 +264,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                 className="w-7 h-7 rounded-full flex items-center justify-center text-sm"
                 style={{ background: "rgba(255,255,255,0.1)", color: "#9CA3AF" }}
               >
-                ✕
-              </button>
+                </button>
             </div>
 
             {/* 카드 미리보기 */}
@@ -296,7 +295,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                 {/* 앱명 + 태그라인 */}
                 <div style={{ marginBottom: 16, position: "relative" }}>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.08em", marginBottom: 1 }}>
-                    🔮 {t.app_name}
+                    {t.app_name}
                   </div>
                   <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)" }}>{t.tagline}</div>
                 </div>
@@ -349,7 +348,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                     padding: "8px 12px", minWidth: 60,
                   }}>
                     <div style={{ fontSize: 20, marginBottom: 3 }}>
-                      {result.riskLevel === "안전" ? "✅" : result.riskLevel === "주의" ? "⚠️" : result.riskLevel === "위험" ? "🔴" : "🚨"}
+                      {result.riskLevel === "안전" ? "" : result.riskLevel === "주의" ? "" : result.riskLevel === "위험" ? "" : ""}
                     </div>
                     <div style={{ fontSize: 10, fontWeight: 800, color: risk.badgeText, textAlign: "center" }}>
                       {riskLabel}
@@ -360,7 +359,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                 {/* 강화할 역량 */}
                 <div style={{ position: "relative", marginBottom: 14 }}>
                   <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>
-                    ✦ {t.skills_label}
+                    {t.skills_label}
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                     {keepSkills.map((skill, i) => (
@@ -403,7 +402,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                   borderRadius: 10, padding: "8px 14px",
                   fontSize: 12, color: "#6EE7B7", textAlign: "center",
                 }}>
-                  ✅ {toastMsg}
+                  {toastMsg}
                 </div>
               )}
 
@@ -422,7 +421,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                 className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98]"
                 style={{ background: "#FEE500", color: "#3A1D1D" }}
               >
-                <span style={{ fontSize: 16 }}>💬</span> {lang === "ko" ? "카카오톡 공유" : "KakaoTalk"}
+                <span style={{ fontSize: 16 }}></span> {lang === "ko" ? "카카오톡 공유" : "KakaoTalk"}
               </button>
 
               {/* X + Threads */}
@@ -460,7 +459,7 @@ export default function ShareCard({ result, lang = "ko" }: ShareCardProps) {
                     color: "#fff",
                   }}
                 >
-                  <span style={{ fontSize: 14 }}>📸</span> Instagram
+                  <span style={{ fontSize: 14 }}></span> Instagram
                 </button>
               </div>
 

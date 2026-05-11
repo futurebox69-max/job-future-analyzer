@@ -72,12 +72,11 @@ export default function AuthModal({ onClose, reason }: AuthModalProps) {
             color: "#9CA3AF", cursor: "pointer",
           }}
         >
-          ✕
-        </button>
+          </button>
 
         {!sent ? (
           <>
-            <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔐</div>
+            <div style={{ fontSize: "36px", marginBottom: "12px" }}></div>
             <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>
               로그인 / 회원가입
             </h2>
@@ -172,7 +171,7 @@ export default function AuthModal({ onClose, reason }: AuthModalProps) {
           </>
         ) : (
           <>
-            <div style={{ fontSize: "48px", marginBottom: "16px" }}>📧</div>
+            <div style={{ fontSize: "48px", marginBottom: "16px" }}></div>
             <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1E1B4B", marginBottom: "10px" }}>
               이메일을 확인하세요!
             </h2>

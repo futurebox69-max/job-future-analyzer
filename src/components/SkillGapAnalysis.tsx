@@ -103,7 +103,7 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
     >
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: "#1E1B4B" }}>
-          <span>🎯</span> {L.title}
+          <span></span> {L.title}
         </h2>
         <span
           className="text-sm px-3 py-1 rounded-full font-semibold"
@@ -118,13 +118,13 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
         {/* 유지 스킬 */}
         <div className="rounded-xl p-4 border" style={{ background: "#F0FDF4", borderColor: "#BBF7D0" }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">🛡️</span>
+            <span className="text-lg"></span>
             <span className="font-semibold text-sm" style={{ color: "#16A34A" }}>{L.keep}</span>
           </div>
           <ul className="space-y-2">
             {data.keepSkills.map((skill, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-0.5 text-sm font-bold" style={{ color: "#16A34A" }}>✓</span>
+                <span className="mt-0.5 text-sm font-bold" style={{ color: "#16A34A" }}></span>
                 <span className="text-sm" style={{ color: "#374151" }}>{skill}</span>
               </li>
             ))}
@@ -134,13 +134,13 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
         {/* 사라질 스킬 */}
         <div className="rounded-xl p-4 border" style={{ background: "#FEF2F2", borderColor: "#FECACA" }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">⚠️</span>
+            <span className="text-lg"></span>
             <span className="font-semibold text-sm" style={{ color: "#DC2626" }}>{L.lose}</span>
           </div>
           <ul className="space-y-2">
             {data.loseSkills.map((skill, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-0.5 text-sm font-bold" style={{ color: "#DC2626" }}>✗</span>
+                <span className="mt-0.5 text-sm font-bold" style={{ color: "#DC2626" }}></span>
                 <span className="text-sm line-through" style={{ color: "#9CA3AF", textDecorationColor: "#FCA5A5" }}>{skill}</span>
               </li>
             ))}
@@ -150,7 +150,7 @@ export default function SkillGapAnalysis({ data, lang = "ko" }: Props) {
         {/* AI로 증폭할 역량 */}
         <div className="rounded-xl p-4 border" style={{ background: "#F5F4FF", borderColor: "#DDD6FE" }}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">🤖</span>
+            <span className="text-lg"></span>
             <span className="font-semibold text-sm" style={{ color: "#6C63FF" }}>{L.gain}</span>
           </div>
           <ul className="space-y-2">

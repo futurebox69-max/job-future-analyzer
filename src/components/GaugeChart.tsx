@@ -207,7 +207,7 @@ export default function GaugeChart({ rate, riskLevel, jobName, lang = "ko" }: Ga
 
       {/* 불확실성 안내 */}
       <div className="mt-4 px-4 py-2.5 rounded-xl text-sm text-center" style={{ background: "rgba(0,0,0,0.04)", color: "#9CA3AF" }}>
-        ⚠️ {L.disclaimer}
+        {L.disclaimer}
       </div>
     </div>
   );

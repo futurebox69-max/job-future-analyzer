@@ -2,7 +2,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'BTS 분석 | 나는 미래에 얼마나 준비된 사람인가',
+  title: '직업의 미래 | 나는 미래에 얼마나 준비된 사람인가',
   description: '성격이 아니라 준비 상태를 봅니다. 3분이면 당신의 통찰 구조가 보입니다.',
 }
 

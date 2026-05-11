@@ -13,32 +13,32 @@ const LABELS: Record<LangCode, {
   footer: string;
 }> = {
   ko: {
-    title: "🧊 시스템사고 빙산 모델",
+    title: "시스템사고 빙산 모델",
     footer: "Donella Meadows 시스템사고 빙산 모델 적용",
   },
   en: {
-    title: "🧊 Systems Thinking Iceberg Model",
+    title: "Systems Thinking Iceberg Model",
     footer: "Based on Donella Meadows Systems Thinking Iceberg Model",
   },
   zh: {
-    title: "🧊 系统思维冰山模型",
+    title: "系统思维冰山模型",
     footer: "基于Donella Meadows系统思维冰山模型",
   },
   ja: {
-    title: "🧊 システム思考アイスバーグモデル",
+    title: "システム思考アイスバーグモデル",
     footer: "Donella Meadows システム思考アイスバーグモデル適用",
   },
   es: {
-    title: "🧊 Modelo Iceberg de Pensamiento Sistémico",
+    title: "Modelo Iceberg de Pensamiento Sistémico",
     footer: "Basado en el Modelo Iceberg de Donella Meadows",
   },
 };
 
 const LAYER_STYLES = [
-  { bg: "#EFF6FF", border: "#BFDBFE", icon: "🌊", textColor: "#1D4ED8" },
-  { bg: "#EEF2FF", border: "#C7D2FE", icon: "🔵", textColor: "#3730A3" },
-  { bg: "#E0E7FF", border: "#A5B4FC", icon: "🔷", textColor: "#4338CA" },
-  { bg: "#C7D2FE", border: "#818CF8", icon: "⚓", textColor: "#3730A3" },
+  { bg: "#EFF6FF", border: "#BFDBFE", icon: "", textColor: "#1D4ED8" },
+  { bg: "#EEF2FF", border: "#C7D2FE", icon: "", textColor: "#3730A3" },
+  { bg: "#E0E7FF", border: "#A5B4FC", icon: "", textColor: "#4338CA" },
+  { bg: "#C7D2FE", border: "#818CF8", icon: "", textColor: "#3730A3" },
 ];
 
 export default function IcebergModel({ layers, lang = "ko" }: IcebergModelProps) {

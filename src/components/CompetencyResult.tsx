@@ -97,16 +97,16 @@ export default function CompetencyResult({
 
   const actions = [
     strengths.length > 0
-      ? `✅ ${COMPETENCY_INFO[strengths[0]].name}을 살려 AI와 협업하는 역할을 선점하세요`
-      : `✅ ${topCompInfo.name}을 핵심 차별화 포인트로 의식적으로 강화하세요`,
+      ? `${COMPETENCY_INFO[strengths[0]].name}을 살려 AI와 협업하는 역할을 선점하세요`
+      : `${topCompInfo.name}을 핵심 차별화 포인트로 의식적으로 강화하세요`,
     weakPoints.length > 0
-      ? `📚 ${COMPETENCY_INFO[weakPoints[0]].name} 역량 강화가 시급합니다 — 관련 프로젝트나 학습을 시작하세요`
-      : `📚 현재 역량 균형이 좋습니다. AI 도구 활용법 학습에 집중하세요`,
+      ? `${COMPETENCY_INFO[weakPoints[0]].name} 역량 강화가 시급합니다 — 관련 프로젝트나 학습을 시작하세요`
+      : `현재 역량 균형이 좋습니다. AI 도구 활용법 학습에 집중하세요`,
     overallRisk >= 70
-      ? `🚀 AI 대체율이 높은 직업이므로 3년 내 역할 전환을 구체적으로 계획하세요`
+      ? `AI 대체율이 높은 직업이므로 3년 내 역할 전환을 구체적으로 계획하세요`
       : overallRisk >= 40
-      ? `🔄 지금이 역량 업그레이드의 적기입니다. AI 협업 포지션을 확보하세요`
-      : `🌱 비교적 안전한 직업이지만 ${topCompInfo.name}으로 더욱 차별화할 수 있습니다`,
+      ? `지금이 역량 업그레이드의 적기입니다. AI 협업 포지션을 확보하세요`
+      : `비교적 안전한 직업이지만 ${topCompInfo.name}으로 더욱 차별화할 수 있습니다`,
   ];
 
   const sortedScores = (Object.entries(scores) as [CompetencyKey, number][]).sort((a, b) => b[1] - a[1]);
@@ -172,7 +172,7 @@ export default function CompetencyResult({
         boxShadow: "0 4px 24px rgba(108,99,255,0.06)", marginBottom: "14px",
       }}>
         <div style={{ fontSize: "12px", color: "#6C63FF", fontWeight: 700, letterSpacing: "0.06em", marginBottom: "14px" }}>
-          📊 AI 대체율 × 역량 교차 분석
+          AI 대체율 × 역량 교차 분석
         </div>
         <div style={{ background: "#F5F4FF", borderRadius: "14px", padding: "16px", marginBottom: "14px" }}>
           <p style={{ fontSize: "14px", color: "#1E1B4B", lineHeight: 1.8 }}>
@@ -188,7 +188,7 @@ export default function CompetencyResult({
             </strong>
             은{" "}
             {importantSkills.includes(topKey)
-              ? "이 직업의 핵심 생존 역량입니다! 🎯"
+              ? "이 직업의 핵심 생존 역량입니다! "
               : "보조적 강점으로 활용할 수 있습니다."}
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function CompetencyResult({
               fontSize: "12px", fontWeight: 600,
               border: "1px solid #BBF7D0",
             }}>
-              ✅ 강점: {COMPETENCY_INFO[k].name}
+              강점: {COMPETENCY_INFO[k].name}
             </span>
           ))}
           {weakPoints.map((k) => (
@@ -211,7 +211,7 @@ export default function CompetencyResult({
               fontSize: "12px", fontWeight: 600,
               border: "1px solid #FDE68A",
             }}>
-              ⚠️ 보완: {COMPETENCY_INFO[k].name}
+              보완: {COMPETENCY_INFO[k].name}
             </span>
           ))}
         </div>
@@ -223,7 +223,7 @@ export default function CompetencyResult({
         boxShadow: "0 4px 24px rgba(108,99,255,0.06)", marginBottom: "14px",
       }}>
         <div style={{ fontSize: "12px", color: "#6C63FF", fontWeight: 700, letterSpacing: "0.06em", marginBottom: "14px" }}>
-          🎯 맞춤 성장 전략
+          맞춤 성장 전략
         </div>
         {actions.map((action, i) => (
           <div key={i} style={{
@@ -243,7 +243,7 @@ export default function CompetencyResult({
         border: "1px solid #FDE68A",
       }}>
         <div style={{ fontSize: "12px", color: "#D97706", fontWeight: 700, letterSpacing: "0.06em", marginBottom: "14px" }}>
-          💡 사고방식 메타분석
+          사고방식 메타분석
         </div>
         <div style={{ fontSize: "13px", color: "#78350F", lineHeight: 1.8 }}>
           <p>선택한 질문 유형: <strong>&quot;{metaAnalysis.questionTypeMeaning}&quot;</strong></p>

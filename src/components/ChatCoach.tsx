@@ -124,7 +124,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "22px" }}>🔮</span>
+          <span style={{ fontSize: "22px" }}></span>
           <div>
             <div style={{ fontSize: "15px", fontWeight: 800, color: "white" }}>AI 커리어 코치</div>
             <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)" }}>{jobName} 분석 기반 맞춤 상담</div>
@@ -145,12 +145,12 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
       {showComparison && (
         <div style={{ background: "#FAFAFA", borderBottom: "1px solid #EDE9FE", padding: "16px 20px" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1E1B4B" }}>💡 일반 AI와 무엇이 다른가요?</div>
-            <button onClick={() => setShowComparison(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: "16px" }}>✕</button>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#1E1B4B" }}>일반 AI와 무엇이 다른가요?</div>
+            <button onClick={() => setShowComparison(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: "16px" }}></button>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
             <div style={{ background: "#F3F4F6", borderRadius: "12px", padding: "12px" }}>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#6B7280", marginBottom: "6px" }}>💬 일반 AI (ChatGPT 등)</div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#6B7280", marginBottom: "6px" }}>일반 AI (ChatGPT 등)</div>
               <div style={{ fontSize: "12px", color: "#9CA3AF", lineHeight: 1.6 }}>
                 • 누구에게나 같은 답변<br />
                 • 내 직업 상황 모름<br />
@@ -159,7 +159,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
               </div>
             </div>
             <div style={{ background: "#F0EEFF", borderRadius: "12px", padding: "12px", border: "1px solid #DDD6FE" }}>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#6C63FF", marginBottom: "6px" }}>🔮 이 AI 코치</div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#6C63FF", marginBottom: "6px" }}>이 AI 코치</div>
               <div style={{ fontSize: "12px", color: "#5B52D6", lineHeight: 1.6 }}>
                 • <strong>{jobName}</strong> 분석 결과 보유<br />
                 • 내 대체율·스킬갭 파악<br />
@@ -178,7 +178,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
       <div style={{ height: "380px", overflowY: "auto", padding: "16px 20px", background: "white" }}>
         {messages.length === 0 && (
           <div style={{ textAlign: "center", marginTop: "60px" }}>
-            <div style={{ fontSize: "36px", marginBottom: "12px" }}>🔮</div>
+            <div style={{ fontSize: "36px", marginBottom: "12px" }}></div>
             <div style={{ fontSize: "15px", fontWeight: 600, color: "#1E1B4B", marginBottom: "6px" }}>무엇이든 물어보세요</div>
             <div style={{ fontSize: "13px", color: "#9CA3AF", lineHeight: 1.7 }}>
               {jobName} 분석 결과를 바탕으로<br />맞춤 커리어 조언을 드립니다
@@ -208,7 +208,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
             marginBottom: "12px",
           }}>
             {msg.role === "assistant" && (
-              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #6C63FF, #4158D0)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", flexShrink: 0, marginRight: "8px", alignSelf: "flex-end" }}>🔮</div>
+              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #6C63FF, #4158D0)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", flexShrink: 0, marginRight: "8px", alignSelf: "flex-end" }}></div>
             )}
             <div style={{
               maxWidth: "78%", padding: "10px 14px", borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
@@ -274,7 +274,7 @@ export default function ChatCoach({ jobName, analysisContext, onUpgrade }: ChatC
                 transition: "all 0.15s",
               }}
             >
-              {loading ? "⏳" : "➤"}
+              {loading ? "⏳" : ""}
             </button>
           </div>
         )}

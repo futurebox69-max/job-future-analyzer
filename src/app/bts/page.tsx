@@ -11,7 +11,7 @@ export default function BtsLanding() {
         당신은 미래에 얼마나<br />준비된 사람입니까?
       </h1>
       <p className="text-slate-600 mb-2">
-        BTS 분석은 성격을 분류하지 않습니다.
+        이 분석은 성격을 분류하지 않습니다.
       </p>
       <p className="text-slate-600 mb-8">
         미래 변화에 대한 당신의 준비 상태를 진단합니다.
@@ -32,7 +32,7 @@ export default function BtsLanding() {
           이 검사는 어떻게 만들어졌나요?
         </h3>
         <p className="text-sm text-slate-500 leading-relaxed">
-          BTS 분석의 7차원 모델은 세계경제포럼(WEF), OECD, UNESCO 등
+          이 분석의 7차원 모델은 세계경제포럼(WEF), OECD, UNESCO 등
           국제 기관이 강조한 미래 핵심 역량을 참고하여 설계한 자체 모델입니다.
           자기 보고가 아니라, 실제 상황에서의 판단과 행동을 측정합니다.
         </p>

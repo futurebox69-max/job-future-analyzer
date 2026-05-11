@@ -28,10 +28,10 @@ const EMPTY_SCORES: CompetencyScores = {
 const QTYPE_OPTIONS: {
   type: QuestionType; icon: string; title: string; desc: string; meta: string;
 }[] = [
-  { type: "scenario", icon: "📖", title: "시나리오형",     desc: "현실적인 상황이 주어지고, 어떻게 행동할지 선택합니다", meta: "논리적 · 현실 지향" },
-  { type: "game",     icon: "🎮", title: "게임 비유형",    desc: "롤, 포트나이트, 마크 등 게임 상황으로 질문합니다",   meta: "은유적 · 게임 친화" },
-  { type: "image",    icon: "🖼️", title: "이미지 선택형",  desc: "두 가지 상징 중 끌리는 것을 고릅니다",               meta: "직관적 · 감각형" },
-  { type: "rank",     icon: "📊", title: "순위 매기기형",   desc: "가치와 행동에 우선순위를 매깁니다",                   meta: "분석적 · 체계형" },
+  { type: "scenario", icon: "", title: "시나리오형",     desc: "현실적인 상황이 주어지고, 어떻게 행동할지 선택합니다", meta: "논리적 · 현실 지향" },
+  { type: "game",     icon: "", title: "게임 비유형",    desc: "롤, 포트나이트, 마크 등 게임 상황으로 질문합니다",   meta: "은유적 · 게임 친화" },
+  { type: "image",    icon: "", title: "이미지 선택형",  desc: "두 가지 상징 중 끌리는 것을 고릅니다",               meta: "직관적 · 감각형" },
+  { type: "rank",     icon: "", title: "순위 매기기형",   desc: "가치와 행동에 우선순위를 매깁니다",                   meta: "분석적 · 체계형" },
 ];
 
 export default function CompetencyAssessment({
@@ -269,7 +269,7 @@ export default function CompetencyAssessment({
             AI 분석 중 · 잠깐!
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>
-            🧠 미래역량 검사
+            미래역량 검사
           </h2>
           <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.6 }}>
             AI 분석이 완료되는 동안(12~20초)<br />
@@ -358,7 +358,7 @@ export default function CompetencyAssessment({
             borderRadius: "20px", padding: "20px 28px", textAlign: "center",
             boxShadow: "0 16px 48px rgba(0,0,0,0.12)",
           }}>
-            <div style={{ fontSize: "36px", marginBottom: "6px" }}>✨</div>
+            <div style={{ fontSize: "36px", marginBottom: "6px" }}></div>
             <div style={{ fontSize: "15px", color: "#1E1B4B", fontWeight: 600 }}>{feedbackText}</div>
           </div>
         </div>
@@ -395,7 +395,7 @@ export default function CompetencyAssessment({
       }}>
         {s.context && (
           <div style={{ fontSize: "11px", color: "#4ECDC4", fontWeight: 700, letterSpacing: "1.5px", marginBottom: "8px", textTransform: "uppercase" }}>
-            ⚡ {s.context}
+            {s.context}
           </div>
         )}
         {s.emoji && <span style={{ fontSize: "36px", display: "block", marginBottom: "10px" }}>{s.emoji}</span>}
