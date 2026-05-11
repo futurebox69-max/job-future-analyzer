@@ -125,7 +125,11 @@ export default function GaugeChart({ rate, riskLevel, jobName, lang = "ko" }: Ga
         boxShadow: "0 4px 24px rgba(108,99,255,0.08)",
       }}
     >
-      <svg width="300" height="170" viewBox="0 0 300 170" className="overflow-visible">
+      <svg
+        viewBox="0 0 300 170"
+        preserveAspectRatio="xMidYMid meet"
+        className="overflow-visible w-full max-w-[300px] h-auto"
+      >
         {/* 배경 트랙 */}
         <path
           d={bgPath}
@@ -182,7 +186,7 @@ export default function GaugeChart({ rate, riskLevel, jobName, lang = "ko" }: Ga
       {/* 중앙 수치 */}
       <div className="text-center -mt-4">
         <div
-          className="text-6xl font-bold tabular-nums"
+          className="text-5xl sm:text-6xl font-bold tabular-nums"
           style={{ color }}
         >
           {animatedRate}%
@@ -191,8 +195,8 @@ export default function GaugeChart({ rate, riskLevel, jobName, lang = "ko" }: Ga
       </div>
 
       {/* 직업명 + 리스크 레벨 */}
-      <div className="mt-4 flex items-center gap-3">
-        <span className="text-xl font-semibold" style={{ color: "#1E1B4B" }}>{jobName}</span>
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-2">
+        <span className="text-lg sm:text-xl font-semibold break-words" style={{ color: "#1E1B4B" }}>{jobName}</span>
         <span
           className="px-3 py-1 rounded-full text-sm font-semibold"
           style={{

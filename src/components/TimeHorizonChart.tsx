@@ -99,15 +99,15 @@ export default function TimeHorizonChart({ data, lang = "ko" }: Props) {
       <p className="text-sm mb-5" style={{ color: "#9CA3AF" }}>{L.subtitle}</p>
 
       {/* 바 차트 */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-3 mb-6">
         {YEARS.map((y, i) => {
           const value = values[i];
           const color = getRiskColor(value);
           const riskKey = getRiskKey(value);
           return (
-            <div key={y.key} className="flex flex-col items-center gap-2">
-              <span className="text-sm" style={{ color: "#6B7280" }}>{y.label}</span>
-              <div className="relative w-full h-32 flex items-end justify-center">
+            <div key={y.key} className="flex flex-col items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="text-xs sm:text-sm text-center break-keep" style={{ color: "#6B7280" }}>{y.label}</span>
+              <div className="relative w-full h-28 sm:h-32 flex items-end justify-center">
                 <div
                   className="w-full rounded-t-lg transition-all duration-700"
                   style={{
@@ -119,9 +119,9 @@ export default function TimeHorizonChart({ data, lang = "ko" }: Props) {
                   }}
                 />
               </div>
-              <span className="font-bold text-lg" style={{ color: "#1E1B4B" }}>{value}%</span>
+              <span className="font-bold text-base sm:text-lg" style={{ color: "#1E1B4B" }}>{value}%</span>
               <span
-                className="text-sm px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
+                className="text-[11px] sm:text-sm px-1.5 sm:px-2 py-0.5 rounded-full font-medium text-center break-keep leading-tight"
                 style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
               >
                 {L.riskMap[riskKey]}

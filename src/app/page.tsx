@@ -316,7 +316,7 @@ export default function Home() {
     profile.monthly_usage >= FREE_LIMIT - 1 && profile.monthly_usage < FREE_LIMIT;
 
   return (
-    <main className="min-h-screen" style={{ background: "#0B1B2B" }}>
+    <main className="min-h-screen overflow-x-clip" style={{ background: "#0B1B2B" }}>
 
       {/* Auth 모달 */}
       {showAuthModal && (
@@ -397,7 +397,7 @@ export default function Home() {
           style={{ gap: "12px" }}
         >
           {/* REFRAME 브랜드 로고 */}
-          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1, minWidth: 0 }}>
             <a
               href="https://futurebox.live"
               style={{
@@ -408,16 +408,18 @@ export default function Home() {
                 textDecoration: "none",
                 marginBottom: "4px",
                 display: "block",
+                whiteSpace: "nowrap",
               }}
             >
               ← REFRAME
             </a>
             <div style={{
               color: "#C9A24B",
-              fontSize: "22px",
+              fontSize: "clamp(17px, 5.2vw, 22px)",
               fontWeight: 900,
               letterSpacing: "-0.02em",
               textShadow: "0 2px 12px rgba(0,0,0,0.18)",
+              whiteSpace: "nowrap",
             }}>
               직업의 미래
             </div>
@@ -428,6 +430,7 @@ export default function Home() {
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               marginTop: "2px",
+              whiteSpace: "nowrap",
             }}>
               내 삶을 다시 설계하다
             </div>
@@ -543,8 +546,8 @@ export default function Home() {
             style={{
               color: "white",
               fontWeight: 900,
-              fontSize: "clamp(40px, 7vw, 68px)",
-              lineHeight: 1.15,
+              fontSize: "clamp(30px, 7vw, 68px)",
+              lineHeight: 1.2,
               marginBottom: "18px",
               textShadow: "0 2px 24px rgba(0,0,0,0.12)",
               wordBreak: "keep-all",
@@ -662,10 +665,10 @@ export default function Home() {
           style={{ marginTop: "-56px", position: "relative", zIndex: 20 }}
         >
           <div
+            className="rounded-3xl shadow-lg"
             style={{
               background: "white",
-              borderRadius: "28px",
-              padding: "28px 28px 22px",
+              padding: "20px 18px 18px",
               boxShadow: "0 24px 64px rgba(201,162,75,0.18), 0 4px 20px rgba(0,0,0,0.07)",
             }}
           >
@@ -708,17 +711,18 @@ export default function Home() {
                 }}>
                   {t.popular_jobs_title}
                 </p>
-                <div className="grid grid-cols-5" style={{ gap: "8px" }}>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2">
                   {popularJobs.map(({ icon, name, job }) => (
                     <button
                       key={job}
                       onClick={() => handleAnalyze(job)}
                       style={{
                         background: "rgba(201,162,75,0.08)", border: "1.5px solid rgba(201,162,75,0.25)",
-                        borderRadius: "16px", padding: "12px 6px", color: "#C9A24B",
+                        borderRadius: "16px", padding: "14px 10px",
+                        minHeight: "56px", color: "#C9A24B",
                         fontWeight: 600, cursor: "pointer", transition: "all 0.15s ease",
                         textAlign: "center", display: "flex", flexDirection: "column",
-                        alignItems: "center", gap: "6px",
+                        alignItems: "center", justifyContent: "center", gap: "6px",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background = "#C9A24B";
@@ -736,7 +740,7 @@ export default function Home() {
                       }}
                     >
                       <JobIcon name={icon} size={24} />
-                      <span style={{ fontSize: "13px", lineHeight: 1.3, wordBreak: "keep-all" }}>{name}</span>
+                      <span style={{ fontSize: "14px", lineHeight: 1.3, wordBreak: "keep-all" }}>{name}</span>
                     </button>
                   ))}
                 </div>
@@ -1313,10 +1317,9 @@ export default function Home() {
         {!result && !isLoading && !error && (
           <div style={{ marginTop: "52px", marginBottom: "32px" }}>
             <div
+              className="grid grid-cols-1 sm:grid-cols-3"
               style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "0",
+                gap: "12px",
                 maxWidth: "600px",
                 margin: "0 auto",
                 textAlign: "center",
@@ -1326,19 +1329,17 @@ export default function Home() {
                 { num: "01", title: t.step1_title, desc: t.step1_desc },
                 { num: "02", title: t.step2_title, desc: t.step2_desc },
                 { num: "03", title: t.step3_title, desc: t.step3_desc },
-              ].map(({ num, title, desc }, i, arr) => (
-                <div key={num} style={{ position: "relative", padding: "20px 24px", flex: 1 }}>
-                  {/* connector line */}
-                  {i < arr.length - 1 && (
-                    <div style={{
-                      position: "absolute",
-                      top: "30px",
-                      right: "-8px",
-                      width: "16px",
-                      height: "1px",
-                      background: "#EDE9FE",
-                    }} />
-                  )}
+              ].map(({ num, title, desc }) => (
+                <div
+                  key={num}
+                  style={{
+                    padding: "20px 24px",
+                    background: "white",
+                    borderRadius: "16px",
+                    border: "1px solid #EDE9FE",
+                    boxShadow: "0 2px 8px rgba(201,162,75,0.06)",
+                  }}
+                >
                   <div style={{
                     fontSize: "13px",
                     fontWeight: 800,
@@ -1357,8 +1358,8 @@ export default function Home() {
                     {title}
                   </div>
                   <div style={{
-                    fontSize: "14px",
-                    color: "#9CA3AF",
+                    fontSize: "15px",
+                    color: "#6B7280",
                     lineHeight: 1.6,
                     wordBreak: "keep-all",
                   }}>

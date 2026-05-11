@@ -48,11 +48,12 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
           placeholder={placeholder}
           maxLength={50}
           disabled={isLoading}
-          className="w-full px-6 py-5 pr-36 rounded-2xl text-xl transition-all duration-200 disabled:opacity-50 outline-none"
+          className="w-full px-4 sm:px-6 py-4 sm:py-5 pr-28 sm:pr-36 rounded-2xl text-base sm:text-xl transition-all duration-200 disabled:opacity-50 outline-none"
           style={{
             background: "#FFFFFF",
             border: `1.5px solid ${error ? "#EF4444" : "#EDE9FE"}`,
             color: "#1E1B4B",
+            minHeight: "60px",
             boxShadow: error ? "0 0 0 3px rgba(239,68,68,0.10)" : "0 2px 12px rgba(108,99,255,0.08)",
           }}
           onFocus={(e) => {
@@ -71,10 +72,11 @@ export default function JobInput({ onAnalyze, isLoading, mode, lang }: JobInputP
         <button
           type="submit"
           disabled={isLoading || !job.trim()}
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-3 rounded-xl font-medium text-base transition-all duration-200 flex items-center gap-2 text-white"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-4 sm:px-6 py-3 rounded-xl font-medium text-sm sm:text-base transition-all duration-200 flex items-center gap-1 sm:gap-2 text-white"
           style={{
             background: isLoading || !job.trim() ? "#D1D5DB" : "#C9A24B",
             cursor: isLoading || !job.trim() ? "not-allowed" : "pointer",
+            minHeight: "48px",
             boxShadow: isLoading || !job.trim() ? "none" : "0 2px 8px rgba(201,162,75,0.35)",
             color: isLoading || !job.trim() ? "white" : "#0B1B2B",
           }}
