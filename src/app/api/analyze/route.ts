@@ -275,7 +275,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
       // 5초마다 keepalive 신호 (브라우저/모바일 타임아웃 방지)
       const keepAlive = setInterval(() => {
-        send({ type: "progress", stage: "processing", message: "8차원 분석 진행 중..." });
+        send({ type: "progress", stage: "processing", message: "여덟 개의 눈으로 분석 진행 중..." });
       }, 5000);
 
       try {

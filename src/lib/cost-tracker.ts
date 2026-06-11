@@ -15,6 +15,7 @@ export const AGENTS = {
   job_validate:  { label: "직업검증 (Haiku)",       emoji: "✅", costUSD: 0.000025 },
   chat_coach:    { label: "채팅 코치 (Sonnet)",     emoji: "💬", costUSD: 0.0195 },
   bts_report:    { label: "BTS 역량보고서 (Sonnet)", emoji: "📊", costUSD: 0.114  },
+  v3_refine:     { label: "v3 정밀화 (Sonnet)",     emoji: "🎯", costUSD: 0.012  },
 } as const;
 
 export type AgentKey = keyof typeof AGENTS;

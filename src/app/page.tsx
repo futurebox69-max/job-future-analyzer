@@ -747,13 +747,19 @@ export default function Home() {
               </div>
             )}
           </div>
-          <div style={{ textAlign: "center", marginTop: "12px" }}>
+          <div style={{ textAlign: "center", marginTop: "12px", display: "flex", justifyContent: "center", gap: "20px", flexWrap: "wrap" }}>
             <button
               onClick={() => setServiceMode("paid")}
               style={{ background: "none", border: "none", cursor: "pointer", color: "#C9A24B", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
             >
               유료 플랜 자세히 보기 →
             </button>
+            <a
+              href="/v3"
+              style={{ color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
+            >
+              새 분석 방식 미리보기 (베타) →
+            </a>
           </div>
         </div>
       )}
@@ -797,23 +803,23 @@ export default function Home() {
               display: "inline-block", background: "rgba(254,243,199,0.9)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 500,
               marginBottom: "14px",
-            }}>8 DIMENSIONS</div>
+            }}>여덟 개의 눈</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "8px" }}>
-              직업의 미래를 보는 8개 기준
+              직업을 보는 여덟 개의 눈
             </h2>
             <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px" }}>
-              하나의 수치가 아니라, 8개 구조 축으로 입체적으로 분석합니다
+              하나의 점수가 아니라, 여덟 개의 눈으로 당신의 직업을 입체적으로 봅니다
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
               {[
-                { icon: "zap",          name: "자동화 위험도",   risk: "AI·로봇이 이 일을 직접 대체할 가능성" },
-                { icon: "handshake",    name: "AI 협업 가능성",  risk: "AI를 도구로 써서 오히려 강해질 수 있는지" },
+                { icon: "zap",          name: "자동화 압력",   risk: "이 일의 어느 부분부터 AI가 먼저 들어오는지" },
+                { icon: "handshake",    name: "AI와 함께 강해질 가능성",  risk: "AI를 도구로 써서 오히려 강해질 수 있는지" },
                 { icon: "chart-line",   name: "수요 변화 방향",  risk: "10년 후 이 직업의 사회적 필요가 늘어나는지" },
-                { icon: "castle",       name: "진입장벽 높이",   risk: "이 직업을 대체하기 얼마나 어려운지" },
-                { icon: "dollar-sign",  name: "소득 방어력",     risk: "변화 속에서도 수입 수준을 유지할 수 있는지" },
-                { icon: "waves",        name: "시장 변동성",     risk: "경기·기술·정책 변화에 얼마나 흔들리는지" },
-                { icon: "refresh",      name: "직업 전환 가능성", risk: "다른 직업으로 이동하기 얼마나 쉬운지" },
-                { icon: "rocket",       name: "성장 확장 기회",   risk: "AI 시대에 오히려 새 기회가 생기는지" },
+                { icon: "castle",       name: "남이 내 자리를 차지하기 어려운 정도",   risk: "면허·숙련·신뢰가 내 자리를 지켜주는 정도" },
+                { icon: "dollar-sign",  name: "벌이가 흔들리지 않는 힘",     risk: "변화 속에서도 수입 수준을 유지할 수 있는지" },
+                { icon: "waves",        name: "시장이 흔들릴 때 같이 흔들리는 정도",        risk: "경기·기술·정책 변화에 얼마나 흔들리는지" },
+                { icon: "refresh",      name: "다른 길로 옮겨갈 수 있는 힘", risk: "지금의 경험이 다른 일에서도 통하는 정도" },
+                { icon: "rocket",       name: "새 기회가 열리는 자리",   risk: "AI 시대에 오히려 새 기회가 생기는지" },
               ].map(({ icon, name, risk }) => (
                 <div key={name} style={{
                   background: "white", borderRadius: "16px", padding: "18px 16px",
@@ -825,6 +831,45 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* 정체성 사례 — 점수가 아니라 결 */}
+          <div style={{ marginTop: "56px", textAlign: "center" }}>
+            <div className="label-mono" style={{
+              display: "inline-block", background: "rgba(201,162,75,0.12)", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#C9A24B", fontWeight: 500,
+              marginBottom: "14px",
+            }}>IDENTITY</div>
+            <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.4, marginBottom: "8px", wordBreak: "keep-all" }}>
+              이 앱은 점수를 매기지 않습니다.<br />당신의 결을 짚습니다.
+            </h2>
+            <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px", wordBreak: "keep-all" }}>
+              실제 분석에서 나온 정체성 이름들입니다 (익명 사례)
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {[
+                { job: "의료기기 제조 기술자", name: "장인형 손작업가", en: "The Gentle Crafter" },
+                { job: "간호사",             name: "곁에 머무는 사람", en: "The One Who Stays" },
+                { job: "영어강사",           name: "언어 안내자",     en: "The Language Guide" },
+              ].map(({ job, name, en }) => (
+                <div key={job} style={{
+                  background: "white", borderRadius: "16px", padding: "18px 22px",
+                  boxShadow: "0 4px 16px rgba(201,162,75,0.08)", border: "1px solid rgba(201,162,75,0.2)",
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
+                  flexWrap: "wrap", textAlign: "left",
+                }}>
+                  <span style={{ fontSize: "14px", color: "#6B7280", fontWeight: 500 }}>{job}</span>
+                  <span style={{ textAlign: "right" }}>
+                    <span style={{ fontSize: "15px", fontWeight: 800, color: "#1E1B4B", display: "block" }}>&ldquo;{name}&rdquo;</span>
+                    <span style={{ fontSize: "12px", color: "#C9A24B", fontStyle: "italic" }}>{en}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: "14px", color: "#374151", marginTop: "16px", lineHeight: 1.8, wordBreak: "keep-all" }}>
+              같은 직업이라도, 같은 이름이 나오지 않습니다.<br />
+              <strong style={{ color: "#1E1B4B" }}>당신이 다르기 때문입니다.</strong>
+            </p>
           </div>
 
           {/* 이 앱이 다른 이유 */}
@@ -853,6 +898,44 @@ export default function Home() {
                   <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.6 }}>{desc}</div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* 신뢰 — 이 앱이 모른다고 말하는 것들 (P.17 철학) */}
+          <div style={{ marginTop: "56px", textAlign: "center" }}>
+            <div className="label-mono" style={{
+              display: "inline-block", background: "rgba(11,27,43,0.06)", borderRadius: "100px",
+              padding: "4px 16px", fontSize: "12px", color: "#0B1B2B", fontWeight: 500,
+              marginBottom: "14px",
+            }}>HONESTY</div>
+            <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "8px", wordBreak: "keep-all" }}>
+              이 앱이 모른다고 말하는 것들
+            </h2>
+            <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px", wordBreak: "keep-all" }}>
+              진단 앱이 자기 한계를 첫 화면에 쓰는 일은 드뭅니다. 우리는 그것이 신뢰의 시작이라고 믿습니다.
+            </p>
+            <div style={{
+              background: "#0B1B2B", borderRadius: "20px", padding: "26px 28px",
+              textAlign: "left", boxShadow: "0 8px 32px rgba(11,27,43,0.25)",
+            }}>
+              {[
+                "이 분석은 직업의 평균이지, 아직 '당신'이 아닙니다. 입력해주신 만큼만 당신에게 가까워집니다.",
+                "입력하지 않으신 것은 분석하지 못합니다 — 그리고 그 사실을 보고서에 그대로 적습니다.",
+                "시장은 계속 움직입니다. 오늘의 분석은 오늘의 자리이고, 6개월 뒤에는 다시 짚어야 합니다.",
+                "당신의 사정, 당신의 기쁨, 당신이 일에서 찾는 의미 — 숫자가 닿지 못하는 자리가 있습니다.",
+              ].map((text, i, arr) => (
+                <div key={i} style={{
+                  display: "flex", alignItems: "flex-start", gap: "12px",
+                  padding: "12px 0",
+                  borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none",
+                }}>
+                  <span style={{ color: "#C9A24B", fontWeight: 800, flexShrink: 0, fontSize: "14px" }}>—</span>
+                  <span style={{ fontSize: "14px", color: "#F2EBDC", lineHeight: 1.8, wordBreak: "keep-all" }}>{text}</span>
+                </div>
+              ))}
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)", marginTop: "16px", marginBottom: 0, lineHeight: 1.7, wordBreak: "keep-all" }}>
+                그래서 모든 보고서의 마지막에는 &ldquo;이 보고서가 받지 못한 입력값&rdquo;을 정직하게 인쇄합니다.
+              </p>
             </div>
           </div>
 
@@ -1066,25 +1149,32 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* PREMIUM */}
+              {/* SIGNATURE — 사람의 결이 들어가는 1인 맞춤 보고서 */}
               <div style={{
-                border: "2px solid #4F46E5",
+                border: "2px solid #D4AF37",
                 borderRadius: "20px",
-                background: "linear-gradient(145deg, #1E1B4B 0%, #312E81 100%)",
+                background: "linear-gradient(145deg, #0B1B2B 0%, #142B44 100%)",
                 padding: "22px 22px 20px", position: "relative", overflow: "hidden",
               }}>
+                <div style={{
+                  position: "absolute", top: "14px", right: "14px",
+                  background: "linear-gradient(135deg, #D4AF37, #F5D26B)",
+                  borderRadius: "100px", padding: "3px 10px",
+                  fontSize: "11px", fontWeight: 700, color: "#78350F",
+                }}>사람의 결</div>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
                     <div style={{
                       display: "inline-block", background: "rgba(255,255,255,0.15)", borderRadius: "100px",
                       padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#D4AF37",
                       marginBottom: "6px",
-                    }}>Family</div>
-                    <div style={{ fontSize: "22px", fontWeight: 900, color: "white" }}>₩39,900
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>/월</span>
+                    }}>Signature</div>
+                    <div style={{ fontSize: "20px", fontWeight: 900, color: "white", wordBreak: "keep-all" }}>1인 맞춤 보고서</div>
+                    <div style={{ fontSize: "16px", fontWeight: 700, color: "#D4AF37", marginTop: "2px" }}>₩149,000
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>/건 · 납기 5~7일</span>
                     </div>
                   </div>
-                  <JobIcon name="crown" size={36} color="#D4AF37" />
+                  <JobIcon name="pen-line" size={36} color="#D4AF37" />
                 </div>
 
                 <div style={{
@@ -1094,23 +1184,22 @@ export default function Home() {
                   border: "1px solid rgba(212,175,55,0.3)",
                   display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  <JobIcon name="sparkles" size={14} color="#D4AF37" />부모와 자녀를 함께 보고 싶은 가정용 플랜
+                  <JobIcon name="sparkles" size={14} color="#D4AF37" />자동화되지 않는 자리는, 사람이 짚습니다
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#C7D2FE", lineHeight: 1.7, marginBottom: "14px" }}>
-                  가족의 결과를 함께 관리하고 대화와 진로 준비에 활용할 수 있습니다.
-                  <strong style={{ color: "white" }}>자녀 3명까지 함께</strong> 진단하고
-                  각자의 적성과 미래 직업을 분석해 드립니다. 매일 아침 AI가
-                  직업 세계의 변화를 카드 한 장으로 짧고 강하게 전달합니다.
+                  사전 설문과 1:1 대담(서면·전화·줌)을 바탕으로 <strong style={{ color: "white" }}>22페이지 맞춤 보고서</strong>를
+                  만듭니다. AI가 초안을 쓰고, 정체성 작명 · 강점 자산 · The Decision · Letter —
+                  이 네 자리는 반드시 사람이 함께 짚습니다. 같은 직업이라도 같은 보고서가 나오지 않습니다.
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {[
-                    ["refresh",    "기본 분석 30회",            "나와 가족 모두를 위한 충분한 분석 횟수"],
-                    ["users",      "가족 진단 (자녀 3인)",       "자녀의 미래 직업·적성을 AI가 청소년 눈높이로 분석"],
-                    ["sparkles",   "AI 코치 무제한",             "언제든 커리어 고민을 AI 코치에게 상담, 횟수 제한 없음"],
-                    ["sunrise",    "AI 미래직업 데일리 카드",     "매일 아침 카카오톡·이메일로 직업 트렌드 핵심 1가지를 카드로 전송"],
-                    ["chart-line", "월간 직업 트렌드 리포트",     "매월 업종별 AI 대체 현황과 신흥 직업 트렌드 리포트 제공"],
+                    ["users",      "1:1 대담",                "서면·전화·줌 중 편한 방식으로 당신의 이야기를 듣습니다"],
+                    ["sparkles",   "정체성 작명",             "점수가 아니라, 당신의 결에 이름을 붙입니다"],
+                    ["search",     "강점 자산 (의중 읽기)",    "입력값에 없지만 대담에서 읽히는 결까지 담습니다"],
+                    ["compass",    "The Decision",            "이직·전직·창직·유지 — 당신이 쓴 단어를 함께 되짚습니다"],
+                    ["pen-line",   "Letter",                  "보고서의 마지막은 당신에게 쓰는 편지입니다"],
                   ].map(([icon, title, desc]) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                       <JobIcon name={icon} size={16} color="#D4AF37" style={{ flexShrink: 0, marginTop: "2px" }} />
@@ -1689,8 +1778,11 @@ export default function Home() {
           <h2 style={{ fontSize: "28px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>
             지금은 무료로 시작하세요
           </h2>
-          <p style={{ fontSize: "15px", color: "#6B7280" }}>
+          <p style={{ fontSize: "15px", color: "#6B7280", marginBottom: "6px" }}>
             유료 플랜은 곧 출시됩니다 · 출시 시 사전 가입자 특별 혜택 제공
+          </p>
+          <p style={{ fontSize: "14px", fontWeight: 700, color: "#C9A24B", wordBreak: "keep-all" }}>
+            내 자리 보기 → 내 결 알기 → 내 길 그리기 → 1인 맞춤 보고서
           </p>
         </div>
 
@@ -1708,82 +1800,72 @@ export default function Home() {
             const plans = [
               {
                 tag: "FREE", tagColor: "#C9A24B", tagBg: "#F0EEFF",
-                name: "무료", price: null, sub: "로그인 후 바로 시작",
+                name: "내 자리 보기", price: "무료", priceUnit: null, sub: "로그인 후 바로 시작 · 깊이 1페이지",
                 dark: false, highlight: false, comingSoon: false,
                 features: [
-                  "기본 분석 3회",
-                  "8차원 심층 리포트",
+                  "종합 위험도 한 수치",
+                  "여덟 개의 눈 요약",
+                  "정체성 한 줄",
                   "10년 시간 예측",
-                  "스킬 갭 분석",
                   "5개 언어 지원",
-                  "이 앱이 뭔지 체험",
                 ],
+                limit: "이것은 직업의 평균이지, 아직 당신이 아닙니다",
               },
               {
                 tag: "BASIC", tagColor: "#0891B2", tagBg: "#ECFEFF",
-                name: "₩9,900", price: "/월", sub: "곧 출시 예정",
+                name: "내 결 알기", price: "₩9,900", priceUnit: "/월", sub: "곧 출시 예정",
                 dark: false, highlight: false, comingSoon: true,
                 features: [
-                  "기본 분석 10회",
-                  "업무별 세부 대체 분석",
-                  "AI 불안 심리 케어",
-                  "AI 협업 역량 점수",
+                  "핵심 5문항 심화 입력",
+                  "4~5p PDF 보고서",
+                  "시간 비중·AI 위험 지도",
+                  "미니 한계 페이지(P.17)",
                 ],
+                limit: "당신의 결의 일부만 반영됩니다. 받지 못한 입력값을 그대로 적습니다",
               },
               {
                 tag: "STANDARD", tagColor: "#7C3AED", tagBg: "#F5F3FF",
-                name: "₩19,900", price: "/월", sub: "곧 출시 예정",
+                name: "내 길 그리기", price: "₩19,900", priceUnit: "/월", sub: "곧 출시 예정",
                 dark: false, highlight: true, comingSoon: true,
-                badge: "인기",
+                badge: "추천",
                 features: [
-                  "기본 분석 20회",
-                  "비전 시나리오 3가지",
-                  "직업 추천 + 역량 로드맵",
-                  "연봉 협상 도우미",
-                  "미래전략 액션플랜",
-                  "AI 챗봇 월 30회",
+                  "심화 10문항 + 챗봇 대담",
+                  "8~10p PDF 보고서",
+                  "시나리오 A·B·C",
+                  "30일 액션 + 18개월 로드맵",
+                  "풀 한계 페이지(P.17)",
+                  "시장 변화 갱신 알림 (보고서가 자랍니다)",
                 ],
+                limit: "AI가 생성하고 사람이 검수하지 않은 보고서입니다. 정체성·결단의 자리는 1인 맞춤에서 사람이 함께 짚습니다",
               },
               {
-                tag: "PREMIUM", tagColor: "#D4AF37", tagBg: "#FFFBEB",
-                name: "₩39,900", price: "/월", sub: "곧 출시 예정",
+                tag: "SIGNATURE", tagColor: "#D4AF37", tagBg: "#FFFBEB",
+                name: "1인 맞춤 보고서", price: "₩149,000", priceUnit: "/건", sub: "곧 출시 예정 · 납기 5~7일",
                 dark: true, highlight: false, comingSoon: true,
+                badge: "사람의 결",
                 features: [
-                  "기본 분석 30회",
-                  "가족 진단 (자녀 3인)",
-                  "전공·학교 추천",
-                  "AI 챗봇 무제한",
-                  "AI 미래직업 데일리 카드 (매일 발송)",
-                  "월간 직업 트렌드 리포트",
+                  "사전 설문 + 1:1 대담 (서면·전화·줌)",
+                  "22페이지 맞춤 보고서",
+                  "정체성 작명 — 사람이 짚습니다",
+                  "강점 자산 (의중 읽기)",
+                  "The Decision · Letter",
                 ],
-              },
-              {
-                tag: "ANNUAL", tagColor: "#D4AF37", tagBg: "transparent",
-                name: "₩159,000", price: "/년", sub: "PREMIUM 기준 33% 할인",
-                dark: true, highlight: false, comingSoon: true,
-                badge: "최저가",
-                features: [
-                  "PREMIUM 포함",
-                  "PDF 리포트 무제한",
-                  "연간 구독 33% 절감",
-                ],
+                limit: "그래도 모르는 것이 있습니다. 이 보고서는 출발점이지 결승점이 아닙니다",
               },
               {
                 tag: "EDU", tagColor: "#059669", tagBg: "#ECFDF5",
-                name: "₩1,000,000", price: "/년", sub: "학교·학원 30명 기준",
+                name: "우리 아이들의 결", price: "₩1,000,000", priceUnit: "/년", sub: "학교·학원 30명 기준 · 학기 단위",
                 dark: false, highlight: false, comingSoon: true,
                 badge: "기관용",
                 features: [
-                  "학생 30명 계정",
-                  "청소년 전용 진로 분석",
-                  "학과·대학 진출 경로 추천",
-                  "선생님 대시보드",
-                  "학급 단위 진로 리포트",
+                  "학생 설문 + 교사 입력",
+                  "학생별 8~10p 보고서",
+                  "갈림길 비교 (관심 직업 2~4개 나란히)",
+                  "학급 통계 · 선생님 대시보드",
                   "AI 진로 코치 (청소년 모드)",
                   "학부모 결과 공유",
-                  "그룹 진로 통계 분석",
-                  "전담 온라인 상담 지원",
                 ],
+                limit: "이 결과는 상담 대체가 아니라, 상담의 재료입니다",
               },
             ];
 
@@ -1828,23 +1910,45 @@ export default function Home() {
                   marginBottom: "12px", letterSpacing: "0.06em",
                 }}>{plan.tag}</div>
 
+                {/* 단계 이름을 가격보다 크게 (명세서 4-1) */}
                 <div style={{
-                  fontSize: "26px", fontWeight: 900,
+                  fontSize: "24px", fontWeight: 900,
                   color: plan.dark ? "white" : "#1E1B4B",
-                  marginBottom: "4px", letterSpacing: "-0.01em",
+                  marginBottom: "4px", letterSpacing: "-0.01em", wordBreak: "keep-all",
                 }}>
                   {plan.name}
-                  {plan.price && <span style={{ fontSize: "14px", fontWeight: 500, color: plan.dark ? "#A5B4FC" : "#9CA3AF" }}>{plan.price}</span>}
+                </div>
+                <div style={{
+                  fontSize: "16px", fontWeight: 700,
+                  color: plan.dark ? "#D4AF37" : plan.tagColor,
+                  marginBottom: "4px",
+                }}>
+                  {plan.price}
+                  {plan.priceUnit && <span style={{ fontSize: "13px", fontWeight: 500, color: plan.dark ? "#A5B4FC" : "#9CA3AF" }}>{plan.priceUnit}</span>}
                 </div>
                 <div style={{ fontSize: "12px", color: plan.dark ? "#A5B4FC" : "#9CA3AF", marginBottom: "20px" }}>{plan.sub}</div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "22px", flex: 1 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "9px", marginBottom: "16px", flex: 1 }}>
                   {plan.features.map((f) => (
                     <div key={f} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: plan.dark ? "#C7D2FE" : "#374151", lineHeight: 1.4 }}>
                       <span style={{ color: plan.dark ? "#D4AF37" : plan.tagColor, fontWeight: 700, flexShrink: 0, marginTop: "1px" }}></span>
                       <span style={{ wordBreak: "keep-all" }}>{f}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* 명시할 한계 — 산출물 안에 인쇄되는 문장 (명세서 3-1) */}
+                <div style={{
+                  borderRadius: "12px", padding: "10px 12px", marginBottom: "16px",
+                  background: plan.dark ? "rgba(255,255,255,0.06)" : "rgba(11,27,43,0.04)",
+                  border: `1px dashed ${plan.dark ? "rgba(255,255,255,0.2)" : "rgba(11,27,43,0.12)"}`,
+                }}>
+                  <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", color: plan.dark ? "rgba(255,255,255,0.45)" : "#9CA3AF", marginBottom: "4px" }}>
+                    이 단계가 말하는 한계
+                  </div>
+                  <div style={{ fontSize: "12px", lineHeight: 1.6, color: plan.dark ? "#C7D2FE" : "#6B7280", wordBreak: "keep-all" }}>
+                    &ldquo;{plan.limit}&rdquo;
+                  </div>
                 </div>
 
                 {plan.comingSoon ? (
@@ -1878,6 +1982,9 @@ export default function Home() {
         className="relative z-10 text-center py-6 text-xs border-t"
         style={{ color: "#9CA3AF", borderColor: "#EDE9FE" }}
       >
+        <p style={{ marginBottom: "8px", lineHeight: 1.8, wordBreak: "keep-all", padding: "0 16px" }}>
+          REFRAME 3부작 — ① 역량평가 <span style={{ color: "#C9A24B" }}>나는 어떤 결인가</span> → ② 직업의 미래 <span style={{ color: "#C9A24B" }}>내 결은 시장에서 어떻게 살아남는가</span> → ③ REFRAME <span style={{ color: "#C9A24B" }}>이 결을 어떻게 다시 짤 것인가</span>
+        </p>
         {t.footer}
       </footer>
     </main>

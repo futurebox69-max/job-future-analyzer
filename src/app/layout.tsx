@@ -25,12 +25,12 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://job-future-analyzer.vercel.app"),
   title: "직업의 미래 | REFRAME — 내 삶을 다시 설계하다",
   description:
-    "AI가 내 직업을 대체할 가능성을 8차원으로 분석하고, 구체적인 전환 경로를 제시합니다.",
+    "내 직업의 변화를 구조로 읽고, 지금 준비할 것을 보여드립니다.",
   keywords: ["AI 직업 대체율", "직업 미래", "커리어 전환", "자동화", "REFRAME"],
   openGraph: {
     title: "내 직업의 미래 — REFRAME",
     description:
-      "AI가 내 직업을 대체할 가능성을 8차원으로 분석합니다. 무료 진단으로 내 커리어의 다음 한 수를 설계하세요.",
+      "내 직업의 변화를 구조로 읽고, 지금 준비할 것을 보여드립니다. 막연한 불안을 구조적인 준비로.",
     url: "/",
     siteName: "REFRAME",
     images: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "내 직업의 미래 — REFRAME",
     description:
-      "AI가 내 직업을 대체할 가능성을 8차원으로 분석합니다. 무료 진단으로 내 커리어의 다음 한 수를 설계하세요.",
+      "내 직업의 변화를 구조로 읽고, 지금 준비할 것을 보여드립니다. 막연한 불안을 구조적인 준비로.",
     images: ["/og-default.png"],
   },
 };
