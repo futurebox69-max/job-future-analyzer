@@ -20,10 +20,12 @@ import UsageCounter from "@/components/UsageCounter";
 import { useAuth } from "@/context/AuthContext";
 import { AnalysisResult } from "@/types/analysis";
 import { getLang, LangCode } from "@/lib/i18n";
+import { getLanding } from "@/lib/landing-content";
 import { FREE_LIMIT } from "@/lib/supabase";
 import CompetencyAssessment from "@/components/CompetencyAssessment";
 import CompetencyResultTab from "@/components/CompetencyResult";
 import { CompetencyResult as CompetencyResultType } from "@/types/competency";
+import { buildCompetencyResultFromCode } from "@/lib/reframe-code";
 import SurvivalSkills from "@/components/SurvivalSkills";
 import JobIcon from "@/components/JobIcon";
 
@@ -113,6 +115,7 @@ export default function Home() {
   const [mode, setMode] = useState<"adult" | "youth">("adult");
   const [lang, setLang] = useState<LangCode>("ko");
   const t = getLang(lang);
+  const L = getLanding(lang);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
   const [loadingStageIdx, setLoadingStageIdx] = useState(0);
@@ -127,6 +130,11 @@ export default function Home() {
   const [competencyResult, setCompetencyResult] = useState<CompetencyResultType | null>(null);
   const [showAssessment, setShowAssessment] = useState(false);
   const [assessmentCompleted, setAssessmentCompleted] = useState(false);
+  // 역량의 지도 결과 코드 연동 (§4-1)
+  const [reframeCode, setReframeCode] = useState("");
+  const [reframeCodeError, setReframeCodeError] = useState("");
+  const [importedCompetency, setImportedCompetency] = useState<CompetencyResultType | null>(null);
+  const [importedDepth, setImportedDepth] = useState<1 | 2 | null>(null);
   // 첫 화면 서비스 선택: null=선택 전, "free"=무료, "paid"=유료(출시예정)
   const [serviceMode, setServiceMode] = useState<"free" | "paid" | null>("free");
 
@@ -217,9 +225,16 @@ export default function Home() {
     // ────────────────────────────────────────────
 
     setIsLoading(true);
-    setShowAssessment(true);
-    setAssessmentCompleted(false);
-    setCompetencyResult(null);
+    if (importedCompetency) {
+      // 역량의 지도 코드로 가져온 결과가 있으면 앱 내 검사를 건너뛴다 (§4-1)
+      setShowAssessment(false);
+      setAssessmentCompleted(true);
+      setCompetencyResult(importedCompetency);
+    } else {
+      setShowAssessment(true);
+      setAssessmentCompleted(false);
+      setCompetencyResult(null);
+    }
     setError(null);
     setResult(null);
     setLoadingMsg(t.loading[0]);
@@ -336,13 +351,11 @@ export default function Home() {
             boxShadow: "0 24px 64px rgba(0,0,0,0.18)",
           }} onClick={e => e.stopPropagation()}>
             <JobIcon name="rocket" size={40} color="#C9A24B" style={{ marginBottom: "12px" }} />
-            <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1E1B4B", marginBottom: "12px" }}>
-              무료 분석 3회를<br />모두 사용하셨습니다
+            <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#1E1B4B", marginBottom: "12px", whiteSpace: "pre-line" }}>
+              {L.upgrade_title}
             </h2>
-            <p style={{ fontSize: "15px", color: "#6B7280", lineHeight: 1.7, marginBottom: "24px" }}>
-              프리미엄으로 업그레이드하면<br />
-              <strong style={{ color: "#1E1B4B" }}>무제한 분석</strong>과 8가지 심화 기능을<br />
-              모두 이용할 수 있습니다.
+            <p style={{ fontSize: "15px", color: "#6B7280", lineHeight: 1.7, marginBottom: "24px", whiteSpace: "pre-line" }}>
+              {L.upgrade_body}
             </p>
             <button style={{
               width: "100%", padding: "16px", borderRadius: "14px", border: "none",
@@ -350,14 +363,14 @@ export default function Home() {
               color: "white", fontSize: "16px", fontWeight: 700, cursor: "pointer",
               marginBottom: "10px",
             }}>
-              프리미엄 시작하기 · ₩4,900/월
+              {L.upgrade_cta}
             </button>
             <button onClick={() => setShowUpgradePopup(false)} style={{
               width: "100%", padding: "12px", borderRadius: "14px",
               border: "1.5px solid #F2EBDC", background: "white",
               color: "#6B7280", fontSize: "14px", cursor: "pointer",
             }}>
-              다음에
+              {L.upgrade_later}
             </button>
           </div>
         </div>
@@ -432,7 +445,7 @@ export default function Home() {
               marginTop: "2px",
               whiteSpace: "nowrap",
             }}>
-              내 삶을 다시 설계하다
+              {L.brand_subtitle}
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
@@ -496,7 +509,7 @@ export default function Home() {
                         onMouseEnter={(e) => { e.currentTarget.style.background = "#FEF2F2"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
                       >
-                        로그아웃
+                        {L.nav_logout}
                       </button>
                     </div>
                   )}
@@ -512,7 +525,7 @@ export default function Home() {
                     cursor: "pointer", backdropFilter: "blur(10px)",
                   }}
                 >
-                  로그인
+                  {L.nav_login}
                 </button>
               )
             }
@@ -677,13 +690,13 @@ export default function Home() {
               <UsageCounter onUpgradeClick={() => setShowUpgradePopup(true)} />
               {!user && !authLoading && (
                 <button
-                  onClick={() => { setAuthReason("로그인하면 무료로 3회 분석할 수 있습니다."); setShowAuthModal(true); }}
+                  onClick={() => { setAuthReason(L.auth_reason_3free); setShowAuthModal(true); }}
                   style={{
                     fontSize: "12px", color: "#9CA3AF", background: "none",
                     border: "none", cursor: "pointer", textDecoration: "underline",
                   }}
                 >
-                  로그인하면 3회 무료 분석
+                  {L.login_free_3}
                 </button>
               )}
             </div>
@@ -695,12 +708,110 @@ export default function Home() {
                 borderRadius: "12px", padding: "10px 14px", marginBottom: "12px",
                 fontSize: "13px", color: "#92400E", fontWeight: 500,
               }}>
-                이번 달 {FREE_LIMIT - (profile?.monthly_usage ?? 0)}회 남았습니다.
-                프리미엄으로 업그레이드하면 무제한 분석이 가능합니다.
+                {L.usage_left(FREE_LIMIT - (profile?.monthly_usage ?? 0))}
               </div>
             )}
 
             <JobInput onAnalyze={handleAnalyze} isLoading={isLoading} mode={mode} lang={lang} />
+
+            {/* 역량의 지도 결과 코드 가져오기 (§4-1) */}
+            {!isLoading && !result && (
+              <div style={{ marginTop: "14px" }}>
+                {importedCompetency ? (
+                  <div
+                    style={{
+                      display: "flex", alignItems: "center", gap: "10px",
+                      background: "#F0FDF4", border: "1.5px solid #86EFAC",
+                      borderRadius: "14px", padding: "12px 16px",
+                    }}
+                  >
+                    <span style={{ fontSize: "18px" }}>{importedCompetency.archetypeEmoji}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: "13px", fontWeight: 700, color: "#15803D" }}>
+                        {lang === "ko"
+                          ? `역량의 지도에서 가져왔습니다 · ${importedCompetency.archetype}`
+                          : `Imported from 역량의 지도 · ${importedCompetency.archetype}`}
+                      </p>
+                      <p style={{ fontSize: "12px", color: "#16A34A" }}>
+                        {lang === "ko"
+                          ? `${importedDepth === 2 ? "2층 프로파일" : "1층 스냅샷"} · 직업 분석 시 역량검사를 건너뜁니다`
+                          : `${importedDepth === 2 ? "Layer 2" : "Layer 1"} · the in-app assessment will be skipped`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setImportedCompetency(null);
+                        setImportedDepth(null);
+                        setReframeCode("");
+                        setReframeCodeError("");
+                      }}
+                      style={{
+                        background: "none", border: "none", cursor: "pointer",
+                        color: "#16A34A", fontSize: "13px", fontWeight: 600, whiteSpace: "nowrap",
+                      }}
+                    >
+                      {lang === "ko" ? "해제" : "Clear"}
+                    </button>
+                  </div>
+                ) : (
+                  <details style={{ fontSize: "13px" }}>
+                    <summary style={{ cursor: "pointer", color: "#9CA3AF", fontWeight: 600, listStyle: "none" }}>
+                      {lang === "ko"
+                        ? "🗺️ ‘역량의 지도’ 결과 코드가 있으신가요?"
+                        : "🗺️ Have a ‘역량의 지도’ result code?"}
+                    </summary>
+                    <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
+                      <input
+                        type="text"
+                        value={reframeCode}
+                        onChange={(e) => {
+                          setReframeCode(e.target.value);
+                          if (reframeCodeError) setReframeCodeError("");
+                        }}
+                        placeholder="RF-XXXX-XXXX-XXXX-XXXX"
+                        style={{
+                          flex: 1, minWidth: "200px", padding: "12px 14px",
+                          borderRadius: "12px", border: `1.5px solid ${reframeCodeError ? "#EF4444" : "#EDE9FE"}`,
+                          fontFamily: "monospace", fontSize: "14px", color: "#1E1B4B", outline: "none",
+                          letterSpacing: "0.04em", textTransform: "uppercase",
+                        }}
+                      />
+                      <button
+                        onClick={() => {
+                          const built = buildCompetencyResultFromCode(reframeCode);
+                          if (!built) {
+                            setReframeCodeError(
+                              lang === "ko"
+                                ? "코드를 읽을 수 없습니다. RF-로 시작하는 코드를 확인해 주세요."
+                                : "Could not read the code. Check the RF- code."
+                            );
+                            return;
+                          }
+                          setImportedCompetency(built.result);
+                          setImportedDepth(built.depth);
+                          setReframeCodeError("");
+                        }}
+                        style={{
+                          padding: "12px 22px", borderRadius: "12px", border: "none",
+                          background: "#6C63FF", color: "#fff", fontWeight: 700,
+                          fontSize: "14px", cursor: "pointer", whiteSpace: "nowrap",
+                        }}
+                      >
+                        {lang === "ko" ? "가져오기" : "Import"}
+                      </button>
+                    </div>
+                    {reframeCodeError && (
+                      <p style={{ marginTop: "6px", color: "#EF4444", fontSize: "12px" }}>{reframeCodeError}</p>
+                    )}
+                    <p style={{ marginTop: "6px", color: "#9CA3AF", fontSize: "12px", lineHeight: 1.5 }}>
+                      {lang === "ko"
+                        ? "‘역량의 지도’ 검사를 마치면 [이 결과 가져가기]에서 코드를 받을 수 있습니다."
+                        : "Finish the ‘역량의 지도’ assessment and copy the code from [이 결과 가져가기]."}
+                    </p>
+                  </details>
+                )}
+              </div>
+            )}
 
             {/* Popular job chips */}
             {!isLoading && !result && (
@@ -752,13 +863,13 @@ export default function Home() {
               onClick={() => setServiceMode("paid")}
               style={{ background: "none", border: "none", cursor: "pointer", color: "#C9A24B", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
             >
-              유료 플랜 자세히 보기 →
+              {L.link_paid}
             </button>
             <a
-              href="/v3"
+              href={lang === "ko" ? "/v3" : `/v3?lang=${lang}`}
               style={{ color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 600, textDecoration: "underline" }}
             >
-              새 분석 방식 미리보기 (베타) →
+              {L.link_beta_v3}
             </a>
           </div>
         </div>
@@ -774,24 +885,24 @@ export default function Home() {
               display: "inline-block", background: "rgba(201,162,75,0.12)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#C9A24B", fontWeight: 500,
               marginBottom: "14px",
-            }}>WHY THIS</div>
+            }}>{L.why_tag}</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "20px", wordBreak: "keep-all" }}>
-              직업만 보면 절반만 보는 것입니다
+              {L.why_title}
             </h2>
             <div style={{
               background: "white", borderRadius: "20px", padding: "24px 28px",
               boxShadow: "0 8px 32px rgba(201,162,75,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
             }}>
               <p style={{ fontSize: "15px", color: "#374151", lineHeight: 1.9, marginBottom: "14px" }}>
-                같은 직업이어도<br />
-                <strong style={{ color: "#1E1B4B" }}>누구는 버티고, 누구는 밀립니다.</strong>
+                {L.why_lead}<br />
+                <strong style={{ color: "#1E1B4B" }}>{L.why_lead_strong}</strong>
               </p>
               <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.8, marginBottom: "14px" }}>
-                차이는 직업 이름이 아니라 준비 상태와 역량 구조에 있습니다.
+                {L.why_sub}
               </p>
               <div style={{ background: "rgba(201,162,75,0.08)", borderRadius: "12px", padding: "14px 18px", borderLeft: "4px solid #C9A24B" }}>
                 <p style={{ fontSize: "14px", color: "#1E1B4B", lineHeight: 1.7, margin: 0, fontWeight: 600 }}>
-                  이 분석은 직업의 변화 가능성만 보지 않습니다. 당신도 함께 봅니다.
+                  {L.why_highlight}
                 </p>
               </div>
             </div>
@@ -803,24 +914,15 @@ export default function Home() {
               display: "inline-block", background: "rgba(254,243,199,0.9)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#92400E", fontWeight: 500,
               marginBottom: "14px",
-            }}>여덟 개의 눈</div>
+            }}>{L.eyes_tag}</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "8px" }}>
-              직업을 보는 여덟 개의 눈
+              {L.eyes_title}
             </h2>
             <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px" }}>
-              하나의 점수가 아니라, 여덟 개의 눈으로 당신의 직업을 입체적으로 봅니다
+              {L.eyes_sub}
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              {[
-                { icon: "zap",          name: "자동화 압력",   risk: "이 일의 어느 부분부터 AI가 먼저 들어오는지" },
-                { icon: "handshake",    name: "AI와 함께 강해질 가능성",  risk: "AI를 도구로 써서 오히려 강해질 수 있는지" },
-                { icon: "chart-line",   name: "수요 변화 방향",  risk: "10년 후 이 직업의 사회적 필요가 늘어나는지" },
-                { icon: "castle",       name: "남이 내 자리를 차지하기 어려운 정도",   risk: "면허·숙련·신뢰가 내 자리를 지켜주는 정도" },
-                { icon: "dollar-sign",  name: "벌이가 흔들리지 않는 힘",     risk: "변화 속에서도 수입 수준을 유지할 수 있는지" },
-                { icon: "waves",        name: "시장이 흔들릴 때 같이 흔들리는 정도",        risk: "경기·기술·정책 변화에 얼마나 흔들리는지" },
-                { icon: "refresh",      name: "다른 길로 옮겨갈 수 있는 힘", risk: "지금의 경험이 다른 일에서도 통하는 정도" },
-                { icon: "rocket",       name: "새 기회가 열리는 자리",   risk: "AI 시대에 오히려 새 기회가 생기는지" },
-              ].map(({ icon, name, risk }) => (
+              {L.eyes.map(({ icon, name, risk }) => (
                 <div key={name} style={{
                   background: "white", borderRadius: "16px", padding: "18px 16px",
                   boxShadow: "0 4px 16px rgba(201,162,75,0.08)", border: "1px solid rgba(201,162,75,0.2)", textAlign: "left",
@@ -839,19 +941,15 @@ export default function Home() {
               display: "inline-block", background: "rgba(201,162,75,0.12)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#C9A24B", fontWeight: 500,
               marginBottom: "14px",
-            }}>IDENTITY</div>
+            }}>{L.identity_tag}</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.4, marginBottom: "8px", wordBreak: "keep-all" }}>
-              이 앱은 점수를 매기지 않습니다.<br />당신의 결을 짚습니다.
+              {L.identity_title_1}<br />{L.identity_title_2}
             </h2>
             <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px", wordBreak: "keep-all" }}>
-              실제 분석에서 나온 정체성 이름들입니다 (익명 사례)
+              {L.identity_sub}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[
-                { job: "의료기기 제조 기술자", name: "장인형 손작업가", en: "The Gentle Crafter" },
-                { job: "간호사",             name: "곁에 머무는 사람", en: "The One Who Stays" },
-                { job: "영어강사",           name: "언어 안내자",     en: "The Language Guide" },
-              ].map(({ job, name, en }) => (
+              {L.identity_cases.map(({ job, primary, secondary }) => (
                 <div key={job} style={{
                   background: "white", borderRadius: "16px", padding: "18px 22px",
                   boxShadow: "0 4px 16px rgba(201,162,75,0.08)", border: "1px solid rgba(201,162,75,0.2)",
@@ -860,15 +958,15 @@ export default function Home() {
                 }}>
                   <span style={{ fontSize: "14px", color: "#6B7280", fontWeight: 500 }}>{job}</span>
                   <span style={{ textAlign: "right" }}>
-                    <span style={{ fontSize: "15px", fontWeight: 800, color: "#1E1B4B", display: "block" }}>&ldquo;{name}&rdquo;</span>
-                    <span style={{ fontSize: "12px", color: "#C9A24B", fontStyle: "italic" }}>{en}</span>
+                    <span style={{ fontSize: "15px", fontWeight: 800, color: "#1E1B4B", display: "block" }}>&ldquo;{primary}&rdquo;</span>
+                    <span style={{ fontSize: "12px", color: "#C9A24B", fontStyle: "italic" }}>{secondary}</span>
                   </span>
                 </div>
               ))}
             </div>
             <p style={{ fontSize: "14px", color: "#374151", marginTop: "16px", lineHeight: 1.8, wordBreak: "keep-all" }}>
-              같은 직업이라도, 같은 이름이 나오지 않습니다.<br />
-              <strong style={{ color: "#1E1B4B" }}>당신이 다르기 때문입니다.</strong>
+              {L.identity_close_1}<br />
+              <strong style={{ color: "#1E1B4B" }}>{L.identity_close_strong}</strong>
             </p>
           </div>
 
@@ -878,17 +976,12 @@ export default function Home() {
               display: "inline-block", background: "rgba(240,253,244,0.95)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#059669", fontWeight: 500,
               marginBottom: "14px",
-            }}>DIFFERENCE</div>
+            }}>{L.diff_tag}</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "24px" }}>
-              이 앱이 다른 이유
+              {L.diff_title}
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              {[
-                { icon: "search",     title: "직업 분석", desc: "당신의 직업이 앞으로 어떤 방향으로 움직일지 분석합니다" },
-                { icon: "link",       title: "역량 연결", desc: "직업 변화와 나의 현재 역량을 함께 봅니다" },
-                { icon: "target",     title: "행동 제안", desc: "지금 줄일 것, 키울 것, 시작할 것을 제안합니다" },
-                { icon: "chart-line", title: "지속 추적", desc: "계속 변하는 미래를 따라갈 수 있게 돕습니다" },
-              ].map(({ icon, title, desc }) => (
+              {L.diff_items.map(({ icon, title, desc }) => (
                 <div key={title} style={{
                   background: "white", borderRadius: "16px", padding: "20px 16px",
                   boxShadow: "0 4px 16px rgba(201,162,75,0.08)", border: "1px solid rgba(201,162,75,0.2)", textAlign: "left",
@@ -907,23 +1000,18 @@ export default function Home() {
               display: "inline-block", background: "rgba(11,27,43,0.06)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#0B1B2B", fontWeight: 500,
               marginBottom: "14px",
-            }}>HONESTY</div>
+            }}>{L.honesty_tag}</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "8px", wordBreak: "keep-all" }}>
-              이 앱이 모른다고 말하는 것들
+              {L.honesty_title}
             </h2>
             <p style={{ fontSize: "14px", color: "#6B7280", marginBottom: "24px", wordBreak: "keep-all" }}>
-              진단 앱이 자기 한계를 첫 화면에 쓰는 일은 드뭅니다. 우리는 그것이 신뢰의 시작이라고 믿습니다.
+              {L.honesty_sub}
             </p>
             <div style={{
               background: "#0B1B2B", borderRadius: "20px", padding: "26px 28px",
               textAlign: "left", boxShadow: "0 8px 32px rgba(11,27,43,0.25)",
             }}>
-              {[
-                "이 분석은 직업의 평균이지, 아직 '당신'이 아닙니다. 입력해주신 만큼만 당신에게 가까워집니다.",
-                "입력하지 않으신 것은 분석하지 못합니다 — 그리고 그 사실을 보고서에 그대로 적습니다.",
-                "시장은 계속 움직입니다. 오늘의 분석은 오늘의 자리이고, 6개월 뒤에는 다시 짚어야 합니다.",
-                "당신의 사정, 당신의 기쁨, 당신이 일에서 찾는 의미 — 숫자가 닿지 못하는 자리가 있습니다.",
-              ].map((text, i, arr) => (
+              {L.honesty_lines.map((text, i, arr) => (
                 <div key={i} style={{
                   display: "flex", alignItems: "flex-start", gap: "12px",
                   padding: "12px 0",
@@ -934,7 +1022,7 @@ export default function Home() {
                 </div>
               ))}
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)", marginTop: "16px", marginBottom: 0, lineHeight: 1.7, wordBreak: "keep-all" }}>
-                그래서 모든 보고서의 마지막에는 &ldquo;이 보고서가 받지 못한 입력값&rdquo;을 정직하게 인쇄합니다.
+                {L.honesty_footer}
               </p>
             </div>
           </div>
@@ -945,21 +1033,15 @@ export default function Home() {
               display: "inline-block", background: "rgba(255,247,237,0.95)", borderRadius: "100px",
               padding: "4px 16px", fontSize: "12px", color: "#C2410C", fontWeight: 500,
               marginBottom: "14px",
-            }}>WHO NEEDS THIS</div>
+            }}>{L.who_tag}</div>
             <h2 style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, color: "#1E1B4B", lineHeight: 1.3, marginBottom: "20px" }}>
-              직업이 걱정되는 분이라면
+              {L.who_title}
             </h2>
             <div style={{
               background: "white", borderRadius: "20px", padding: "24px 28px",
               boxShadow: "0 8px 32px rgba(201,162,75,0.1)", border: "1px solid #EDE9FE", textAlign: "left",
             }}>
-              {[
-                { icon: "briefcase",      text: "내 직업의 미래가 걱정되는 직장인" },
-                { icon: "refresh",        text: "이직과 전환을 고민하는 분" },
-                { icon: "users",          text: "자녀 진로를 준비하는 부모" },
-                { icon: "books",          text: "학생을 지도하는 교사와 상담자" },
-                { icon: "church",         text: "청소년과 청년의 길을 돕는 교회와 기관" },
-              ].map(({ icon, text }, i, arr) => (
+              {L.who_items.map(({ icon, text }, i, arr) => (
                 <div key={text} style={{
                   display: "flex", alignItems: "center", gap: "14px",
                   padding: "13px 0",
@@ -977,7 +1059,7 @@ export default function Home() {
                   color: "white", fontSize: "15px", fontWeight: 700, cursor: "pointer",
                 }}
               >
-                내 직업 무료 분석하기
+                {L.who_cta}
               </button>
             </div>
           </div>
@@ -1774,15 +1856,15 @@ export default function Home() {
           <div style={{
             display: "inline-block", background: "#F0EEFF", borderRadius: "100px",
             padding: "5px 16px", fontSize: "13px", color: "#C9A24B", fontWeight: 600, marginBottom: "12px",
-          }}>요금제</div>
+          }}>{L.pricing_header_tag}</div>
           <h2 style={{ fontSize: "28px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>
-            지금은 무료로 시작하세요
+            {L.pricing_header_title}
           </h2>
           <p style={{ fontSize: "15px", color: "#6B7280", marginBottom: "6px" }}>
-            유료 플랜은 곧 출시됩니다 · 출시 시 사전 가입자 특별 혜택 제공
+            {L.pricing_header_sub}
           </p>
           <p style={{ fontSize: "14px", fontWeight: 700, color: "#C9A24B", wordBreak: "keep-all" }}>
-            내 자리 보기 → 내 결 알기 → 내 길 그리기 → 1인 맞춤 보고서
+            {L.pricing_ladder}
           </p>
         </div>
 
@@ -1983,7 +2065,13 @@ export default function Home() {
         style={{ color: "#9CA3AF", borderColor: "#EDE9FE" }}
       >
         <p style={{ marginBottom: "8px", lineHeight: 1.8, wordBreak: "keep-all", padding: "0 16px" }}>
-          REFRAME 3부작 — ① 역량평가 <span style={{ color: "#C9A24B" }}>나는 어떤 결인가</span> → ② 직업의 미래 <span style={{ color: "#C9A24B" }}>내 결은 시장에서 어떻게 살아남는가</span> → ③ REFRAME <span style={{ color: "#C9A24B" }}>이 결을 어떻게 다시 짤 것인가</span>
+          {L.reframe_prefix}
+          {L.reframe_parts.map((p, i) => (
+            <span key={p.n}>
+              {i > 0 && " → "}
+              {p.n} {p.app} <span style={{ color: "#C9A24B" }}>{p.q}</span>
+            </span>
+          ))}
         </p>
         {t.footer}
       </footer>
