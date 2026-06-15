@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compileP17, hasPressureLanguage, stripPressureSentences, PERMANENT_LIMITS } from "@/lib/v3/p17";
+import { compileP17, hasPressureLanguage, stripPressureSentences, PERMANENT_LIMITS, permanentLimits } from "@/lib/v3/p17";
 import { EMPTY_STEP2, type Step2Input } from "@/lib/v3/types";
 
 describe("compileP17 — 빈 입력 필드가 곧 한계 문장이 된다", () => {
@@ -45,6 +45,14 @@ describe("compileP17 — 빈 입력 필드가 곧 한계 문장이 된다", () =
 
   it("입력을 다 채워도 사라지지 않는 근본 한계가 존재한다", () => {
     expect(PERMANENT_LIMITS.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("영어로도 한계 문장과 근본 한계를 만든다", () => {
+    const entries = compileP17(null, "en");
+    expect(entries).toHaveLength(5);
+    expect(entries.map((e) => e.field)).toContain("How you feel about your work");
+    expect(permanentLimits("en").length).toBeGreaterThanOrEqual(2);
+    expect(permanentLimits("en")[0]).toMatch(/statistics|trends/);
   });
 });
 

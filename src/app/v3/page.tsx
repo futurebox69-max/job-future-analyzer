@@ -1,28 +1,24 @@
 "use client";
 
-// /v3 — 점진 심화 입력 (Progressive Deepening) 플로우.
+// /v3 — 점진 심화 입력 (Progressive Deepening) 플로우. 한국어/영어.
 // FABLE 5 재설계 명세서 §2: 묻기 전에 먼저 보여준다.
 // 1단계 3문항 → 미니 결과 → (선택) 핵심 5문항 → 숫자가 움직인다 → P.17 자동 컴파일.
 // 금지: 카운트다운, "지금 결제하면" 류의 압박 장치 전부 (§4-3).
+// 언어는 URL ?lang= 로 받는다 (랜딩의 베타 링크가 현재 언어를 전달).
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { AnalysisResult } from "@/types/analysis";
 import {
-  AGE_RANGES,
-  DIRECTION_OPTIONS,
   EMPTY_STEP2,
-  REGIONS,
-  SATISFACTION_OPTIONS,
-  WORK_TYPES,
-  YEARS_OPTIONS,
   type AgeRange,
   type RefineResult,
   type Region,
   type Step1Input,
   type Step2Input,
 } from "@/lib/v3/types";
-import { compileP17, PERMANENT_LIMITS } from "@/lib/v3/p17";
+import { compileP17, permanentLimits } from "@/lib/v3/p17";
+import { getV3, toV3Lang, type V3Lang } from "@/lib/v3/i18n";
 import {
   loadBaseResult,
   loadRefined,
@@ -55,26 +51,27 @@ type Phase =
   | "refining"
   | "final";
 
-// 보고서가 자라는 미리보기 — 진행바 대신 목차가 차오른다 (§4-2)
-const TOC_ITEMS: { label: string; unlockedBy: (s: State) => boolean }[] = [
-  { label: "종합 위험도", unlockedBy: (s) => !!s.jobName },
-  { label: "직업 일반론 — 평균의 이야기", unlockedBy: (s) => !!s.jobName },
-  { label: "연령대 맥락", unlockedBy: (s) => !!s.ageRange },
-  { label: "지역 노동시장 맥락", unlockedBy: (s) => !!s.region },
-  { label: "근무 형태가 바꾸는 숫자", unlockedBy: (s) => !!s.step2.workType },
-  { label: "경력 단계별 준비", unlockedBy: (s) => !!s.step2.years },
-  { label: "머무름 / 떠남의 결", unlockedBy: (s) => !!s.step2.satisfaction },
-  { label: "방향에 맞춘 다음 걸음", unlockedBy: (s) => !!s.step2.direction },
-  { label: "당신의 고민에 대한 답", unlockedBy: (s) => s.step2.concern.trim().length > 0 },
-  { label: "P.17 — 이 보고서가 모르는 것", unlockedBy: () => true },
-];
-
 interface State {
   jobName: string;
   ageRange: AgeRange | null;
   region: Region | null;
   step2: Step2Input;
 }
+
+// 보고서가 자라는 미리보기 — 진행바 대신 목차가 차오른다 (§4-2).
+// 라벨은 i18n(V.toc_labels)에서, 잠금 해제 조건만 여기 둔다 (순서 1:1).
+const TOC_PREDICATES: ((s: State) => boolean)[] = [
+  (s) => !!s.jobName,
+  (s) => !!s.jobName,
+  (s) => !!s.ageRange,
+  (s) => !!s.region,
+  (s) => !!s.step2.workType,
+  (s) => !!s.step2.years,
+  (s) => !!s.step2.satisfaction,
+  (s) => !!s.step2.direction,
+  (s) => s.step2.concern.trim().length > 0,
+  () => true,
+];
 
 function riskColor(rate: number): string {
   if (rate < 30) return "#4ADE80";
@@ -83,9 +80,10 @@ function riskColor(rate: number): string {
   return "#F87171";
 }
 
-function splitLines(summary: string): string[] {
+function splitLines(summary: string, lang: V3Lang): string[] {
+  const re = lang === "ko" ? /(?<=다\.)\s+/ : /(?<=[.!?])\s+/;
   return summary
-    .split(/(?<=다\.)\s+/)
+    .split(re)
     .map((l) => l.trim())
     .filter(Boolean)
     .slice(0, 3);
@@ -113,6 +111,13 @@ function AnimatedRate({ from, to }: { from: number; to: number }) {
 }
 
 export default function V3Flow() {
+  const [lang, setLang] = useState<V3Lang>(() =>
+    typeof window !== "undefined"
+      ? toV3Lang(new URLSearchParams(window.location.search).get("lang"))
+      : "ko"
+  );
+  const V = getV3(lang);
+
   const [phase, setPhase] = useState<Phase>("intro");
   const [jobName, setJobName] = useState("");
   const [ageRange, setAgeRange] = useState<AgeRange | null>(null);
@@ -123,6 +128,11 @@ export default function V3Flow() {
   const [error, setError] = useState<string | null>(null);
   const [loadingMsg, setLoadingMsg] = useState("");
   const topRef = useRef<HTMLDivElement>(null);
+
+  // 언어 동기화 (URL ?lang=)
+  useEffect(() => {
+    setLang(toV3Lang(new URLSearchParams(window.location.search).get("lang")));
+  }, []);
 
   // 세션 복원 — 새로고침해도 흐름이 죽지 않는다
   useEffect(() => {
@@ -155,7 +165,7 @@ export default function V3Flow() {
   const runBaseAnalysis = async (s1: Step1Input) => {
     setPhase("analyzing");
     setError(null);
-    setLoadingMsg("직업의 평균을 먼저 살펴봅니다...");
+    setLoadingMsg(V.loading_base);
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -163,13 +173,13 @@ export default function V3Flow() {
         body: JSON.stringify({
           job: s1.jobName,
           mode: s1.ageRange === "10대" ? "youth" : "adult",
-          lang: "ko",
+          lang,
         }),
       });
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        setError((data as { error?: string }).error ?? "분석에 실패했습니다. 다시 시도해주세요.");
+        setError((data as { error?: string }).error ?? V.err_analyze);
         setPhase("q_job");
         return;
       }
@@ -194,7 +204,7 @@ export default function V3Flow() {
               if (event.type === "progress" && event.message) setLoadingMsg(event.message);
               else if (event.type === "result" && event.success && event.data) result = event.data;
               else if (event.type === "error") {
-                setError(event.error ?? "분석에 실패했습니다.");
+                setError(event.error ?? V.err_failed);
               }
             } catch {
               /* 파싱 실패 무시 */
@@ -204,7 +214,7 @@ export default function V3Flow() {
       } else {
         const data = await response.json();
         if (data.success && data.data) result = data.data;
-        else setError(data.error ?? "분석에 실패했습니다.");
+        else setError(data.error ?? V.err_failed);
       }
 
       if (result) {
@@ -216,7 +226,7 @@ export default function V3Flow() {
         setPhase("q_job");
       }
     } catch {
-      setError("네트워크 오류가 발생했습니다.");
+      setError(V.err_network);
       setPhase("q_job");
     }
   };
@@ -246,6 +256,7 @@ export default function V3Flow() {
           ageRange,
           region,
           step2: finalStep2,
+          lang,
         }),
       });
       const data = await res.json();
@@ -253,10 +264,10 @@ export default function V3Flow() {
         setRefined(data.data);
         saveRefined(data.data);
       } else {
-        setError(data.error ?? "정밀화에 실패했습니다. 일반 분석 결과를 보여드립니다.");
+        setError(data.error ?? V.err_failed);
       }
     } catch {
-      setError("네트워크 오류로 정밀화하지 못했습니다. 일반 분석 결과를 보여드립니다.");
+      setError(V.err_network);
     }
     setPhase("final");
   };
@@ -287,7 +298,7 @@ export default function V3Flow() {
         color: DIM, fontSize: "13px", textDecoration: "underline", marginTop: "8px",
       }}
     >
-      이 질문은 건너뛰기 — 보고서가 그 사실을 정직하게 적습니다
+      {V.skip}
     </button>
   );
 
@@ -314,10 +325,10 @@ export default function V3Flow() {
       background: "rgba(255,255,255,0.03)", padding: "16px 18px", marginTop: "32px",
     }}>
       <div style={{ fontSize: "11px", letterSpacing: "0.12em", color: DIM, marginBottom: "10px", textTransform: "uppercase" }}>
-        지금까지 자란 보고서
+        {V.toc_title}
       </div>
-      {TOC_ITEMS.map(({ label, unlockedBy }) => {
-        const on = unlockedBy(state);
+      {V.toc_labels.map((label, i) => {
+        const on = TOC_PREDICATES[i](state);
         return (
           <div key={label} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0" }}>
             <span style={{
@@ -338,19 +349,19 @@ export default function V3Flow() {
 
   // P.17 박스
   const p17Box = (showFull: boolean) => {
-    const entries = compileP17(showFull ? step2 : null);
+    const entries = compileP17(showFull ? step2 : null, lang);
     return (
       <div style={{
         borderRadius: "16px", border: `1px solid rgba(201,162,75,0.35)`,
         background: "rgba(201,162,75,0.06)", padding: "20px 22px", textAlign: "left",
       }}>
         <div style={{ fontSize: "12px", letterSpacing: "0.12em", color: GOLD, fontWeight: 700, marginBottom: "12px" }}>
-          P.17 — 이 보고서가 모르는 것
+          {V.p17_title}
         </div>
         {entries.length > 0 && (
           <>
             <div style={{ fontSize: "13px", color: DIM, marginBottom: "8px" }}>
-              본 보고서가 받지 못한 입력값:
+              {V.p17_not_received}
             </div>
             {entries.map((e) => (
               <div key={e.field} style={{ marginBottom: "10px" }}>
@@ -363,14 +374,14 @@ export default function V3Flow() {
             <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "14px 0" }} />
           </>
         )}
-        {PERMANENT_LIMITS.map((l) => (
+        {permanentLimits(lang).map((l) => (
           <p key={l} style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: "8px", wordBreak: "keep-all" }}>
             — {l}
           </p>
         ))}
         {entries.length > 0 && (
           <p style={{ fontSize: "13px", color: GOLD, lineHeight: 1.7, marginTop: "12px", marginBottom: 0, wordBreak: "keep-all" }}>
-            이 목록을 줄이는 방법은 하나뿐입니다 — 입력을 채우시면, 한계 문장이 분석 문장으로 바뀝니다.
+            {V.p17_reduce}
           </p>
         )}
       </div>
@@ -399,19 +410,19 @@ export default function V3Flow() {
       {phase === "intro" && (
         <div style={{ width: "100%", maxWidth: "560px", textAlign: "center", marginTop: "8vh" }}>
           <div style={{ fontSize: "12px", letterSpacing: "0.18em", color: DIM, textTransform: "uppercase", marginBottom: "16px" }}>
-            내 직업의 미래 · 점진 심화 분석
+            {V.intro_eyebrow}
           </div>
           <h1 style={{ fontSize: "clamp(28px, 7vw, 44px)", fontWeight: 900, lineHeight: 1.3, marginBottom: "20px", wordBreak: "keep-all" }}>
-            세 가지만 알려주세요.<br />
-            <span style={{ color: GOLD }}>30초</span>면 됩니다.
+            {V.intro_title_1}<br />
+            <span style={{ color: GOLD }}>{V.intro_title_accent}</span>{V.intro_title_2}
           </h1>
           <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.7)", lineHeight: 1.9, marginBottom: "12px", wordBreak: "keep-all" }}>
-            먼저 직업의 평균을 보여드립니다.<br />
-            그 다음은 — 보여드린 결과가 스스로 다음 질문을 할 겁니다.
+            {V.intro_p1a}<br />
+            {V.intro_p1b}
           </p>
           <p style={{ fontSize: "13px", color: DIM, lineHeight: 1.8, marginBottom: "36px", wordBreak: "keep-all" }}>
-            모든 추가 질문은 건너뛸 수 있습니다.<br />
-            다만 보고서가 빈 자리를 정직하게 적습니다.
+            {V.intro_p2a}<br />
+            {V.intro_p2b}
           </p>
           <button
             onClick={() => setPhase("q_job")}
@@ -421,25 +432,25 @@ export default function V3Flow() {
               boxShadow: "0 8px 32px rgba(201,162,75,0.35)",
             }}
           >
-            시작하기 →
+            {V.intro_start}
           </button>
           <div style={{ marginTop: "20px" }}>
             <Link href="/" style={{ color: DIM, fontSize: "13px", textDecoration: "underline" }}>
-              기존 분석으로 돌아가기
+              {V.intro_back}
             </Link>
           </div>
         </div>
       )}
 
       {/* ── 1단계: 직업명 ── */}
-      {phase === "q_job" && questionShell("1 / 3", "어떤 일을 하고 계신가요?", (
+      {phase === "q_job" && questionShell(V.step_of(1, 3), V.q_job_title, (
         <>
           <input
             autoFocus
             value={jobName}
             onChange={(e) => setJobName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && jobName.trim()) setPhase("q_age"); }}
-            placeholder="직업명 (예: 간호사, 영어강사, 의료기기 제조 기술자)"
+            placeholder={V.q_job_placeholder}
             style={{
               width: "100%", padding: "16px 18px", borderRadius: "14px",
               border: "1.5px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.06)",
@@ -456,25 +467,26 @@ export default function V3Flow() {
               cursor: jobName.trim() ? "pointer" : "default",
             }}
           >
-            다음
+            {V.q_next}
           </button>
           {growingToc}
         </>
       ))}
 
       {/* ── 1단계: 연령대 ── */}
-      {phase === "q_age" && questionShell("2 / 3", "연령대를 알려주세요.", (
+      {phase === "q_age" && questionShell(V.step_of(2, 3), V.q_age_title, (
         <>
-          {AGE_RANGES.map((a) => optionBtn(a, ageRange === a, () => { setAgeRange(a); setPhase("q_region"); }))}
+          {V.ageOptions.map((o) => optionBtn(o.label, ageRange === o.value, () => { setAgeRange(o.value as AgeRange); setPhase("q_region"); }))}
           {growingToc}
         </>
       ))}
 
       {/* ── 1단계: 지역 ── */}
-      {phase === "q_region" && questionShell("3 / 3", "주로 어디에서 일하시나요?", (
+      {phase === "q_region" && questionShell(V.step_of(3, 3), V.q_region_title, (
         <>
-          {REGIONS.map((r) =>
-            optionBtn(r, region === r, () => {
+          {V.regionOptions.map((o) =>
+            optionBtn(o.label, region === o.value, () => {
+              const r = o.value as Region;
               setRegion(r);
               runBaseAnalysis({ jobName: jobName.trim(), ageRange: ageRange!, region: r });
             })
@@ -493,10 +505,10 @@ export default function V3Flow() {
             />
           </div>
           <p style={{ fontSize: "15px", color: CREAM, fontWeight: 600, marginBottom: "8px" }}>
-            {phase === "analyzing" ? (loadingMsg || "분석 중...") : "입력하신 내용으로 숫자를 다시 계산하고 있습니다..."}
+            {phase === "analyzing" ? (loadingMsg || V.analyzing_title) : V.refining_title}
           </p>
           <p style={{ fontSize: "13px", color: DIM }}>
-            {phase === "analyzing" ? "처음 분석은 30~90초 걸립니다 · 같은 직업은 즉시" : "잠시만요 — 일반론이 당신의 이야기로 바뀌는 중입니다"}
+            {phase === "analyzing" ? V.analyzing_sub : V.refining_sub}
           </p>
         </div>
       )}
@@ -505,13 +517,13 @@ export default function V3Flow() {
       {phase === "mini" && base && (
         <div style={{ width: "100%", maxWidth: "560px", textAlign: "center" }}>
           <div style={{ fontSize: "12px", letterSpacing: "0.15em", color: DIM, textTransform: "uppercase", marginBottom: "20px" }}>
-            미니 결과 · {base.jobName}
+            {V.mini_eyebrow} · {base.jobName}
           </div>
           <div style={{ fontSize: "clamp(56px, 14vw, 84px)", fontWeight: 900, lineHeight: 1, color: riskColor(base.overallRate), marginBottom: "6px" }}>
             {base.overallRate}%
           </div>
           <div style={{ fontSize: "14px", color: DIM, marginBottom: "28px" }}>
-            종합 위험도 · {base.riskLevel}
+            {V.mini_risk_label} · {base.riskLevel}
           </div>
 
           <div style={{
@@ -519,7 +531,7 @@ export default function V3Flow() {
             background: "rgba(255,255,255,0.04)", padding: "20px 22px",
             textAlign: "left", marginBottom: "28px",
           }}>
-            {splitLines(base.summary).map((line, i) => (
+            {splitLines(base.summary, lang).map((line, i) => (
               <p key={i} style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)", lineHeight: 1.8, marginBottom: "8px", wordBreak: "keep-all" }}>
                 {line}
               </p>
@@ -529,11 +541,11 @@ export default function V3Flow() {
           {/* 결과가 스스로 다음 질문을 한다 */}
           <div style={{ marginBottom: "32px" }}>
             <p style={{ fontSize: "clamp(17px, 4.5vw, 21px)", fontWeight: 800, color: CREAM, lineHeight: 1.7, wordBreak: "keep-all" }}>
-              여기까지는 &lsquo;{base.jobName}&rsquo;의 미래입니다.<br />
-              <span style={{ color: GOLD }}>&lsquo;당신&rsquo;의 미래는 아직 아닙니다.</span>
+              {V.mini_frame_1(base.jobName)}<br />
+              <span style={{ color: GOLD }}>{V.mini_frame_2}</span>
             </p>
             <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", marginTop: "10px", lineHeight: 1.8, wordBreak: "keep-all" }}>
-              근무 형태를 알려주시면 — 이 숫자가 달라집니다.
+              {V.mini_frame_sub}
             </p>
           </div>
 
@@ -545,7 +557,7 @@ export default function V3Flow() {
               boxShadow: "0 8px 32px rgba(201,162,75,0.35)", marginBottom: "12px",
             }}
           >
-            더 알려주기 (5문항, 1분)
+            {V.mini_more}
           </button>
           <button
             onClick={() => setPhase("final")}
@@ -554,56 +566,56 @@ export default function V3Flow() {
               color: DIM, fontSize: "14px", textDecoration: "underline",
             }}
           >
-            여기까지만 볼게요
+            {V.mini_stop}
           </button>
         </div>
       )}
 
       {/* ── 2단계: 핵심 5문항 ── */}
-      {phase === "d_work" && questionShell("심화 1 / 5", "어떤 형태로 일하고 계신가요?", (
+      {phase === "d_work" && questionShell(V.deepen_of(1, 5), V.d_work_title, (
         <>
-          {WORK_TYPES.map((w) => optionBtn(w, step2.workType === w, () => { setStep2({ ...step2, workType: w }); setPhase("d_years"); }))}
+          {V.workOptions.map((o) => optionBtn(o.label, step2.workType === o.value, () => { setStep2({ ...step2, workType: o.value as Step2Input["workType"] }); setPhase("d_years"); }))}
           {skipBtn(() => { setStep2({ ...step2, workType: null }); setPhase("d_years"); })}
           {growingToc}
         </>
       ))}
 
-      {phase === "d_years" && questionShell("심화 2 / 5", "이 일을 하신 지 얼마나 되셨나요?", (
+      {phase === "d_years" && questionShell(V.deepen_of(2, 5), V.d_years_title, (
         <>
-          {YEARS_OPTIONS.map((y) => optionBtn(y, step2.years === y, () => { setStep2({ ...step2, years: y }); setPhase("d_satisfaction"); }))}
+          {V.yearsOptions.map((o) => optionBtn(o.label, step2.years === o.value, () => { setStep2({ ...step2, years: o.value as Step2Input["years"] }); setPhase("d_satisfaction"); }))}
           {skipBtn(() => { setStep2({ ...step2, years: null }); setPhase("d_satisfaction"); })}
           {growingToc}
         </>
       ))}
 
       {/* 만족도 — 불안 주입 방지 장치 (§2-3) */}
-      {phase === "d_satisfaction" && questionShell("심화 3 / 5", "지금 일에 얼마나 만족하십니까?", (
+      {phase === "d_satisfaction" && questionShell(V.deepen_of(3, 5), V.d_sat_title, (
         <>
           <p style={{ fontSize: "13px", color: DIM, marginBottom: "16px", lineHeight: 1.7, wordBreak: "keep-all" }}>
-            이 답은 보고서의 방향을 바꿉니다. 만족하며 일하고 계시다면 — 떠날 이유가 아니라 머무름을 단단하게 만드는 쪽으로 씁니다.
+            {V.d_sat_note}
           </p>
-          {SATISFACTION_OPTIONS.map((o) => optionBtn(o, step2.satisfaction === o, () => { setStep2({ ...step2, satisfaction: o }); setPhase("d_direction"); }))}
+          {V.satOptions.map((o) => optionBtn(o.label, step2.satisfaction === o.value, () => { setStep2({ ...step2, satisfaction: o.value as Step2Input["satisfaction"] }); setPhase("d_direction"); }))}
           {skipBtn(() => { setStep2({ ...step2, satisfaction: null }); setPhase("d_direction"); })}
           {growingToc}
         </>
       ))}
 
-      {phase === "d_direction" && questionShell("심화 4 / 5", "지금 어느 쪽을 바라보고 계신가요?", (
+      {phase === "d_direction" && questionShell(V.deepen_of(4, 5), V.d_dir_title, (
         <>
-          {DIRECTION_OPTIONS.map((d) => optionBtn(d, step2.direction === d, () => { setStep2({ ...step2, direction: d }); setPhase("d_concern"); }))}
+          {V.dirOptions.map((o) => optionBtn(o.label, step2.direction === o.value, () => { setStep2({ ...step2, direction: o.value as Step2Input["direction"] }); setPhase("d_concern"); }))}
           {skipBtn(() => { setStep2({ ...step2, direction: null }); setPhase("d_concern"); })}
           {growingToc}
         </>
       ))}
 
-      {phase === "d_concern" && questionShell("심화 5 / 5", "요즘 일과 관련해 가장 큰 고민이 무엇인가요?", (
+      {phase === "d_concern" && questionShell(V.deepen_of(5, 5), V.d_concern_title, (
         <>
           <textarea
             value={step2.concern}
             onChange={(e) => setStep2({ ...step2, concern: e.target.value })}
             rows={5}
             maxLength={1000}
-            placeholder="쓰신 만큼 깊어집니다. 안 쓰셔도 됩니다 — 다만 보고서가 그 사실을 정직하게 적습니다."
+            placeholder={V.concern_placeholder}
             style={{
               width: "100%", padding: "16px 18px", borderRadius: "14px",
               border: "1.5px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.06)",
@@ -618,7 +630,7 @@ export default function V3Flow() {
               boxShadow: "0 8px 32px rgba(201,162,75,0.35)",
             }}
           >
-            내 숫자 다시 계산하기 →
+            {V.recalc}
           </button>
           {growingToc}
         </>
@@ -633,9 +645,7 @@ export default function V3Flow() {
             lineHeight: 1.7, marginBottom: "32px", wordBreak: "keep-all",
             fontFamily: "var(--font-gowun-batang), serif",
           }}>
-            {refined
-              ? refined.singleSentence
-              : `${base.jobName}의 평균은 보았습니다. 당신의 이야기는 아직 시작 전입니다.`}
+            {refined ? refined.singleSentence : V.final_default_sentence(base.jobName)}
           </p>
 
           {/* 위험도 — 숫자가 움직이는 것을 보여준다 */}
@@ -649,7 +659,7 @@ export default function V3Flow() {
                   <AnimatedRate from={base.overallRate} to={refined.adjustedRate} />
                 </div>
                 <div style={{ fontSize: "13px", color: GOLD, marginTop: "10px", fontWeight: 600 }}>
-                  입력하신 내용이 숫자를 움직였습니다
+                  {V.final_moved}
                 </div>
               </div>
             ) : (
@@ -659,7 +669,7 @@ export default function V3Flow() {
             )}
           </div>
           <div style={{ fontSize: "14px", color: DIM, marginBottom: "28px" }}>
-            {refined ? "당신의 조정 위험도" : `종합 위험도 · ${base.riskLevel}`}
+            {refined ? V.final_adjusted_label : `${V.final_risk_label} · ${base.riskLevel}`}
           </div>
 
           {/* 숫자가 움직인 이유 */}
@@ -670,7 +680,7 @@ export default function V3Flow() {
               textAlign: "left", marginBottom: "16px",
             }}>
               <div style={{ fontSize: "12px", letterSpacing: "0.1em", color: DIM, marginBottom: "10px", textTransform: "uppercase" }}>
-                숫자가 움직인 이유
+                {V.reasons_title}
               </div>
               {refined.rateReasons.map((r) => (
                 <p key={r} style={{ fontSize: "14px", color: "rgba(255,255,255,0.8)", lineHeight: 1.8, marginBottom: "6px", wordBreak: "keep-all" }}>
@@ -688,7 +698,7 @@ export default function V3Flow() {
               textAlign: "left", marginBottom: "16px",
             }}>
               <div style={{ fontSize: "12px", letterSpacing: "0.1em", color: GOLD, marginBottom: "10px", textTransform: "uppercase" }}>
-                직업이 아니라, 당신에 대하여
+                {V.personal_title}
               </div>
               {refined.personalNotes.map((n) => (
                 <p key={n} style={{ fontSize: "14px", color: CREAM, lineHeight: 1.9, marginBottom: "10px", wordBreak: "keep-all" }}>
@@ -705,7 +715,7 @@ export default function V3Flow() {
             textAlign: "left", marginBottom: "16px",
           }}>
             <div style={{ fontSize: "12px", letterSpacing: "0.1em", color: DIM, marginBottom: "12px", textTransform: "uppercase" }}>
-              여덟 개의 눈 요약
+              {V.eyes_summary_title}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               {Object.values(base.dimensions).map((d) => (
@@ -722,8 +732,8 @@ export default function V3Flow() {
 
           {/* 다음 — 압박 장치 없이 */}
           <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", lineHeight: 1.8, marginBottom: "20px", wordBreak: "keep-all" }}>
-            여기까지가 무료 분석이 볼 수 있는 자리입니다.<br />
-            더 깊은 보고서가 필요해지면 — 그때 오시면 됩니다.
+            {V.final_outro_1}<br />
+            {V.final_outro_2}
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link
@@ -734,12 +744,12 @@ export default function V3Flow() {
                 textDecoration: "none",
               }}
             >
-              전체 보고서 보러 가기
+              {V.final_full_report}
             </Link>
             <button
               onClick={() => {
                 if (typeof window !== "undefined") sessionStorage.clear();
-                window.location.href = "/v3";
+                window.location.href = lang === "ko" ? "/v3" : `/v3?lang=${lang}`;
               }}
               style={{
                 minHeight: 48, padding: "14px 24px", borderRadius: "14px",
@@ -747,7 +757,7 @@ export default function V3Flow() {
                 color: CREAM, fontSize: "14px", fontWeight: 600, cursor: "pointer",
               }}
             >
-              다른 직업 분석하기
+              {V.final_another}
             </button>
           </div>
         </div>
