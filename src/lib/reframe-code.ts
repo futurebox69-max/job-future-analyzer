@@ -15,11 +15,12 @@
  */
 
 import {
-  ARCHETYPES,
   type CompetencyKey,
   type CompetencyResult,
   type CompetencyScores,
 } from "@/types/competency";
+import { archetypeLabel, importedMeta } from "@/lib/competency-i18n";
+import type { LangCode } from "@/lib/i18n";
 
 // 역량의 지도와 동일한 인코딩 알파벳 (32자, 혼동 문자 I·L·O·U 제외)
 const ALPHA = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
@@ -84,7 +85,8 @@ export function decodeReframeCode(code: string): DecodedReframeCode | null {
  * metaAnalysis는 "가져온 결과"임을 명시한다.
  */
 export function buildCompetencyResultFromCode(
-  code: string
+  code: string,
+  lang: LangCode
 ): { result: CompetencyResult; depth: 1 | 2; track: "adult" | "youth" } | null {
   const decoded = decodeReframeCode(code);
   if (!decoded) return null;
@@ -93,10 +95,8 @@ export function buildCompetencyResultFromCode(
   const topKey = (Object.entries(scores) as [CompetencyKey, number][]).sort(
     (a, b) => b[1] - a[1]
   )[0][0];
-  const arch = ARCHETYPES[topKey];
-
-  const depthLabel =
-    depth === 2 ? "2층 프로파일 (14문항)" : "1층 스냅샷 (8문항)";
+  const arch = archetypeLabel(topKey, lang);
+  const meta = importedMeta(lang, depth);
 
   const result: CompetencyResult = {
     scores,
@@ -106,9 +106,9 @@ export function buildCompetencyResultFromCode(
     archetypeSubtitle: arch.subtitle,
     metaAnalysis: {
       questionType: "scenario",
-      questionTypeMeaning: `역량의 지도에서 가져온 결과 · ${depthLabel}`,
+      questionTypeMeaning: meta.meaning,
       avgResponseTime: 0,
-      responseStyle: "역량의 지도 검사 결과를 가져왔습니다",
+      responseStyle: meta.style,
     },
     behaviorData: [],
   };

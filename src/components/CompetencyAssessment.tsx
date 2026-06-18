@@ -8,12 +8,14 @@ import {
   QuestionType,
   Scenario,
   BehaviorData,
-  ARCHETYPES,
 } from "@/types/competency";
-import { buildScenarios, questionTypeMap, calcRankScores } from "@/lib/competency-scenarios";
+import { buildScenarios, questionTypeMeaning, calcRankScores } from "@/lib/competency-scenarios";
+import { Loc, LangCode, loc } from "@/lib/i18n";
+import { archetypeLabel } from "@/lib/competency-i18n";
 
 interface CompetencyAssessmentProps {
   mode: "adult" | "youth";
+  lang: LangCode;
   onComplete: (result: CompetencyResult) => void;
   onSkip?: () => void;
 }
@@ -26,19 +28,35 @@ const EMPTY_SCORES: CompetencyScores = {
 };
 
 const QTYPE_OPTIONS: {
-  type: QuestionType; icon: string; title: string; desc: string; meta: string;
+  type: QuestionType; icon: string; title: Loc; desc: Loc; meta: Loc;
 }[] = [
-  { type: "scenario", icon: "", title: "시나리오형",     desc: "현실적인 상황이 주어지고, 어떻게 행동할지 선택합니다", meta: "논리적 · 현실 지향" },
-  { type: "game",     icon: "", title: "게임 비유형",    desc: "롤, 포트나이트, 마크 등 게임 상황으로 질문합니다",   meta: "은유적 · 게임 친화" },
-  { type: "image",    icon: "", title: "이미지 선택형",  desc: "두 가지 상징 중 끌리는 것을 고릅니다",               meta: "직관적 · 감각형" },
-  { type: "rank",     icon: "", title: "순위 매기기형",   desc: "가치와 행동에 우선순위를 매깁니다",                   meta: "분석적 · 체계형" },
+  { type: "scenario", icon: "", title: { ko: "시나리오형", en: "Scenario" },     desc: { ko: "현실적인 상황이 주어지고, 어떻게 행동할지 선택합니다", en: "You're given a realistic situation and choose how to act" }, meta: { ko: "논리적 · 현실 지향", en: "Logical · Reality-oriented" } },
+  { type: "game",     icon: "", title: { ko: "게임 비유형", en: "Game metaphor" },    desc: { ko: "롤, 포트나이트, 마크 등 게임 상황으로 질문합니다", en: "Questions framed as game situations (LoL, Fortnite, Minecraft)" },   meta: { ko: "은유적 · 게임 친화", en: "Metaphorical · Game-friendly" } },
+  { type: "image",    icon: "", title: { ko: "이미지 선택형", en: "Image choice" },  desc: { ko: "두 가지 상징 중 끌리는 것을 고릅니다", en: "Pick the symbol that draws you between two" },               meta: { ko: "직관적 · 감각형", en: "Intuitive · Sensory" } },
+  { type: "rank",     icon: "", title: { ko: "순위 매기기형", en: "Ranking" },   desc: { ko: "가치와 행동에 우선순위를 매깁니다", en: "Prioritize values and actions" },                   meta: { ko: "분석적 · 체계형", en: "Analytical · Systematic" } },
 ];
+
+const A_LABELS: Record<string, Loc> = {
+  intro_badge:     { ko: "AI 분석 중 · 잠깐!", en: "Analyzing · One moment!" },
+  intro_title:     { ko: "미래역량 검사", en: "Future Competency Check" },
+  intro_sub:       { ko: "AI 분석이 완료되는 동안(12~20초)\n당신의 미래역량을 먼저 파악해드립니다.", en: "While the AI analysis runs (12–20s),\nlet's map your future competencies first." },
+  pick_style:      { ko: "질문 스타일을 선택하세요 · 선택 자체가 당신의 사고방식을 드러냅니다", en: "Pick a question style · the choice itself reveals how you think" },
+  skip:            { ko: "건너뛰기", en: "Skip" },
+  timeout:         { ko: "⏰ 시간 초과 — 다음 문제로 넘어갑니다", en: "⏰ Time's up — moving to the next question" },
+  rank_done:       { ko: "순위 기록 완료!", en: "Ranking recorded!" },
+  drag_hint:       { ko: "드래그하여 순서를 변경하세요", en: "Drag to reorder" },
+  rank_confirm:    { ko: "이 순서로 확정 →", en: "Confirm this order →" },
+  style_fast:      { ko: "빠른 직관형 의사결정자", en: "Fast, intuitive decision-maker" },
+  style_careful:   { ko: "신중하게 고민하는 숙고형", en: "Careful, deliberate thinker" },
+};
 
 export default function CompetencyAssessment({
   mode,
+  lang,
   onComplete,
   onSkip,
 }: CompetencyAssessmentProps) {
+  const AL = (key: string) => loc(A_LABELS[key], lang);
   const [phase, setPhase] = useState<Phase>("qtype");
   const [selectedQType, setSelectedQType] = useState<QuestionType | null>(null);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -84,7 +102,7 @@ export default function CompetencyAssessment({
     const max = Math.max(...Object.values(finalScores)) || 1;
     const topKey = (Object.entries(finalScores) as [CompetencyKey, number][])
       .sort((a, b) => b[1] - a[1])[0][0];
-    const arch = ARCHETYPES[topKey];
+    const arch = archetypeLabel(topKey, lang);
     const avgTime = finalBehavior.length > 0
       ? finalBehavior.reduce((s, d) => s + d.time, 0) / finalBehavior.length
       : 5000;
@@ -99,18 +117,18 @@ export default function CompetencyAssessment({
       archetypeSubtitle: arch.subtitle,
       metaAnalysis: {
         questionType: qtype,
-        questionTypeMeaning: questionTypeMap[qtype],
+        questionTypeMeaning: questionTypeMeaning(qtype, lang),
         avgResponseTime: avgTime / 1000,
         responseStyle:
           fastRounds > finalBehavior.length / 2
-            ? "빠른 직관형 의사결정자"
-            : "신중하게 고민하는 숙고형",
+            ? AL("style_fast")
+            : AL("style_careful"),
       },
       behaviorData: finalBehavior,
     });
     // suppress unused var warning
     void max;
-  }, [onComplete]);
+  }, [onComplete, lang, AL]);
 
   const advanceRound = useCallback((
     nextRound: number,
@@ -151,7 +169,7 @@ export default function CompetencyAssessment({
           // 시간 초과: 점수 없이 건너뜀 (랜덤 선택 안 함)
           const newBehavior = [...curBehavior, { round: roundRef.current, type: s.type || "scenario", time: elapsed, skipped: true }];
           setBehaviorData(newBehavior);
-          showFeedback("⏰ 시간 초과 — 다음 문제로 넘어갑니다");
+          showFeedback(AL("timeout"));
           setTimeout(() => advanceRound(roundRef.current + 1, scenariosRef.current, curScores, newBehavior), 1500);
           return 0;
         }
@@ -163,7 +181,7 @@ export default function CompetencyAssessment({
   }, [phase, round]);
 
   function startGame(qtype: QuestionType) {
-    const built = buildScenarios(mode, qtype);
+    const built = buildScenarios(mode, qtype, lang);
     setScenarios(built);
     scenariosRef.current = built;
     setSelectedQType(qtype);
@@ -217,7 +235,7 @@ export default function CompetencyAssessment({
     const newBehavior = [...behaviorRef.current, { round: roundRef.current, type: "rank", time: elapsed, order: items }];
     setScores(newScores);
     setBehaviorData(newBehavior);
-    showFeedback("순위 기록 완료!");
+    showFeedback(AL("rank_done"));
     setTimeout(() => advanceRound(roundRef.current + 1, scenariosRef.current, newScores, newBehavior), 1100);
   }
 
@@ -266,19 +284,18 @@ export default function CompetencyAssessment({
       <div style={{ padding: "24px 16px", maxWidth: "480px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <div style={{ fontSize: "13px", color: "#6C63FF", fontWeight: 700, marginBottom: "6px", letterSpacing: "0.06em" }}>
-            AI 분석 중 · 잠깐!
+            {AL("intro_badge")}
           </div>
           <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#1E1B4B", marginBottom: "8px" }}>
-            미래역량 검사
+            {AL("intro_title")}
           </h2>
-          <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.6 }}>
-            AI 분석이 완료되는 동안(12~20초)<br />
-            당신의 미래역량을 먼저 파악해드립니다.
+          <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.6, whiteSpace: "pre-line" }}>
+            {AL("intro_sub")}
           </p>
         </div>
 
         <p style={{ fontSize: "12px", color: "#9CA3AF", fontWeight: 600, marginBottom: "10px", letterSpacing: "0.04em" }}>
-          질문 스타일을 선택하세요 · 선택 자체가 당신의 사고방식을 드러냅니다
+          {AL("pick_style")}
         </p>
 
         {QTYPE_OPTIONS.map((opt) => (
@@ -311,13 +328,13 @@ export default function CompetencyAssessment({
               flexShrink: 0,
             }}>{opt.icon}</span>
             <div>
-              <div style={{ fontSize: "15px", fontWeight: 700, color: "#1E1B4B", marginBottom: "2px" }}>{opt.title}</div>
-              <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.4 }}>{opt.desc}</div>
+              <div style={{ fontSize: "15px", fontWeight: 700, color: "#1E1B4B", marginBottom: "2px" }}>{loc(opt.title, lang)}</div>
+              <div style={{ fontSize: "12px", color: "#6B7280", lineHeight: 1.4 }}>{loc(opt.desc, lang)}</div>
               <span style={{
                 display: "inline-block", marginTop: "4px",
                 fontSize: "11px", color: "#6C63FF", fontWeight: 600,
                 background: "#F0EEFF", borderRadius: "4px", padding: "2px 8px",
-              }}>{opt.meta}</span>
+              }}>{loc(opt.meta, lang)}</span>
             </div>
           </button>
         ))}
@@ -332,7 +349,7 @@ export default function CompetencyAssessment({
               touchAction: "manipulation",
             }}
           >
-            건너뛰기
+            {AL("skip")}
           </button>
         )}
       </div>
@@ -465,7 +482,7 @@ export default function CompetencyAssessment({
         {s.type === "rank" && (
           <div>
             <p style={{ fontSize: "12px", color: "#9CA3AF", marginBottom: "10px", textAlign: "center" }}>
-              드래그하여 순서를 변경하세요
+              {AL("drag_hint")}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
               {rankItems.map((item, i) => (
@@ -509,7 +526,7 @@ export default function CompetencyAssessment({
                 touchAction: "manipulation",
               }}
             >
-              이 순서로 확정 →
+              {AL("rank_confirm")}
             </button>
           </div>
         )}

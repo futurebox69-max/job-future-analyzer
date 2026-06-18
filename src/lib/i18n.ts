@@ -486,3 +486,14 @@ export const COUNTRY_CONTEXTS: Record<LangCode, string> = {
 export function getLang(code: LangCode) {
   return UI_STRINGS[code];
 }
+
+/**
+ * 부분 다국어 문자열. ko·en은 필수, 나머지는 선택(미입력 시 en으로 폴백).
+ * 역량검사 등 점진적으로 번역 중인 영역에 사용한다.
+ */
+export type Loc = { ko: string; en: string; zh?: string; ja?: string; es?: string };
+
+/** Loc에서 해당 언어 문자열을 고른다. 없으면 영어, 영어도 없으면 한국어로 폴백. */
+export function loc(o: Loc, lang: LangCode): string {
+  return o[lang] ?? o.en ?? o.ko;
+}

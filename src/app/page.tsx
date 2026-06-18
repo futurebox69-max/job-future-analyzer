@@ -164,7 +164,7 @@ export default function Home() {
   const SECTIONS = [
     { id: "overview",    icon: "barchart",       label: t.section_overview },
     { id: "survival",    icon: "shield",         label: lang === "ko" ? "생존스킬" : lang === "zh" ? "生存技能" : lang === "ja" ? "生存スキル" : lang === "es" ? "Supervivencia" : "Survival Skills" },
-    { id: "competency",  icon: "brain",          label: "미래역량" },
+    { id: "competency",  icon: "brain",          label: lang === "ko" ? "미래역량" : lang === "zh" ? "未来能力" : lang === "ja" ? "未来力" : lang === "es" ? "Competencias" : "Competencies" },
     { id: "dimensions",  icon: "target",         label: t.section_dimensions },
     { id: "horizon",     icon: "hourglass",      label: t.section_horizon },
     { id: "skills",      icon: "graduation-cap", label: t.section_skills },
@@ -209,7 +209,11 @@ export default function Home() {
           : null;
       if (anonUsed) {
         // 이미 1회 사용 → 로그인 유도
-        setAuthReason("무료 분석 1회를 모두 사용했습니다. 계속 분석하려면 로그인해 주세요.");
+        setAuthReason(
+          lang === "ko"
+            ? "무료 분석 1회를 모두 사용했습니다. 계속 분석하려면 로그인해 주세요."
+            : "You've used your 1 free analysis. Please log in to continue."
+        );
         setShowAuthModal(true);
         return;
       }
@@ -295,7 +299,7 @@ export default function Home() {
                   document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }, 100);
               } else if (event.type === "error") {
-                setError(event.error ?? "분석에 실패했습니다. 다시 시도해주세요.");
+                setError(event.error ?? t.error_analyze);
               }
             } catch {
               // JSON 파싱 실패 무시
@@ -434,7 +438,7 @@ export default function Home() {
               textShadow: "0 2px 12px rgba(0,0,0,0.18)",
               whiteSpace: "nowrap",
             }}>
-              직업의 미래
+              {lang === "ko" ? "직업의 미래" : "Future of Work"}
             </div>
             <div style={{
               color: "rgba(255,255,255,0.55)",
@@ -611,7 +615,9 @@ export default function Home() {
             marginBottom: "20px",
             letterSpacing: "0.01em",
           }}>
-            막연한 공포가 아니라, 지금 무엇을 준비해야 하는지 보여드립니다
+            {lang === "ko"
+              ? "막연한 공포가 아니라, 지금 무엇을 준비해야 하는지 보여드립니다"
+              : "Not vague fear — we show you what to prepare right now"}
           </p>
 
           {/* 매월 1일 업데이트 배지 */}
@@ -646,9 +652,9 @@ export default function Home() {
           {/* 신뢰 숫자 바 */}
           <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap" }}>
             {[
-              { icon: "brain",   text: "Claude AI 기반 분석" },
-              { icon: "refresh", text: "매월 데이터 업데이트" },
-              { icon: "zap",     text: "결과 즉시 저장" },
+              { icon: "brain",   text: lang === "ko" ? "Claude AI 기반 분석" : "Powered by Claude AI" },
+              { icon: "refresh", text: lang === "ko" ? "매월 데이터 업데이트" : "Monthly data updates" },
+              { icon: "zap",     text: lang === "ko" ? "결과 즉시 저장" : "Results saved instantly" },
             ].map(({ icon, text }) => (
               <div key={text} style={{
                 display: "flex", alignItems: "center", gap: "6px",
@@ -730,7 +736,7 @@ export default function Home() {
                       <p style={{ fontSize: "13px", fontWeight: 700, color: "#15803D" }}>
                         {lang === "ko"
                           ? `역량의 지도에서 가져왔습니다 · ${importedCompetency.archetype}`
-                          : `Imported from 역량의 지도 · ${importedCompetency.archetype}`}
+                          : `Imported from the Competency Map · ${importedCompetency.archetype}`}
                       </p>
                       <p style={{ fontSize: "12px", color: "#16A34A" }}>
                         {lang === "ko"
@@ -758,7 +764,7 @@ export default function Home() {
                     <summary style={{ cursor: "pointer", color: "#9CA3AF", fontWeight: 600, listStyle: "none" }}>
                       {lang === "ko"
                         ? "🗺️ ‘역량의 지도’ 결과 코드가 있으신가요?"
-                        : "🗺️ Have a ‘역량의 지도’ result code?"}
+                        : "🗺️ Have a Competency Map result code?"}
                     </summary>
                     <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
                       <input
@@ -778,7 +784,7 @@ export default function Home() {
                       />
                       <button
                         onClick={() => {
-                          const built = buildCompetencyResultFromCode(reframeCode);
+                          const built = buildCompetencyResultFromCode(reframeCode, lang);
                           if (!built) {
                             setReframeCodeError(
                               lang === "ko"
@@ -806,7 +812,7 @@ export default function Home() {
                     <p style={{ marginTop: "6px", color: "#9CA3AF", fontSize: "12px", lineHeight: 1.5 }}>
                       {lang === "ko"
                         ? "‘역량의 지도’ 검사를 마치면 [이 결과 가져가기]에서 코드를 받을 수 있습니다."
-                        : "Finish the ‘역량의 지도’ assessment and copy the code from [이 결과 가져가기]."}
+                        : "Finish the Competency Map assessment and copy the code from [Take these results]."}
                     </p>
                   </details>
                 )}
@@ -1084,7 +1090,7 @@ export default function Home() {
               fontWeight: 600, cursor: "pointer", marginBottom: "12px",
             }}
           >
-            ← 처음으로
+            {L.paid.back}
           </button>
 
           {/* 메인 카드 */}
@@ -1101,13 +1107,13 @@ export default function Home() {
                 borderRadius: "100px", padding: "6px 18px",
                 fontSize: "13px", fontWeight: 700, color: "#92400E", marginBottom: "16px",
               }}>
-                ⏳ 얼리버드 모집 중
+                {L.paid.ebBadge}
               </div>
               <h2 style={{ fontSize: "26px", fontWeight: 900, color: "#1E1B4B", marginBottom: "8px" }}>
-                직업의 미래 유료 플랜 안내
+                {L.paid.header}
               </h2>
               <p style={{ fontSize: "14px", color: "#6B7280", lineHeight: 1.7 }}>
-                지금 얼리버드 신청하시면 <strong style={{ color: "#C9A24B" }}>출시 즉시 30% 할인가</strong>가 자동 적용됩니다
+                {L.paid.subPre}<strong style={{ color: "#C9A24B" }}>{L.paid.subBold}</strong>{L.paid.subPost}
               </p>
             </div>
 
@@ -1128,7 +1134,7 @@ export default function Home() {
                       border: "1px solid #BAE6FD", marginBottom: "6px",
                     }}>Starter</div>
                     <div style={{ fontSize: "22px", fontWeight: 900, color: "#0C4A6E" }}>₩9,900
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#0891B2" }}>/월</span>
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#0891B2" }}>{lang === "ko" ? "/월" : "/mo"}</span>
                     </div>
                   </div>
                   <JobIcon name="search" size={36} color="#0891B2" />
@@ -1141,24 +1147,17 @@ export default function Home() {
                   fontSize: "13px", color: "#0C4A6E", fontWeight: 600,
                   display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  <JobIcon name="sparkles" size={14} color="#0891B2" />가볍게 시작하는 분께
+                  <JobIcon name="sparkles" size={14} color="#0891B2" />{L.paid.basic.oneLiner}
                 </div>
 
                 {/* 왜 필요한가 */}
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
-                  기본 분석과 월간 요약으로 내 직업의 흐름을 꾸준히 확인합니다.
-                  무료 분석은 3회로 끝나지만, Starter는 <strong>월 10회 분석</strong>으로
-                  여러 직업을 비교하고 내 업무 중 어떤 세부 작업이 먼저 AI로 대체될지까지 알려드립니다.
+                  {L.paid.basic.paragraph}
                 </p>
 
                 {/* 제공 방식 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {[
-                    ["refresh", "매월 10회",          "다양한 직업을 자유롭게 분석"],
-                    ["gear",    "업무별 대체 분석",   "내 업무 중 AI가 먼저 대체할 세부 작업 식별"],
-                    ["brain",   "AI 협업 역량 점수",  "AI와 함께 일하는 능력을 수치로 측정·가이드"],
-                    ["spa",     "AI 불안 심리 케어",  "직업 불안감을 실질적 행동 계획으로 전환"],
-                  ].map(([icon, title, desc]) => (
+                  {L.paid.basic.rows.map(({ icon, title, desc }) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                       <JobIcon name={icon} size={16} color="#0891B2" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
@@ -1181,7 +1180,7 @@ export default function Home() {
                   background: "linear-gradient(135deg, #7C3AED, #A78BFA)",
                   borderRadius: "100px", padding: "3px 10px",
                   fontSize: "11px", fontWeight: 700, color: "white",
-                }}>가장 인기</div>
+                }}>{L.paid.standard.badge}</div>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
                     <div style={{
@@ -1190,7 +1189,7 @@ export default function Home() {
                       border: "1px solid #C4B5FD", marginBottom: "6px",
                     }}>Builder</div>
                     <div style={{ fontSize: "22px", fontWeight: 900, color: "#4C1D95" }}>₩19,900
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#7C3AED" }}>/월</span>
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#7C3AED" }}>{lang === "ko" ? "/월" : "/mo"}</span>
                     </div>
                   </div>
                   <JobIcon name="map" size={36} color="#7C3AED" />
@@ -1202,24 +1201,15 @@ export default function Home() {
                   fontSize: "13px", color: "#4C1D95", fontWeight: 600,
                   display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  <JobIcon name="sparkles" size={14} color="#7C3AED" />가장 추천하는 플랜
+                  <JobIcon name="sparkles" size={14} color="#7C3AED" />{L.paid.standard.oneLiner}
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
-                  심층 분석과 90일 행동계획까지, 실제로 준비를 시작하고 싶은 분께 적합합니다.
-                  분석 결과를 알아도 "그래서 나는 어떻게 해야 하지?"라는 질문이 남습니다.
-                  Builder는 내 직업의 미래를 <strong>3가지 시나리오</strong>로 보여주고,
-                  AI 코치와 함께 맞춤 역량 로드맵을 만들어 드립니다.
+                  {L.paid.standard.paragraph}
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {[
-                    ["refresh",     "기본 분석 20회",          "매월 20회, 다양한 직업 시나리오 탐색 가능"],
-                    ["globe",       "비전 시나리오 3가지",      "현재 유지 / 부분 전환 / 완전 전환 경로를 구체적 그림으로 제시"],
-                    ["map",         "직업 추천 + 역량 로드맵",  "나에게 맞는 다음 직업과 갖춰야 할 역량을 단계별로 안내"],
-                    ["sparkles",    "AI 코치 월 30회",          "분석 결과 기반 맞춤 커리어 상담을 AI가 즉시 제공"],
-                    ["dollar-sign", "연봉 협상 도우미",         "내 직업·역량·시장 데이터를 바탕으로 협상 전략 제안"],
-                  ].map(([icon, title, desc]) => (
+                  {L.paid.standard.rows.map(({ icon, title, desc }) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                       <JobIcon name={icon} size={16} color="#7C3AED" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
@@ -1243,7 +1233,7 @@ export default function Home() {
                   background: "linear-gradient(135deg, #D4AF37, #F5D26B)",
                   borderRadius: "100px", padding: "3px 10px",
                   fontSize: "11px", fontWeight: 700, color: "#78350F",
-                }}>사람의 결</div>
+                }}>{L.paid.signature.badge}</div>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
                     <div style={{
@@ -1251,9 +1241,9 @@ export default function Home() {
                       padding: "3px 12px", fontSize: "11px", fontWeight: 700, color: "#D4AF37",
                       marginBottom: "6px",
                     }}>Signature</div>
-                    <div style={{ fontSize: "20px", fontWeight: 900, color: "white", wordBreak: "keep-all" }}>1인 맞춤 보고서</div>
+                    <div style={{ fontSize: "20px", fontWeight: 900, color: "white", wordBreak: "keep-all" }}>{L.paid.signature.title}</div>
                     <div style={{ fontSize: "16px", fontWeight: 700, color: "#D4AF37", marginTop: "2px" }}>₩149,000
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>/건 · 납기 5~7일</span>
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#A5B4FC" }}>{L.paid.signature.priceUnit}</span>
                     </div>
                   </div>
                   <JobIcon name="pen-line" size={36} color="#D4AF37" />
@@ -1266,23 +1256,15 @@ export default function Home() {
                   border: "1px solid rgba(212,175,55,0.3)",
                   display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  <JobIcon name="sparkles" size={14} color="#D4AF37" />자동화되지 않는 자리는, 사람이 짚습니다
+                  <JobIcon name="sparkles" size={14} color="#D4AF37" />{L.paid.signature.oneLiner}
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#C7D2FE", lineHeight: 1.7, marginBottom: "14px" }}>
-                  사전 설문과 1:1 대담(서면·전화·줌)을 바탕으로 <strong style={{ color: "white" }}>22페이지 맞춤 보고서</strong>를
-                  만듭니다. AI가 초안을 쓰고, 정체성 작명 · 강점 자산 · The Decision · Letter —
-                  이 네 자리는 반드시 사람이 함께 짚습니다. 같은 직업이라도 같은 보고서가 나오지 않습니다.
+                  {L.paid.signature.paragraph}
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {[
-                    ["users",      "1:1 대담",                "서면·전화·줌 중 편한 방식으로 당신의 이야기를 듣습니다"],
-                    ["sparkles",   "정체성 작명",             "점수가 아니라, 당신의 결에 이름을 붙입니다"],
-                    ["search",     "강점 자산 (의중 읽기)",    "입력값에 없지만 대담에서 읽히는 결까지 담습니다"],
-                    ["compass",    "The Decision",            "이직·전직·창직·유지 — 당신이 쓴 단어를 함께 되짚습니다"],
-                    ["pen-line",   "Letter",                  "보고서의 마지막은 당신에게 쓰는 편지입니다"],
-                  ].map(([icon, title, desc]) => (
+                  {L.paid.signature.rows.map(({ icon, title, desc }) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                       <JobIcon name={icon} size={16} color="#D4AF37" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
@@ -1305,7 +1287,7 @@ export default function Home() {
                   background: "linear-gradient(135deg, #059669, #34D399)",
                   borderRadius: "100px", padding: "3px 10px",
                   fontSize: "11px", fontWeight: 700, color: "white",
-                }}>기관용</div>
+                }}>{L.paid.edu.badge}</div>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
                     <div style={{
@@ -1314,9 +1296,9 @@ export default function Home() {
                       border: "1px solid #6EE7B7", marginBottom: "6px",
                     }}>EDU</div>
                     <div style={{ fontSize: "22px", fontWeight: 900, color: "#064E3B" }}>₩1,000,000
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#059669" }}>/년</span>
+                      <span style={{ fontSize: "13px", fontWeight: 500, color: "#059669" }}>{L.paid.edu.priceUnit}</span>
                     </div>
-                    <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "2px" }}>학교·학원 30명 기준</div>
+                    <div style={{ fontSize: "11px", color: "#6B7280", marginTop: "2px" }}>{L.paid.edu.priceSub}</div>
                   </div>
                   <JobIcon name="school" size={36} color="#059669" />
                 </div>
@@ -1327,25 +1309,15 @@ export default function Home() {
                   fontSize: "13px", color: "#064E3B", fontWeight: 600,
                   display: "flex", alignItems: "center", gap: "6px",
                 }}>
-                  <JobIcon name="sparkles" size={14} color="#059669" />학생들의 진로를 체계적으로 지도하는 학교·학원·진로상담 기관 선생님
+                  <JobIcon name="sparkles" size={14} color="#059669" />{L.paid.edu.oneLiner}
                 </div>
 
                 <p style={{ fontSize: "13px", color: "#374151", lineHeight: 1.7, marginBottom: "14px" }}>
-                  선생님 한 분이 30명의 학생을 일일이 진로 상담하기는 현실적으로 어렵습니다.
-                  EDU 플랜은 학생 30명이 각자 자신의 직업 적성과 미래를 AI로 분석하고,
-                  선생님은 <strong>대시보드 하나</strong>에서 전체 현황을 파악합니다.
-                  AI 진로 코치가 청소년 눈높이에 맞춰 대화하고, 분석 결과는 학부모에게도 공유됩니다.
+                  {L.paid.edu.paragraph}
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {[
-                    ["graduation-cap", "학생 30명 계정",            "학생들이 각자 계정으로 자신의 진로를 직접 탐색"],
-                    ["compass",        "청소년 전용 진로 분석",     "성인 기준이 아닌 청소년 적성·학업·미래직업 맞춤 분석"],
-                    ["monitor",        "선생님 대시보드",           "반 전체 진행 상황·분석 결과를 한눈에 확인 및 관리"],
-                    ["clipboard",      "학급 단위 진로 리포트",     "반 전체의 진로 경향 통계와 집단 인사이트 리포트 제공"],
-                    ["sparkles",       "AI 진로 코치 (청소년 모드)","학생이 궁금한 점을 AI 코치가 쉽고 친근하게 안내"],
-                    ["users",          "학부모 결과 공유",          "자녀의 분석 결과를 학부모에게 안전하게 공유"],
-                  ].map(([icon, title, desc]) => (
+                  {L.paid.edu.rows.map(({ icon, title, desc }) => (
                     <div key={title} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                       <JobIcon name={icon} size={16} color="#059669" style={{ flexShrink: 0, marginTop: "2px" }} />
                       <div>
@@ -1367,14 +1339,16 @@ export default function Home() {
             }}>
               <div style={{ fontSize: "22px", marginBottom: "8px" }}></div>
               <div style={{ fontSize: "16px", fontWeight: 800, color: "#1E1B4B", marginBottom: "6px" }}>
-                출시 알림 신청
+                {L.paid.ctaTitle}
               </div>
               <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "16px", lineHeight: 1.6 }}>
-                유료 서비스 출시 시 이메일로 가장 먼저 알려드립니다<br />
-                <strong style={{ color: "#C9A24B" }}>사전 등록자 30% 얼리버드 할인</strong> 혜택 제공
+                {L.paid.ctaBody1}<br />
+                <strong style={{ color: "#C9A24B" }}>{L.paid.ctaPre}{L.paid.ctaBold}</strong>
               </div>
               <a
-                href="mailto:futurebox69@gmail.com?subject=유료서비스 출시 알림 신청&body=안녕하세요, 내 직업의 미래 유료 서비스 출시 알림을 신청합니다."
+                href={lang === "ko"
+                  ? "mailto:futurebox69@gmail.com?subject=유료서비스 출시 알림 신청&body=안녕하세요, 내 직업의 미래 유료 서비스 출시 알림을 신청합니다."
+                  : "mailto:futurebox69@gmail.com?subject=Future of My Job — Launch notification&body=Hello, I'd like to be notified when the paid service launches."}
                 style={{
                   display: "inline-block",
                   padding: "13px 28px", borderRadius: "14px",
@@ -1383,10 +1357,10 @@ export default function Home() {
                   textDecoration: "none",
                 }}
               >
-                출시 알림 신청하기 →
+                {L.paid.ctaButton}
               </a>
               <div style={{ marginTop: "12px", fontSize: "12px", color: "#9CA3AF" }}>
-                스팸 없음 · 언제든 취소 가능 · 출시 후 30일 환불 보장
+                {L.paid.ctaFine}
               </div>
             </div>
 
@@ -1400,7 +1374,7 @@ export default function Home() {
                   textDecoration: "underline",
                 }}
               >
-                지금은 무료로 먼저 체험해보기
+                {L.paid.backToFree}
               </button>
             </div>
           </div>
@@ -1417,6 +1391,7 @@ export default function Home() {
           <div className="py-8">
             <CompetencyAssessment
               mode={mode}
+              lang={lang}
               onComplete={(res) => {
                 setCompetencyResult(res);
                 setAssessmentCompleted(true);
@@ -1461,7 +1436,9 @@ export default function Home() {
             </p>
             {assessmentCompleted && competencyResult && (
               <p style={{ color: "#C9A24B", fontSize: "13px", fontWeight: 600 }}>
-                역량 검사 완료! AI 분석 결과를 기다리는 중...
+                {lang === "ko"
+                  ? "역량 검사 완료! AI 분석 결과를 기다리는 중..."
+                  : "Competency check done! Waiting for the AI analysis..."}
               </p>
             )}
             <div className="flex gap-1.5">
@@ -1569,7 +1546,7 @@ export default function Home() {
                 )}
                 {profile?.role === "admin" && result && (
                   <span className="text-sm px-3 py-1 rounded-full" style={{ background: "#F0FDF4", color: "#16A34A", border: "1px solid #BBF7D0" }}>
-                    무제한
+                    {lang === "ko" ? "무제한" : "Unlimited"}
                   </span>
                 )}
               </div>
@@ -1734,16 +1711,17 @@ export default function Home() {
                     analysisResult={result}
                     jobName={result.jobName}
                     mode={mode}
+                    lang={lang}
                   />
                 ) : activeSection === "competency" && !competencyResult ? (
                   <div style={{ textAlign: "center", padding: "60px 20px" }}>
                     <div style={{ fontSize: "48px", marginBottom: "16px" }}></div>
                     <p style={{ color: "#1E1B4B", fontSize: "17px", fontWeight: 700, marginBottom: "8px" }}>
-                      역량 검사를 진행하지 않았습니다
+                      {lang === "ko" ? "역량 검사를 진행하지 않았습니다" : "You haven't taken the competency assessment"}
                     </p>
                     <p style={{ color: "#6B7280", fontSize: "14px", lineHeight: 1.6, marginBottom: "24px" }}>
-                      검사는 약 2~3분 소요되며,<br />
-                      AI 대체율과 교차 분석하여 맞춤 전략을 제공합니다.
+                      {lang === "ko" ? (<>검사는 약 2~3분 소요되며,<br />AI 대체율과 교차 분석하여 맞춤 전략을 제공합니다.</>)
+                        : (<>It takes about 2–3 minutes, and cross-analyzes with your AI risk to tailor a strategy.</>)}
                     </p>
                     <button
                       onClick={() => {
@@ -1766,7 +1744,7 @@ export default function Home() {
                         boxShadow: "0 8px 24px rgba(201,162,75,0.3)",
                       }}
                     >
-                      지금 검사하기
+                      {lang === "ko" ? "지금 검사하기" : "Take the assessment now"}
                     </button>
                   </div>
                 ) : null}
@@ -1831,7 +1809,7 @@ export default function Home() {
                     >
                       <div>
                         <p style={{ fontSize: "15px", color: "#F2EBDC", fontWeight: 700, lineHeight: 1.4, margin: 0 }}>
-                          내 직무 구조를 더 깊이 보려면 → REFRAME
+                          {lang === "ko" ? "내 직무 구조를 더 깊이 보려면 → REFRAME" : "See your work's structure deeper → REFRAME"}
                         </p>
                       </div>
                       <div style={{
@@ -1879,77 +1857,15 @@ export default function Home() {
 
           {/* FREE */}
           {(() => {
-            const plans = [
-              {
-                tag: "FREE", tagColor: "#C9A24B", tagBg: "#F0EEFF",
-                name: "내 자리 보기", price: "무료", priceUnit: null, sub: "로그인 후 바로 시작 · 깊이 1페이지",
-                dark: false, highlight: false, comingSoon: false,
-                features: [
-                  "종합 위험도 한 수치",
-                  "여덟 개의 눈 요약",
-                  "정체성 한 줄",
-                  "10년 시간 예측",
-                  "5개 언어 지원",
-                ],
-                limit: "이것은 직업의 평균이지, 아직 당신이 아닙니다",
-              },
-              {
-                tag: "BASIC", tagColor: "#0891B2", tagBg: "#ECFEFF",
-                name: "내 결 알기", price: "₩9,900", priceUnit: "/월", sub: "곧 출시 예정",
-                dark: false, highlight: false, comingSoon: true,
-                features: [
-                  "핵심 5문항 심화 입력",
-                  "4~5p PDF 보고서",
-                  "시간 비중·AI 위험 지도",
-                  "미니 한계 페이지(P.17)",
-                ],
-                limit: "당신의 결의 일부만 반영됩니다. 받지 못한 입력값을 그대로 적습니다",
-              },
-              {
-                tag: "STANDARD", tagColor: "#7C3AED", tagBg: "#F5F3FF",
-                name: "내 길 그리기", price: "₩19,900", priceUnit: "/월", sub: "곧 출시 예정",
-                dark: false, highlight: true, comingSoon: true,
-                badge: "추천",
-                features: [
-                  "심화 10문항 + 챗봇 대담",
-                  "8~10p PDF 보고서",
-                  "시나리오 A·B·C",
-                  "30일 액션 + 18개월 로드맵",
-                  "풀 한계 페이지(P.17)",
-                  "시장 변화 갱신 알림 (보고서가 자랍니다)",
-                ],
-                limit: "AI가 생성하고 사람이 검수하지 않은 보고서입니다. 정체성·결단의 자리는 1인 맞춤에서 사람이 함께 짚습니다",
-              },
-              {
-                tag: "SIGNATURE", tagColor: "#D4AF37", tagBg: "#FFFBEB",
-                name: "1인 맞춤 보고서", price: "₩149,000", priceUnit: "/건", sub: "곧 출시 예정 · 납기 5~7일",
-                dark: true, highlight: false, comingSoon: true,
-                badge: "사람의 결",
-                features: [
-                  "사전 설문 + 1:1 대담 (서면·전화·줌)",
-                  "22페이지 맞춤 보고서",
-                  "정체성 작명 — 사람이 짚습니다",
-                  "강점 자산 (의중 읽기)",
-                  "The Decision · Letter",
-                ],
-                limit: "그래도 모르는 것이 있습니다. 이 보고서는 출발점이지 결승점이 아닙니다",
-              },
-              {
-                tag: "EDU", tagColor: "#059669", tagBg: "#ECFDF5",
-                name: "우리 아이들의 결", price: "₩1,000,000", priceUnit: "/년", sub: "학교·학원 30명 기준 · 학기 단위",
-                dark: false, highlight: false, comingSoon: true,
-                badge: "기관용",
-                features: [
-                  "학생 설문 + 교사 입력",
-                  "학생별 8~10p 보고서",
-                  "갈림길 비교 (관심 직업 2~4개 나란히)",
-                  "학급 통계 · 선생님 대시보드",
-                  "AI 진로 코치 (청소년 모드)",
-                  "학부모 결과 공유",
-                ],
-                limit: "이 결과는 상담 대체가 아니라, 상담의 재료입니다",
-              },
+            // 정적 스타일(색·플래그)은 고정, 텍스트는 L.grid.plans에서 (순서 1:1)
+            const gridStyle = [
+              { tag: "FREE",      tagColor: "#C9A24B", tagBg: "#F0EEFF", dark: false, highlight: false, comingSoon: false, badge: undefined as string | undefined },
+              { tag: "BASIC",     tagColor: "#0891B2", tagBg: "#ECFEFF", dark: false, highlight: false, comingSoon: true,  badge: undefined as string | undefined },
+              { tag: "STANDARD",  tagColor: "#7C3AED", tagBg: "#F5F3FF", dark: false, highlight: true,  comingSoon: true,  badge: L.grid.badgeRecommended },
+              { tag: "SIGNATURE", tagColor: "#D4AF37", tagBg: "#FFFBEB", dark: true,  highlight: false, comingSoon: true,  badge: L.grid.badgeHuman },
+              { tag: "EDU",       tagColor: "#059669", tagBg: "#ECFDF5", dark: false, highlight: false, comingSoon: true,  badge: L.grid.badgeInstitution },
             ];
+            const plans = gridStyle.map((s, i) => ({ ...s, ...L.grid.plans[i] }));
 
             return plans.map((plan) => (
               <div
@@ -2026,7 +1942,7 @@ export default function Home() {
                   border: `1px dashed ${plan.dark ? "rgba(255,255,255,0.2)" : "rgba(11,27,43,0.12)"}`,
                 }}>
                   <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", color: plan.dark ? "rgba(255,255,255,0.45)" : "#9CA3AF", marginBottom: "4px" }}>
-                    이 단계가 말하는 한계
+                    {L.grid.limitLabel}
                   </div>
                   <div style={{ fontSize: "12px", lineHeight: 1.6, color: plan.dark ? "#C7D2FE" : "#6B7280", wordBreak: "keep-all" }}>
                     &ldquo;{plan.limit}&rdquo;
@@ -2040,7 +1956,7 @@ export default function Home() {
                     background: plan.dark ? "rgba(255,255,255,0.08)" : "#F9FAFB",
                     color: plan.dark ? "rgba(255,255,255,0.35)" : "#9CA3AF",
                     fontSize: "13px", fontWeight: 600,
-                  }}>곧 출시됩니다</div>
+                  }}>{L.grid.comingSoon}</div>
                 ) : (
                   <button
                     onClick={() => { setAuthReason(undefined); setShowAuthModal(true); }}
@@ -2051,7 +1967,7 @@ export default function Home() {
                       fontSize: "14px", fontWeight: 700, cursor: "pointer",
                     }}
                   >
-                    무료로 시작하기
+                    {L.grid.startFree}
                   </button>
                 )}
               </div>
